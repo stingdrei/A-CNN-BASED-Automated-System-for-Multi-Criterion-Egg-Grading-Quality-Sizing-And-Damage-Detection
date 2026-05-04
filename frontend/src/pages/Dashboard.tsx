@@ -17,6 +17,7 @@ export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [gradeData, setGradeData] = useState<GradeDistribution | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(true);
 
   useEffect(() => {
@@ -41,6 +42,23 @@ export function Dashboard() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg">
+          {error}
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+        >
+          Retry
+        </button>
       </div>
     );
   }

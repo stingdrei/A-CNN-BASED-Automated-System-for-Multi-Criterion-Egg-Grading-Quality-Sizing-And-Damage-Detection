@@ -33,7 +33,7 @@ export function Settings() {
       await apiClient.updateSettings(settings);
       setMessage({ type: 'success', text: 'Settings saved successfully!' });
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save settings. Please try again.' });
+      setMessage({ type: 'error', text: getErrorMessage(error) });
     } finally {
       setSaving(false);
     }

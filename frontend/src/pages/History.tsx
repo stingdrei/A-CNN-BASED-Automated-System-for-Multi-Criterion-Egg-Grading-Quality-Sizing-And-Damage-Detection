@@ -8,6 +8,7 @@ import { Prediction } from '../types';
 export function History() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<number | null>(null);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export function History() {
       await apiClient.deletePrediction(id);
       setPredictions((prev) => prev.filter((p) => p.id !== id));
     } catch (error) {
-      console.error('Failed to delete:', error);
+      setError(getErrorMessage(error));
     } finally {
       setDeleting(null);
     }

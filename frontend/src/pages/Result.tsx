@@ -36,7 +36,7 @@ export function Result() {
       await apiClient.deletePrediction(parseInt(id));
       window.location.href = '/history';
     } catch (err) {
-      setError('Failed to delete');
+      setError(getErrorMessage(err));
     } finally {
       setDeleting(false);
     }

@@ -4,6 +4,7 @@ import { DropZone } from '../components/upload/DropZone';
 import { Button } from '../components/common/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/common/Card';
 import { apiClient } from '../api/client';
+import { getErrorMessage } from '../utils/errorHandler';
 
 export function UploadPage() {
   const navigate = useNavigate();

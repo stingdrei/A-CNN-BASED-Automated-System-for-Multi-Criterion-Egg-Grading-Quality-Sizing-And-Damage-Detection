@@ -31,8 +31,7 @@ export const useAuthStore = create<AuthState>()(
           set({ token: data.access_token, isLoading: false });
           return await get().checkAuth();
         } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : 'Login failed';
-          set({ error: message, isLoading: false });
+          set({ error: getErrorMessage(error), isLoading: false });
           return false;
         }
       },
