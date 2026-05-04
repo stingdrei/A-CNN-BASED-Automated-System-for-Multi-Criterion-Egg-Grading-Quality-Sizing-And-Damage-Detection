@@ -57,17 +57,19 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-          set({ token: null, user: null });
+          set({ token: null, user: null, isLoading: false });
           return false;
         }
-        set({ token });
+        // Optimistically set token so UI doesn't flash
+        set({ token, isLoading: true });
         try {
           const user = await apiClient.getMe();
-          set({ user });
+          set({ user, isLoading: false });
           return true;
         } catch {
+          // Token is invalid — clear everything
           localStorage.removeItem('token');
-          set({ token: null, user: null });
+          set({ token: null, user: null, isLoading: false });
           return false;
         }
       },
@@ -75,3 +77,11 @@ export const useAuthStore = create<AuthState>()(
     { name: 'auth-storage', partialize: (state) => ({ token: state.token }) }
   )
 );
+
+// Listen for 401 events from the API client to clear Zustand state
+// This avoids a circular dependency (client.ts → authStore.ts → client.ts)
+if (typeof window !== 'undefined') {
+  window.addEventListener('auth:logout', () => {
+    useAuthStore.getState().logout();
+  });
+}

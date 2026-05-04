@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/authStore';
 import { Layout } from './components/layout/Layout';
 import { Login } from './pages/Login';
@@ -12,14 +12,15 @@ import { Settings } from './pages/Settings';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, checkAuth, isLoading } = useAuthStore();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   
   useEffect(() => {
-    if (!token) {
-      checkAuth();
-    }
-  }, [token, checkAuth]);
+    // Always validate token on mount — stale tokens must be checked against backend
+    checkAuth().then(setIsAuthenticated);
+  }, [checkAuth]);
   
-  if (isLoading) {
+  // Show loading while auth is being validated
+  if (isLoading || isAuthenticated === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -27,12 +28,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   
-  return token ? <>{children}</> : <Navigate to="/login" />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { token } = useAuthStore();
-  return token ? <Navigate to="/dashboard" /> : <>{children}</>;
+  const { token, isLoading } = useAuthStore();
+  
+  // If token exists and is valid, redirect to dashboard
+  if (token && !isLoading) {
+    return <Navigate to="/dashboard" />;
+  }
+  
+  return <>{children}</>;
 }
 
 function App() {

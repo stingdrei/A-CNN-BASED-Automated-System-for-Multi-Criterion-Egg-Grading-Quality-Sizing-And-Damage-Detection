@@ -26,7 +26,12 @@ class ApiClient {
       (error: AxiosError) => {
         if (error.response?.status === 401) {
           localStorage.removeItem('token');
-          window.location.href = '/login';
+          // Notify Zustand store to clear in-memory state (avoids circular dependency)
+          window.dispatchEvent(new CustomEvent('auth:logout'));
+          // Only redirect if not already on login/register pages
+          if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error);
       }
