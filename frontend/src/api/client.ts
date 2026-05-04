@@ -25,13 +25,18 @@ class ApiClient {
       (response) => response,
       (error: AxiosError) => {
         if (error.response?.status === 401) {
-          localStorage.removeItem('token');
-          // Notify Zustand store to clear in-memory state (avoids circular dependency)
-          window.dispatchEvent(new CustomEvent('auth:logout'));
-          // Only redirect if not already on login/register pages
-          if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+          const isAuthPage = window.location.pathname.startsWith('/login') || 
+                           window.location.pathname.startsWith('/register');
+          
+          if (!isAuthPage) {
+            localStorage.removeItem('token');
+            // Notify Zustand store to clear in-memory state (avoids circular dependency)
+            window.dispatchEvent(new CustomEvent('auth:logout'));
+            // Redirect to login
             window.location.href = '/login';
           }
+          // For auth pages (login/register), just reject without clearing state
+          return Promise.reject(error);
         }
         return Promise.reject(error);
       }
