@@ -1,8 +1,11 @@
 torch>=2.0
+torchvision
+ultralytics
 opencv-python>=4.8
 numpy
 pyyaml
+pandas
 tqdm
 scikit-learn
 roboflow
-# Add further packages as needed
+requests
