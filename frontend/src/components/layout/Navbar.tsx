@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Upload, History, Egg, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Upload, History, Egg, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 export function Navbar() {
@@ -85,14 +85,6 @@ export function Navbar() {
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>
                   <div className="py-1">
-                    <Link
-                      to="/profile"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <User className="w-4 h-4" />
-                      Profile
-                    </Link>
                     <Link
                       to="/settings"
                       onClick={() => setDropdownOpen(false)}

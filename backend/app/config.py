@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     VERSION: str = "1.0.0"
 
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/eggcvdatabase"
+    DATABASE_URL: str = "postgresql://wii@localhost/eggcvdatabase"
 
     SECRET_KEY: str = "your-secret-key-change-in-production-min-32-chars-long"
     ALGORITHM: str = "HS256"
