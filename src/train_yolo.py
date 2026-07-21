@@ -19,7 +19,7 @@ RUN_NAME = "train1"
 
 def create_data_yaml():
     data_config = {
-        "path": os.path.abspath("data/eggs"),
+        "path": ".",  # relative path works regardless of machine
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
@@ -45,7 +45,7 @@ def prepare_directories():
     print("Created dataset directories.")
 
 
-def train_yolo():
+def train_yolo(device="cpu"):
     try:
         from ultralytics import YOLO
     except ImportError:
@@ -58,8 +58,9 @@ def train_yolo():
         epochs=EPOCHS,
         imgsz=IMG_SIZE,
         batch=BATCH,
-        project=PROJECT_NAME,
+        project=os.path.abspath(PROJECT_NAME),
         name=RUN_NAME,
+        device=device,
         exist_ok=True,
         pretrained=True,
         optimizer="SGD",
@@ -94,13 +95,16 @@ if __name__ == "__main__":
         "--prepare", action="store_true", help="Prepare directories only"
     )
     parser.add_argument("--train", action="store_true", help="Start training")
+    parser.add_argument(
+        "--device", default="cpu", help="Device: cpu, cuda:0, mps (default: cpu)"
+    )
     args = parser.parse_args()
 
     if args.prepare:
         prepare_directories()
         create_data_yaml()
     elif args.train:
-        train_yolo()
+        train_yolo(device=args.device)
     else:
         prepare_directories()
         create_data_yaml()

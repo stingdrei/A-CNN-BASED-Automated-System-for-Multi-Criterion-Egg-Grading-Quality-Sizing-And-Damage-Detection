@@ -2,7 +2,7 @@ names:
   0: not_damaged
   1: damaged
 nc: 2
-path: /Users/wii/Projects/python/egg-cv/data/eggs
+path: .
 test: images/test
 train: images/train
 val: images/val
