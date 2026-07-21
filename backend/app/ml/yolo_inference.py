@@ -48,7 +48,7 @@ class YOLOPredictor:
         if diameter_px <= 0:
             return None
         diameter_mm = diameter_px * self.mm_per_pixel
-        weight = 0.05 * (diameter_mm ** 3)
+        weight = 0.0005 * (diameter_mm ** 3)
         return round(max(30, min(80, weight)), 1)
 
     def map_to_grade(self, class_name: str, size_category: Optional[str]) -> str:
@@ -57,11 +57,11 @@ class YOLOPredictor:
         if not size_category or size_category == "unknown":
             return "N/A"
         if size_category == "large":
-            return "AA"
-        elif size_category == "medium":
             return "A"
-        else:
+        elif size_category == "medium":
             return "B"
+        else:
+            return "C"
 
     def predict_image(self, image_path: str) -> Dict[str, Any]:
         results = self.model(image_path, conf=self.confidence)
@@ -112,9 +112,9 @@ class YOLOPredictor:
         img = image.copy()
 
         grade_colors = {
-            "AA": (34, 197, 94),
-            "A": (59, 130, 246),
-            "B": (245, 158, 11),
+            "A": (34, 197, 94),
+            "B": (59, 130, 246),
+            "C": (245, 158, 11),
             "N/A": (107, 114, 128),
             "Reject": (239, 68, 68),
         }

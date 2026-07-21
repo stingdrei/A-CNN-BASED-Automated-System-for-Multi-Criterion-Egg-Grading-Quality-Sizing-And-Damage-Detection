@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class EggGradingCNN(nn.Module):
-    def __init__(self, num_classes=3):
+    def __init__(self, num_classes=2):
         super(EggGradingCNN, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, 3, padding=1)

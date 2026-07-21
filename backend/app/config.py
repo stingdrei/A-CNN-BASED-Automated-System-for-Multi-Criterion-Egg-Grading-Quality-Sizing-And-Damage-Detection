@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     MODEL_PATH: str = "/Users/wii/Projects/python/egg-cv/models/egg_detection_finetuned/weights/best.pt"
     CONFIDENCE_THRESHOLD: float = 0.75
-    MM_PER_PIXEL: float = 0.5
+    MM_PER_PIXEL: float = 0.09
 
     class Config:
         env_file = ".env"

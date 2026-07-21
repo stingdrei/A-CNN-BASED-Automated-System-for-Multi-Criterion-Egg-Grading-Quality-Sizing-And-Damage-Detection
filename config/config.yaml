@@ -20,7 +20,7 @@ training:
 # To calibrate: place a reference object of known size in the camera view
 # and measure the pixel width, then divide reference_size_mm / pixel_width
 calibration:
-  mm_per_pixel: 1.0  # Default: adjust based on your camera and distance
+  mm_per_pixel: 0.09  # Approximate for 1080p at 15cm distance
   # Example: if a 50mm ruler appears as 100 pixels, mm_per_pixel = 50/100 = 0.5
   camera_distance_cm: 15  # Approximate distance from camera to egg conveyor (optional)
 

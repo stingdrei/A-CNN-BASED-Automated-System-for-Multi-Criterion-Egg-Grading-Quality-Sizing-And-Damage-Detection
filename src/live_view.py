@@ -5,6 +5,10 @@ from collections import defaultdict
 import csv
 from datetime import datetime
 import argparse
+import torch
+import torch.nn.functional as F
+from model import EggGradingCNN
+from torchvision import transforms
 
 
 class ObjectTracker:
@@ -81,7 +85,7 @@ class ObjectTracker:
 
 class CameraCalibrator:
     def __init__(self):
-        self.mm_per_pixel = 1.0
+        self.mm_per_pixel = 0.09
     
     def pixels_to_mm(self, pixels):
         return pixels * self.mm_per_pixel
@@ -89,7 +93,7 @@ class CameraCalibrator:
     def estimate_weight(self, diameter_mm):
         if diameter_mm <= 0:
             return -1
-        weight_g = 0.05 * (diameter_mm ** 3)
+        weight_g = 0.0005 * (diameter_mm ** 3)
         weight_g = max(30, min(80, weight_g))
         return round(weight_g, 1)
     
@@ -120,7 +124,7 @@ class StatisticsLogger:
                 self.log_file,
                 fieldnames=['timestamp', 'egg_id', 'x1', 'y1', 'x2', 'y2', 
                            'confidence', 'class', 'diameter_px', 'diameter_mm', 
-                           'size_category', 'weight_g']
+                           'size_category', 'weight_g', 'grade']
             )
             self.log_file.seek(0, 2)
             if self.log_file.tell() == 0:
@@ -128,7 +132,7 @@ class StatisticsLogger:
         except Exception as e:
             print(f"Warning: Could not initialize statistics log: {e}")
     
-    def log_detection(self, egg_id, x1, y1, x2, y2, conf, egg_class, diameter_px, diameter_mm, size_category, weight_g):
+    def log_detection(self, egg_id, x1, y1, x2, y2, conf, egg_class, diameter_px, diameter_mm, size_category, weight_g, grade=""):
         try:
             if self.writer:
                 self.writer.writerow({
@@ -140,7 +144,8 @@ class StatisticsLogger:
                     'diameter_px': diameter_px,
                     'diameter_mm': round(diameter_mm, 2),
                     'size_category': size_category,
-                    'weight_g': weight_g
+                    'weight_g': weight_g,
+                    'grade': grade
                 })
                 self.log_file.flush()
         except Exception as e:
@@ -157,14 +162,15 @@ def main():
     parser = argparse.ArgumentParser(description="Egg Detection Live View")
     parser.add_argument("--source", type=str, default="0", 
                         help="Camera index (0, 1, ...) or video file path")
-    parser.add_argument("--conf", type=float, default=0.3,
-                        help="Confidence threshold (default 0.3)")
+    parser.add_argument("--conf", type=float, default=0.75,
+                        help="Confidence threshold (default 0.75)")
     parser.add_argument("--no-logging", action="store_true",
                         help="Disable CSV logging")
+    parser.add_argument("--cnn-conf", type=float, default=0.6,
+                        help="CNN confidence threshold (default 0.6)")
     args = parser.parse_args()
 
     model_path = "models/egg_detection_finetuned/weights/best.pt"
-    class_names = ["not_damaged", "damaged"]
 
     print("Loading YOLO model...")
     try:
@@ -173,6 +179,22 @@ def main():
     except Exception as e:
         print(f"Error loading model: {e}")
         return
+
+    print("Loading EggGradingCNN...")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    cnn_model = EggGradingCNN(num_classes=2)
+    cnn_model.load_state_dict(torch.load('models/egg_grader.pth', map_location=device))
+    cnn_model.to(device)
+    cnn_model.eval()
+    cnn_class_names = ["Damaged", "Not Damaged"]
+    print(f"EggGradingCNN loaded! Classes: {cnn_class_names}")
+
+    cnn_transform = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
 
     source = args.source
     try:
@@ -188,9 +210,22 @@ def main():
     print(f"\n{'='*60}")
     print("Egg Detection Live View")
     print(f"{'='*60}")
-    print(f"Controls: Q=Quit, P=Pause, S=Screenshot, +/-=Confidence")
-    print(f"Confidence threshold: {args.conf}")
+    print(f"Controls: Q=Quit, P=Pause, S=Screenshot, C=CNN Filter, +/-=Confidence")
+    print(f"Confidence threshold: {args.conf} | CNN confidence: {args.cnn_conf}")
     print(f"{'='*60}\n")
+
+    enable_cnn_filtering = True
+
+    def map_grade(damage_status, size_category):
+        if damage_status == "Damaged":
+            return "Reject"
+        if size_category == "Large":
+            return "A"
+        elif size_category == "Medium":
+            return "B"
+        elif size_category == "Small":
+            return "C"
+        return "N/A"
 
     tracker = ObjectTracker()
     calibrator = CameraCalibrator()
@@ -223,10 +258,11 @@ def main():
         egg_classes = []
         
         boxes = results[0].boxes
+        cnn_confs = []
+        cnn_labels = []
         if boxes is not None and len(boxes) > 0:
             xyxy = boxes.xyxy.cpu().numpy()
             confs = boxes.conf.cpu().numpy() if hasattr(boxes, 'conf') else np.ones(len(xyxy))
-            clss = boxes.cls.cpu().numpy() if hasattr(boxes, 'cls') else np.zeros(len(xyxy))
             
             raw_detections = []
             for i, box in enumerate(xyxy):
@@ -236,8 +272,23 @@ def main():
                     raw_detections.append((x1, y1, x2, y2, c))
                     egg_boxes.append((x1, y1, x2, y2))
                     egg_confs.append(c)
-                    cls_id = int(clss[i])
-                    egg_classes.append(class_names[cls_id] if cls_id < len(class_names) else str(cls_id))
+                    
+                    egg_crop = frame[y1:y2, x1:x2]
+                    if egg_crop.size > 0:
+                        input_tensor = cnn_transform(egg_crop).unsqueeze(0).to(device)
+                        with torch.no_grad():
+                            output = cnn_model(input_tensor)
+                            probs = F.softmax(output, dim=1)[0]
+                            pred = torch.argmax(output, 1).item()
+                            cnn_conf = float(probs[pred].cpu().numpy())
+                        cnn_label = cnn_class_names[pred]
+                        cnn_confs.append(cnn_conf)
+                        cnn_labels.append(cnn_label)
+                    else:
+                        cnn_confs.append(0.0)
+                        cnn_labels.append("unknown")
+                    
+                    egg_classes.append(cnn_labels[-1])
             
             tracked = tracker.update(raw_detections)
             
@@ -248,13 +299,15 @@ def main():
                         counted_ids.add(obj_id)
                         egg_count += 1
                     
-                    cls_label = egg_classes[raw_detections.index((x1, y1, x2, y2, conf))] if (x1, y1, x2, y2, conf) in raw_detections else "unknown"
+                    idx = raw_detections.index((x1, y1, x2, y2, conf)) if (x1, y1, x2, y2, conf) in raw_detections else -1
+                    cls_label = cnn_labels[idx] if idx >= 0 else "unknown"
                     
                     if logger:
                         diameter_px = max(x2 - x1, y2 - y1)
                         diameter_mm = calibrator.pixels_to_mm(diameter_px)
                         size, weight = calibrator.categorize_egg(diameter_px)
-                        logger.log_detection(obj_id, x1, y1, x2, y2, conf, cls_label, diameter_px, diameter_mm, size, weight)
+                        grade = map_grade(cls_label, size)
+                        logger.log_detection(obj_id, x1, y1, x2, y2, conf, cls_label, diameter_px, diameter_mm, size, weight, grade)
 
         new_time = time.time()
         elapsed = max(new_time - prev_time, 1e-6)
@@ -266,13 +319,26 @@ def main():
         if egg_detected:
             for i, (x1, y1, x2, y2) in enumerate(egg_boxes):
                 cls = egg_classes[i] if i < len(egg_classes) else "unknown"
-                color = (0, 255, 0) if "not_damaged" in cls else (0, 0, 255)
-                cv2.rectangle(disp_frame, (x1, y1), (x2, y2), color, 2)
-                label = f"{cls} {egg_confs[i]:.2f}"
+                cnn_conf = cnn_confs[i] if i < len(cnn_confs) else 0.0
+                
+                diameter_px = max(x2 - x1, y2 - y1)
+                size, weight = calibrator.categorize_egg(diameter_px)
+                grade = map_grade(cls, size)
+                
+                if enable_cnn_filtering and cnn_conf < args.cnn_conf:
+                    display_class = "Low Confidence"
+                    box_color = (0, 255, 255)
+                else:
+                    display_class = cls
+                    box_color = (0, 255, 0) if cls == "Not Damaged" else (0, 0, 255)
+                
+                cv2.rectangle(disp_frame, (x1, y1), (x2, y2), box_color, 2)
+                label = f"Grade {grade} | {weight}g"
                 cv2.putText(disp_frame, label, (x1, y1 - 10),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, box_color, 2)
         
-        info = f"Count: {egg_count} | In-Frame: {len(egg_boxes)} | Conf: {conf_threshold:.2f} | FPS: {fps:.1f}"
+        filter_status = "ON" if enable_cnn_filtering else "OFF"
+        info = f"Count: {egg_count} | In-Frame: {len(egg_boxes)} | CNN-Filter: {filter_status} | FPS: {fps:.1f}"
         cv2.putText(disp_frame, info, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
         
         cv2.imshow("Egg Detection", disp_frame)
@@ -294,6 +360,9 @@ def main():
         elif key == ord('-'):
             conf_threshold = max(0.1, conf_threshold - 0.05)
             print(f"Confidence: {conf_threshold:.2f}")
+        elif key == ord('c'):
+            enable_cnn_filtering = not enable_cnn_filtering
+            print(f"CNN Filter: {'ON' if enable_cnn_filtering else 'OFF'}")
 
     cap.release()
     cv2.destroyAllWindows()

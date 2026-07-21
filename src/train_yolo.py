@@ -23,8 +23,8 @@ def create_data_yaml():
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
-        "nc": 1,
-        "names": {0: "egg"},
+        "nc": 2,
+        "names": {0: "not_damaged", 1: "damaged"},
     }
     with open("data/eggs/data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
