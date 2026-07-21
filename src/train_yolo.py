@@ -11,7 +11,7 @@ import yaml
 
 YOLO_MODEL = "yolov8s.pt"
 IMG_SIZE = 640
-EPOCHS = 20
+EPOCHS = 100
 BATCH = 16
 PROJECT_NAME = "egg_detection"
 RUN_NAME = "train1"
@@ -78,6 +78,7 @@ def train_yolo(device="cpu"):
         scale=0.5,
         fliplr=0.5,
         mosaic=1.0,
+        patience=50,
         verbose=True,
     )
     print("========================")

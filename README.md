@@ -31,8 +31,8 @@ This project is a starter template for an automated egg grading system using Con
 ├── src/
 │   ├── dataset.py
 │   ├── model.py
-│   ├── train.py
-│   ├── infer.py
+│   ├── train_yolo.py
+│   ├── convert_to_yolo.py
 │   ├── live_view.py
 │   ├── calibrate_camera.py
 │   └── utils.py
@@ -59,16 +59,45 @@ This project is a starter template for an automated egg grading system using Con
     ```bash
     python src/calibrate_camera.py --source 0
     ```
-4. Run `python src/train.py` to train the model.
-5. Run `python src/infer.py` for inference/demos.
-6. Run `python src/live_view.py` for real-time detection with camera feed.
+4. Run `python src/live_view.py` for real-time detection with camera feed.
 
 ## Usage
 
-### Training
+### YOLO Training (Local)
 ```bash
-python src/train.py
+# Prepare dataset directories & data.yaml
+python src/train_yolo.py --prepare
+
+# Train (CPU — ~2.5hr for 100 epochs on M1)
+python src/train_yolo.py --train
+
+# Train on GPU
+python src/train_yolo.py --train --device cuda:0
+python src/train_yolo.py --train --device mps       # Apple Silicon
 ```
+
+### Training on Another Machine
+Transfer the 307MB dataset to any machine with Python:
+
+```bash
+# 1. Copy dataset
+rsync -avz user@this-machine:/path/egg-cv/data/eggs/ /path/to/egg-cv/data/eggs/
+
+# 2. Copy the repo (or just train_yolo.py + data/eggs/)
+# 3. Install dependencies
+pip install ultralytics pyyaml
+
+# 4. Train (adjust device to match hardware)
+python src/train_yolo.py --train --device cuda:0    # NVIDIA GPU
+python src/train_yolo.py --train --device mps       # Apple Silicon GPU
+python src/train_yolo.py --train                    # CPU fallback
+
+# 5. Copy back the trained weights
+rsync -avz /path/to/egg-cv/egg_detection/train1/weights/best.pt \
+    user@this-machine:/path/egg-cv/models/
+```
+
+The `data/eggs/data.yaml` uses relative paths so it works anywhere.
 
 ### Real-Time Detection
 ```bash
