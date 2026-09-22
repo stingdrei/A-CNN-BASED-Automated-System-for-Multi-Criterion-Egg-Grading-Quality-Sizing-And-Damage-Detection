@@ -32,8 +32,3 @@ calibration:
 detection:
   yolo_confidence: 0.75  # Increased from 0.65 (reduces ~6% more false positives)
   cnn_confidence: 0.70   # Increased from 0.60 (adds damage classification check)
-  
-# Object tracking parameters
-tracking:
-  max_distance: 50       # Max centroid distance to match objects (pixels)
-  max_disappeared: 30    # Max frames an object can disappear before removal

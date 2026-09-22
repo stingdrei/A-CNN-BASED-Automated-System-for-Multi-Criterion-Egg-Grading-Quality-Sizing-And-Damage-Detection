@@ -10,9 +10,8 @@ This project is a starter template for an automated egg grading system using Con
 - Modular data loading and image preprocessing (OpenCV)
 - CNN architecture for damage classification (PyTorch)
 - YOLOv8 object detection for egg localization
-- Real-time live view with camera feed
+- Static tray image grading through the FastAPI backend
 - Camera calibration for accurate size/weight measurements
-- Object tracking to prevent duplicate counting
 - CSV data logging for all detections
 - Clearly separated training and inference scripts
 - Easy expansion for new grading criteria
@@ -33,7 +32,6 @@ This project is a starter template for an automated egg grading system using Con
 │   ├── model.py
 │   ├── train_yolo.py
 │   ├── convert_to_yolo.py
-│   ├── live_view.py
 │   ├── calibrate_camera.py
 │   └── utils.py
 ├── models/
@@ -59,7 +57,11 @@ This project is a starter template for an automated egg grading system using Con
     ```bash
     python src/calibrate_camera.py --source 0
     ```
-4. Run `python src/live_view.py` for real-time detection with camera feed.
+4. Start the FastAPI backend:
+    ```bash
+    cd backend
+    uvicorn app.main:app --reload
+    ```
 
 ## Usage
 
@@ -99,24 +101,12 @@ rsync -avz /path/to/egg-cv/egg_detection/train1/weights/best.pt \
 
 The `data/eggs/data.yaml` uses relative paths so it works anywhere.
 
-### Real-Time Detection
+### Static Tray Detection
 ```bash
-# Basic usage (camera 0)
-python src/live_view.py
-
-# With custom settings
-python src/live_view.py --source 1 --yolo-conf 0.75 --cnn-conf 0.70
+# Start the backend, then upload a tray image to POST /api/v1/predictions/upload
+cd backend
+uvicorn app.main:app --reload
 ```
-
-### Keyboard Controls
-| Key | Action |
-|-----|--------|
-| Q   | Quit   |
-| P   | Pause/Resume |
-| S   | Save screenshot |
-| +   | Increase YOLO confidence |
-| -   | Decrease YOLO confidence |
-| C   | Toggle CNN confidence filtering |
 
 ### Analyze Results
 ```bash
@@ -142,12 +132,11 @@ Edit `config/config.yaml` to adjust:
 - `detection.yolo_confidence` — YOLO detection threshold (default: 0.75)
 - `detection.cnn_confidence` — CNN classification threshold (default: 0.70)
 - `calibration.mm_per_pixel` — Camera calibration factor
-- `tracking.max_distance` — Object matching distance (pixels)
 
 ## Extend
 - Add new grading criteria to `src/dataset.py` and `src/model.py`
 - Retrain YOLO with custom annotations via `src/train_yolo.py`
-- Integrate new data sources in `src/live_view.py`
+- Integrate new data sources in the FastAPI prediction service
 
 ## Contributing
 1. Fork the repository

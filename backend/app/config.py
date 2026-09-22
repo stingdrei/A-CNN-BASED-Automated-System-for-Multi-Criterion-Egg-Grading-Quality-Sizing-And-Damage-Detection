@@ -1,5 +1,9 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -16,7 +20,9 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
     MAX_FILE_SIZE_MB: int = 50
 
-    MODEL_PATH: str = "/Users/wii/Projects/python/egg-cv/models/egg_detection_finetuned/weights/best.pt"
+    MODEL_PATH: str = str(
+        PROJECT_ROOT / "models" / "egg_detection_finetuned" / "weights" / "best.pt"
+    )
     CONFIDENCE_THRESHOLD: float = 0.75
     MM_PER_PIXEL: float = 0.09
 

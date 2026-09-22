@@ -31,52 +31,24 @@ python3 src/calibrate_camera.py --source 0
 
 This creates the `mm_per_pixel` value in `config/config.yaml`.
 
-## Step 2: Run Detection
+## Step 2: Run Static Tray Detection
 
-### Basic Usage
+Start the FastAPI backend and upload one top-down tray image (0–5 eggs) through
+`POST /api/v1/predictions/upload`:
+
 ```bash
-python3 src/live_view.py
+cd backend
+uvicorn app.main:app --reload
 ```
-
-### With Custom Settings
-```bash
-# Use camera 1 instead of 0
-python3 src/live_view.py --source 1
-
-# Strict detection (fewer false positives)
-python3 src/live_view.py --yolo-conf 0.75
-
-# Strict classification (only high-confidence damage predictions)
-python3 src/live_view.py --cnn-conf 0.75
-
-# Process video file
-python3 src/live_view.py --source path/to/video.mp4
-
-# All together
-python3 src/live_view.py --source 1 --yolo-conf 0.70 --cnn-conf 0.65
-```
-
-## Keyboard Controls During Detection
-
-| Key | Action |
-|-----|--------|
-| **Q** | Quit program |
-| **P** | Pause/Resume |
-| **S** | Save screenshot |
-| **+** | Increase YOLO confidence (stricter) |
-| **-** | Decrease YOLO confidence (lenient) |
-| **C** | Toggle CNN confidence filtering |
 
 ## Step 3: View Results
 
 After running detection, check:
 
-1. **Real-time display**:
-   - Count: Number of eggs detected
-   - Size distribution: Small/Medium/Large breakdown
-   - Total weight: Sum of all eggs
-   - Class: Damage classification
-   - FPS: Processing speed
+1. **API response**:
+   - Number of eggs detected
+   - Size and weight per egg
+   - Damage classification and grade
 
 2. **CSV Log File** (`egg_statistics.csv`):
 ```bash
@@ -101,38 +73,11 @@ Edit `config/config.yaml`:
 
 ```yaml
 detection:
-  yolo_confidence: 0.65    # 0.5 = lenient, 0.9 = strict
-  cnn_confidence: 0.6      # 0.5 = accept uncertain, 0.99 = very strict
+  yolo_confidence: 0.75
+  cnn_confidence: 0.70
 
 calibration:
-  mm_per_pixel: 1.0        # Set by calibration tool
-
-tracking:
-  max_distance: 50         # Increase if eggs disappear/reappear
-  max_disappeared: 30      # Increase to wait longer for moving eggs
-```
-
-## Typical Settings
-
-### For High-Speed Conveyor
-```bash
-python3 src/live_view.py --yolo-conf 0.70 --cnn-conf 0.65
-# Risk: May miss some eggs at high speed
-# Benefit: Fewer duplicate counts
-```
-
-### For Manual/Slow Processing
-```bash
-python3 src/live_view.py --yolo-conf 0.60 --cnn-conf 0.55
-# Risk: More false positives
-# Benefit: Won't miss any eggs
-```
-
-### For Strict Quality Control
-```bash
-python3 src/live_view.py --yolo-conf 0.80 --cnn-conf 0.80
-# Risk: May miss uncertain/partially visible eggs
-# Benefit: Only high-confidence detections and classifications
+  mm_per_pixel: 0.09
 ```
 
 ## Troubleshooting
@@ -141,41 +86,14 @@ python3 src/live_view.py --yolo-conf 0.80 --cnn-conf 0.80
 - Check: `ls runs/detect/egg_detection/train1/weights/best.pt`
 - Solution: Verify YOLO training completed successfully
 
-### "Failed to open video source"
-- Camera not found: Try `--source 1` or `--source 2`
-- Video file: Use full path: `--source /path/to/video.mp4`
-
-### Too many false positives
-- Press **+** during runtime to increase YOLO confidence
-- Press **C** to enable CNN confidence filtering
-- Edit config: increase `yolo_confidence` and `cnn_confidence`
-
-### Counting same egg multiple times
-- Reduce `max_distance` in config (currently 50 pixels)
-- Increase `max_disappeared` to give tracker more time
-
 ### Weight always same value
 - Run calibration: `python3 src/calibrate_camera.py`
 - Check `config.yaml` `mm_per_pixel` is not 1.0
 
-### CSV file not created
-- Check write permissions in current directory
-- Don't use `--no-logging` flag
-- Check console for error messages
-
-## Example Session
+## Analyze Results
 
 ```bash
-# Terminal 1: Calibrate camera
-python3 src/calibrate_camera.py --source 0
-
-# Terminal 2: Run detection
-python3 src/live_view.py --source 0
-
-# ... process eggs for 5 minutes ...
-# ... press Q to quit ...
-
-# Terminal 3: Analyze results
+# After grading images through the API:
 python3 << 'EOF'
 import pandas as pd
 df = pd.read_csv('egg_statistics.csv')
@@ -194,17 +112,15 @@ EOF
 
 ✅ **Reduced false positives** - Higher default confidence threshold
 ✅ **Better classification** - CNN confidence scores with filtering
-✅ **Accurate counting** - Object tracking prevents duplicates
+✅ **Static tray processing** - Supports one image with 0–5 eggs
 ✅ **Real-world measurements** - Camera calibration for mm/weight
 ✅ **Data logging** - All detections saved to CSV
-✅ **Dynamic control** - Adjust settings in real-time with keyboard
 
 ## Next Steps
 
 1. Calibrate your camera for accurate measurements
-2. Start detection: `python3 src/live_view.py`
-3. Adjust confidence thresholds with +/- keys if needed
-4. Review results in `egg_statistics.csv`
-5. Repeat for different eggs, speeds, or conditions
+2. Start the FastAPI backend
+3. Upload top-down tray images to `/api/v1/predictions/upload`
+4. Review the returned results and `egg_statistics.csv`
 
 See `IMPROVEMENTS.md` for detailed documentation on all features.
