@@ -17,7 +17,9 @@ def infer(image_path, model_path, config_path):
     tensor = transform(image).unsqueeze(0)
     # Load model
     model = EggGradingCNN(num_classes=cfg["model"]["num_classes"])
-    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
+    checkpoint = torch.load(model_path, map_location=torch.device("cpu"))
+    state_dict = checkpoint.get("state_dict", checkpoint)
+    model.load_state_dict(state_dict)
     model.eval()
     with torch.no_grad():
         output = model(tensor)

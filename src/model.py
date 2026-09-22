@@ -2,7 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class EggGradingCNN(nn.Module):
+    """Small binary crop classifier retained for checkpoint compatibility."""
+
     def __init__(self, num_classes=2):
         super(EggGradingCNN, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, 3, padding=1)

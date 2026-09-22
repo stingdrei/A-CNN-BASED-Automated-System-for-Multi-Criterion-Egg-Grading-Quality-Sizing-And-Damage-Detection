@@ -2,7 +2,7 @@ import os
 import csv
 
 # Source and output directories
-SRC_ROOT = "data/Eggs Classification"
+SRC_ROOT = "data/damage"
 OUT_CSV = "data/processed/train_labels.csv"
 
 # Supported extensions

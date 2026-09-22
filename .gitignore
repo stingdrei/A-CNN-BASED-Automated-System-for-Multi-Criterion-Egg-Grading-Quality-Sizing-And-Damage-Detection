@@ -52,6 +52,10 @@ htmlcov/
 models/
 runs/
 
+# Keep the model documentation directory while leaving model binaries ignored.
+!MODELS/
+!MODELS/*.md
+
 # Frontend build
 frontend/dist/
 frontend/.vite/

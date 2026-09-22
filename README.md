@@ -83,9 +83,9 @@ Transfer the 307MB dataset to any machine with Python:
 
 ```bash
 # 1. Copy dataset
-rsync -avz user@this-machine:/path/egg-cv/data/eggs/ /path/to/egg-cv/data/eggs/
+rsync -avz user@this-machine:/path/egg-cv/data/detection/ /path/to/egg-cv/data/detection/
 
-# 2. Copy the repo (or just train_yolo.py + data/eggs/)
+# 2. Copy the repo (or just train_yolo.py + data/detection/)
 # 3. Install dependencies
 pip install ultralytics pyyaml
 
@@ -99,7 +99,7 @@ rsync -avz /path/to/egg-cv/egg_detection/train1/weights/best.pt \
     user@this-machine:/path/egg-cv/models/
 ```
 
-The `data/eggs/data.yaml` uses relative paths so it works anywhere.
+The `data/detection/data.yaml` uses relative paths so it works anywhere.
 
 ### Static Tray Detection
 ```bash

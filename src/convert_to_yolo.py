@@ -8,9 +8,9 @@ import numpy as np
 import yaml
 from pathlib import Path
 
-DAMAGED_DIR = "data/Eggs Classification/Damaged"
-NOT_DAMAGED_DIR = "data/Eggs Classification/Not Damaged"
-OUTPUT_BASE = "data/eggs"
+DAMAGED_DIR = "data/damage/Damaged"
+NOT_DAMAGED_DIR = "data/damage/Not Damaged"
+OUTPUT_BASE = "data/detection"
 
 def find_egg_contour(img):
     """Find egg contour using edge detection and return bounding box."""

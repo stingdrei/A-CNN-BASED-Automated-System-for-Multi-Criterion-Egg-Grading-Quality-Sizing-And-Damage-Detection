@@ -7,7 +7,7 @@ import cv2
 import os
 from datetime import datetime
 
-OUTPUT_DIR = "data/eggs/images/raw"
+OUTPUT_DIR = "data/detection/images/raw"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 cap = cv2.VideoCapture(0)

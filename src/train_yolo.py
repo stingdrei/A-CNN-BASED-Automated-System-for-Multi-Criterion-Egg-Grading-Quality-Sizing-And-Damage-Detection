@@ -26,19 +26,19 @@ def create_data_yaml():
         "nc": 2,
         "names": {0: "not_damaged", 1: "damaged"},
     }
-    with open("data/eggs/data.yaml", "w") as f:
+    with open("data/detection/data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
-    print("Created data/eggs/data.yaml")
+    print("Created data/detection/data.yaml")
 
 
 def prepare_directories():
     dirs = [
-        "data/eggs/images/train",
-        "data/eggs/images/val",
-        "data/eggs/images/test",
-        "data/eggs/labels/train",
-        "data/eggs/labels/val",
-        "data/eggs/labels/test",
+        "data/detection/images/train",
+        "data/detection/images/val",
+        "data/detection/images/test",
+        "data/detection/labels/train",
+        "data/detection/labels/val",
+        "data/detection/labels/test",
     ]
     for d in dirs:
         os.makedirs(d, exist_ok=True)
@@ -54,7 +54,7 @@ def train_yolo(device="cpu"):
 
     model = YOLO(YOLO_MODEL)
     results = model.train(
-        data="data/eggs/data.yaml",
+        data="data/detection/data.yaml",
         epochs=EPOCHS,
         imgsz=IMG_SIZE,
         batch=BATCH,
