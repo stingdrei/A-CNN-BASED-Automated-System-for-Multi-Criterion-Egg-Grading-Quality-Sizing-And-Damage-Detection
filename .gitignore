@@ -36,6 +36,22 @@ uploads/
 *.mov
 *.mkv
 
+# Damage classifier dataset images are required for baseline training.
+!data/damage/
+!data/damage/Damaged/
+!data/damage/Not\ Damaged/
+!data/damage/Damaged/*.jpg
+!data/damage/Not\ Damaged/*.jpg
+
+# YOLO detector dataset images are required for training.
+!data/detection/images/
+!data/detection/images/train/
+!data/detection/images/val/
+!data/detection/images/test/
+!data/detection/images/**/*.jpg
+!data/detection/images/**/*.jpeg
+!data/detection/images/**/*.png
+
 # IDE
 .vscode/
 .idea/
