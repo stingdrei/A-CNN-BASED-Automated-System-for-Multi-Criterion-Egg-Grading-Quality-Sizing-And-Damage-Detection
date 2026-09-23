@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Make all repository-relative paths work regardless of the caller's cwd.
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
 MANIFEST_DIR="${MANIFEST_DIR:-data/damage/manifests}"
 CHECKPOINT="${CHECKPOINT:-models/egg_grader.pth}"
 METRICS="${METRICS:-models/damage_metrics.json}"
@@ -8,7 +12,9 @@ REPORT="${REPORT:-reports/damage_test_report.json}"
 EPOCHS="${EPOCHS:-30}"
 BATCH_SIZE="${BATCH_SIZE:-32}"
 
-python3 src/verify_damage_dataset.py --manifest-dir "$MANIFEST_DIR"
+python3 src/verify_damage_dataset.py \
+  --manifest-dir "$MANIFEST_DIR" \
+  --image-root "$ROOT_DIR"
 
 PYTHONPATH=src python3 src/train_classifier.py \
   --labels "$MANIFEST_DIR/train.csv" \

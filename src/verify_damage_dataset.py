@@ -5,7 +5,7 @@ import csv
 from pathlib import Path
 
 
-def verify(manifest_dir: Path) -> int:
+def verify(manifest_dir: Path, image_root: Path) -> int:
     errors = 0
     for split in ("train", "val", "test"):
         path = manifest_dir / f"{split}.csv"
@@ -20,7 +20,11 @@ def verify(manifest_dir: Path) -> int:
             print(f"{split}: invalid columns; expected filename,label")
             errors += 1
             continue
-        missing = [row["filename"] for row in rows if not Path(row["filename"]).is_file()]
+        missing = [
+            row["filename"]
+            for row in rows
+            if not (image_root / row["filename"]).is_file()
+        ]
         labels = {label: sum(row["label"] == label for row in rows) for label in ("0", "1")}
         print(
             f"{split}: total={len(rows)} damaged={labels['0']} "
@@ -35,8 +39,9 @@ def verify(manifest_dir: Path) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest-dir", type=Path, default=Path("data/damage/manifests"))
+    parser.add_argument("--image-root", type=Path, default=Path("."))
     args = parser.parse_args()
-    errors = verify(args.manifest_dir)
+    errors = verify(args.manifest_dir, args.image_root)
     if errors:
         raise SystemExit(f"Dataset verification failed with {errors} issue(s)")
     print("Damage dataset verification passed")
