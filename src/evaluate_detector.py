@@ -8,6 +8,7 @@ is run against the test split.
 import argparse
 import json
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import yaml
 
@@ -26,6 +27,8 @@ def evaluate(args: argparse.Namespace) -> dict:
     dataset_root = Path(config["path"])
     if not dataset_root.is_absolute():
         dataset_root = (data_path.parent / dataset_root).resolve()
+    runtime_config = dict(config)
+    runtime_config["path"] = str(dataset_root)
     image_dir = dataset_root / "images" / args.split
     label_dir = dataset_root / "labels" / args.split
     image_paths = sorted(
@@ -36,13 +39,19 @@ def evaluate(args: argparse.Namespace) -> dict:
         raise FileNotFoundError(f"No images found in {image_dir}")
 
     model = YOLO(str(Path(args.model).resolve()))
-    validation = model.val(
-        data=str(data_path),
-        split=args.split,
-        conf=args.confidence,
-        plots=False,
-        verbose=False,
-    )
+    with NamedTemporaryFile("w", suffix=".yaml", delete=False) as runtime_file:
+        yaml.safe_dump(runtime_config, runtime_file)
+        runtime_data_path = runtime_file.name
+    try:
+        validation = model.val(
+            data=runtime_data_path,
+            split=args.split,
+            conf=args.confidence,
+            plots=False,
+            verbose=False,
+        )
+    finally:
+        Path(runtime_data_path).unlink(missing_ok=True)
     exact_counts = 0
     false_positives = 0
     missed = 0

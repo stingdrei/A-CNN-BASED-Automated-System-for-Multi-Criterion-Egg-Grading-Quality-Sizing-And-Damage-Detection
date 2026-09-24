@@ -7,6 +7,7 @@ Usage:
 
 import os
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import yaml
 
@@ -22,7 +23,7 @@ RUN_NAME = "train1"
 
 def create_data_yaml():
     data_config = {
-        "path": str(DATASET_DIR),
+        "path": ".",
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
@@ -32,6 +33,17 @@ def create_data_yaml():
     with open(DATASET_DIR / "data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
     print("Created data/detection/data.yaml")
+
+
+def data_config() -> dict:
+    return {
+        "path": str(DATASET_DIR),
+        "train": "images/train",
+        "val": "images/val",
+        "test": "images/test",
+        "nc": 1,
+        "names": {0: "egg"},
+    }
 
 
 def prepare_directories():
@@ -93,38 +105,44 @@ def train_yolo(device="cpu"):
         print("Error: ultralytics not installed. Run: pip install ultralytics")
         return
 
-    model = YOLO(YOLO_MODEL)
-    results = model.train(
-        data=str(DATASET_DIR / "data.yaml"),
-        epochs=EPOCHS,
-        imgsz=IMG_SIZE,
-        batch=BATCH,
-        workers=0,
-        project=os.path.abspath(PROJECT_NAME),
-        name=RUN_NAME,
-        device=device,
-        exist_ok=True,
-        pretrained=True,
-        optimizer="SGD",
-        lr0=0.01,
-        lrf=0.01,
-        momentum=0.937,
-        weight_decay=0.0005,
-        warmup_epochs=3.0,
-        box=7.5,
-        cls=0.5,
-        hsv_h=0.015,
-        hsv_s=0.7,
-        hsv_v=0.4,
-        translate=0.1,
-        scale=0.5,
-        fliplr=0.5,
-        mosaic=1.0,
-        patience=50,
-        verbose=True,
-        seed=0,
-        deterministic=True,
-    )
+    with NamedTemporaryFile("w", suffix=".yaml", delete=False) as runtime_file:
+        yaml.safe_dump(data_config(), runtime_file)
+        runtime_data_path = runtime_file.name
+    try:
+        model = YOLO(YOLO_MODEL)
+        results = model.train(
+            data=runtime_data_path,
+            epochs=EPOCHS,
+            imgsz=IMG_SIZE,
+            batch=BATCH,
+            workers=0,
+            project=os.path.abspath(PROJECT_NAME),
+            name=RUN_NAME,
+            device=device,
+            exist_ok=True,
+            pretrained=True,
+            optimizer="SGD",
+            lr0=0.01,
+            lrf=0.01,
+            momentum=0.937,
+            weight_decay=0.0005,
+            warmup_epochs=3.0,
+            box=7.5,
+            cls=0.5,
+            hsv_h=0.015,
+            hsv_s=0.7,
+            hsv_v=0.4,
+            translate=0.1,
+            scale=0.5,
+            fliplr=0.5,
+            mosaic=1.0,
+            patience=50,
+            verbose=True,
+            seed=0,
+            deterministic=True,
+        )
+    finally:
+        Path(runtime_data_path).unlink(missing_ok=True)
     print("========================")
     print("\nTraining complete!")
     print(f"Results: {results}")

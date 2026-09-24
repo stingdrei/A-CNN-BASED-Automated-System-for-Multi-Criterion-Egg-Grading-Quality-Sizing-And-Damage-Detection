@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE_MB: int = 50
 
     MODEL_PATH: str = str(
-        PROJECT_ROOT / "models" / "egg_detection_finetuned" / "weights" / "best.pt"
+        PROJECT_ROOT / "egg_detection" / "train1" / "weights" / "best.pt"
     )
     CONFIDENCE_THRESHOLD: float = 0.75
     MM_PER_PIXEL: float = 0.09
