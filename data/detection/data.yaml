@@ -2,7 +2,7 @@ names:
   0: not_damaged
   1: damaged
 nc: 2
-path: data/detection
+path: C:\Users\USER_1\Thesis\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\data\detection
 test: images/test
 train: images/train
 val: images/val
