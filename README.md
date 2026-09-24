@@ -71,12 +71,18 @@ This project is a starter template for an automated egg grading system using Con
 python src/train_yolo.py --prepare
 
 # Audit image/label pairing and split leakage before training
+python src/normalize_detector_labels.py --in-place
 python src/verify_detection_dataset.py \
   --preview-dir /tmp/egg-box-previews \
   --preview-per-split 20
 
 # Train (CPU — ~2.5hr for 100 epochs on M1)
 python src/train_yolo.py --train
+
+# After selecting the confidence threshold on validation, evaluate once on test
+python src/evaluate_detector.py \
+    --model egg_detection/train1/weights/best.pt \
+    --confidence 0.75
 
 # Train on GPU
 python src/train_yolo.py --train --device cuda:0
@@ -104,6 +110,8 @@ rsync -avz /path/to/egg-cv/egg_detection/train1/weights/best.pt \
     user@this-machine:/path/egg-cv/models/
 ```
 
+The detector uses one class (`egg`); damage is classified downstream. The
+normalization command converts legacy damage-status class IDs to class 0.
 The audit writes `data/detection/manifest.csv` and
 `reports/detection_dataset_report.json`. Training should not begin if the
 audit reports duplicate or near-duplicate leakage, invalid labels, missing
@@ -124,6 +132,15 @@ The `data/detection/data.yaml` uses repository-relative paths and
 cd backend
 uvicorn app.main:app --reload
 ```
+
+### Live Camera Detector (No Frontend)
+```bash
+./.venv/bin/python src/live_camera.py --device mps
+```
+
+The camera window shows YOLO detections and the current egg count. Press `q` or
+`Esc` to stop. Use `--camera 1` if the default camera is unavailable. This is a
+detector-only demonstration; it does not save predictions or run the API.
 
 ### Analyze Results
 ```bash

@@ -22,12 +22,12 @@ RUN_NAME = "train1"
 
 def create_data_yaml():
     data_config = {
-        "path": str(DATASET_DIR),
+        "path": ".",
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
-        "nc": 2,
-        "names": {0: "not_damaged", 1: "damaged"},
+        "nc": 1,
+        "names": {0: "egg"},
     }
     with open(DATASET_DIR / "data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
@@ -51,7 +51,7 @@ def prepare_directories():
 def validate_dataset():
     """Fail early with an actionable message when images are unavailable."""
     missing_splits = []
-    for split in ("train", "val"):
+    for split in ("train", "val", "test"):
         image_dir = DATASET_DIR / "images" / split
         image_count = sum(
             1
@@ -110,6 +110,8 @@ def train_yolo(device="cpu"):
         mosaic=1.0,
         patience=50,
         verbose=True,
+        seed=0,
+        deterministic=True,
     )
     print("========================")
     print("\nTraining complete!")

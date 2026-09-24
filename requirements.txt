@@ -1,6 +1,6 @@
-torch>=2.0
-torchvision
-ultralytics
+torch>=2.2,<2.4
+torchvision>=0.17,<0.19
+ultralytics==8.1.0
 opencv-python>=4.8
 numpy
 pyyaml

@@ -10,7 +10,9 @@ damage, cleanliness, and geometry measurements.
 
 - Artifact: `models/egg_detection_finetuned/weights/best.pt`
 - Framework: YOLO
-- Dataset classes: `not_damaged`, `damaged`
+- Dataset class: `egg`; damage is handled by the downstream classifier
+- The checked-in checkpoint predates this correction and must be retrained
+  before deployment.
 - Training log: 50 epochs in `models/egg_detection_finetuned/results.csv`
 - Best logged mAP@50: approximately 0.835 at epoch 46
 - Final logged epoch: precision approximately 0.740, recall approximately 0.750,
@@ -38,8 +40,8 @@ These are baseline training-run metrics, not a final independent test result.
 - [ ] Create immutable train/validation/test manifests with source-level splits.
 - [ ] Audit labels for box tightness, duplicate boxes, missing eggs, and class
   consistency.
-- [ ] Confirm the detector class represents egg presence; damage must be
-  classified by the damage model rather than conflated with detection.
+- [x] Confirm the detector class represents egg presence; damage is classified
+  by the damage model rather than conflated with detection.
 - [ ] Retrain with the final static-tray dataset and fixed reproducibility
   settings.
 - [ ] Tune augmentation only on training data.
@@ -49,3 +51,7 @@ These are baseline training-run metrics, not a final independent test result.
   false positives per tray, and count accuracy.
 - [ ] Add inference tests for 0–5 detections and invalid/empty images.
 - [ ] Export and checksum the release checkpoint.
+
+The dataset audit currently reports 298 oversized boxes. These annotations
+must be visually reviewed and corrected before the detector metrics can be
+treated as release evidence.

@@ -107,8 +107,8 @@ def main():
         os.makedirs(f"{OUTPUT_BASE}/images/{split}", exist_ok=True)
         os.makedirs(f"{OUTPUT_BASE}/labels/{split}", exist_ok=True)
     
-    # Get all images with class labels (0=not_damaged, 1=damaged)
-    damaged = [(p, 1) for p in Path(DAMAGED_DIR).glob("*.jpg")]
+    # Detection has one class: egg. Damage is classified downstream.
+    damaged = [(p, 0) for p in Path(DAMAGED_DIR).glob("*.jpg")]
     not_damaged = [(p, 0) for p in Path(NOT_DAMAGED_DIR).glob("*.jpg")]
     all_images = damaged + not_damaged
     np.random.shuffle(all_images)
@@ -162,8 +162,8 @@ def main():
         'train': 'images/train',
         'val': 'images/val',
         'test': 'images/test',
-        'nc': 2,
-        'names': {0: 'not_damaged', 1: 'damaged'}
+        'nc': 1,
+        'names': {0: 'egg'}
     }
     with open(f"{OUTPUT_BASE}/data.yaml", 'w') as f:
         yaml.dump(data_config, f)

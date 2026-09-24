@@ -17,7 +17,8 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 
 # ML
-torch>=2.2.0
+torch>=2.2,<2.4
+torchvision>=0.17,<0.19
 ultralytics==8.1.0
 
 # Image processing

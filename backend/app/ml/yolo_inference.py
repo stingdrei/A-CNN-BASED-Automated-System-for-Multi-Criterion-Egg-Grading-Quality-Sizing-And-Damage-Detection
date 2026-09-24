@@ -12,7 +12,7 @@ class YOLOPredictor:
         self.model_path = model_path or settings.MODEL_PATH
         self.confidence = confidence
         self.mm_per_pixel = mm_per_pixel or settings.MM_PER_PIXEL
-        self.class_names = ["not_damaged", "damaged"]
+        self.class_names = ["egg"]
         self._model = None
 
     @property
@@ -52,8 +52,6 @@ class YOLOPredictor:
         return round(max(30, min(80, weight)), 1)
 
     def map_to_grade(self, class_name: str, size_category: Optional[str]) -> str:
-        if class_name == "damaged":
-            return "Reject"
         if not size_category or size_category == "unknown":
             return "N/A"
         if size_category == "large":
@@ -104,8 +102,9 @@ class YOLOPredictor:
         return {
             "detections": detections,
             "total": len(detections),
-            "damaged": sum(1 for d in detections if d["class"] == "damaged"),
-            "not_damaged": sum(1 for d in detections if d["class"] == "not_damaged")
+            # Damage is intentionally unknown until the damage classifier runs.
+            "damaged": 0,
+            "not_damaged": 0,
         }
 
     def draw_boxes(self, image: np.ndarray, detections: List[Dict]) -> np.ndarray:

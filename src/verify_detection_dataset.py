@@ -173,7 +173,7 @@ def validate(args: argparse.Namespace) -> dict:
                                     "class": class_names[box[0]],
                                     "area_fraction": round(box[3] * box[4], 6),
                                 })
-                if not boxes:
+                if not boxes and args.require_boxes:
                     errors.append(f"{split}: no valid boxes for {relative_image}")
                 records.append({
                     "split": split,
@@ -287,6 +287,11 @@ def main() -> None:
     )
     parser.add_argument("--preview-per-split", type=int, default=20)
     parser.add_argument("--preview-seed", type=int, default=42)
+    parser.add_argument(
+        "--require-boxes",
+        action="store_true",
+        help="Reject empty-tray annotations; empty label files are valid by default",
+    )
     validate(parser.parse_args())
 
 
