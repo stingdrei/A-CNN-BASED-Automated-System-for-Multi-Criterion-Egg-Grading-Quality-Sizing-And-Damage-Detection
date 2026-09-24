@@ -87,6 +87,7 @@ def train_yolo(device="cpu"):
         epochs=EPOCHS,
         imgsz=IMG_SIZE,
         batch=BATCH,
+        workers=0,
         project=os.path.abspath(PROJECT_NAME),
         name=RUN_NAME,
         device=device,
