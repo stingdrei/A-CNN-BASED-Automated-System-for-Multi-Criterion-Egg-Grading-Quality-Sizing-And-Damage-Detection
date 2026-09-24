@@ -22,7 +22,7 @@ RUN_NAME = "train1"
 
 def create_data_yaml():
     data_config = {
-        "path": ".",
+        "path": str(DATASET_DIR),
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
@@ -71,7 +71,19 @@ def validate_dataset():
         )
 
 
+def clean_cache_files():
+    labels_dir = DATASET_DIR / "labels"
+    if labels_dir.is_dir():
+        for cache_file in labels_dir.glob("*.cache"):
+            try:
+                cache_file.unlink()
+                print(f"Removed cache file: {cache_file.name}")
+            except Exception as e:
+                print(f"Failed to remove cache file {cache_file}: {e}")
+
+
 def train_yolo(device="cpu"):
+    clean_cache_files()
     create_data_yaml()
     validate_dataset()
 
