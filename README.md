@@ -70,6 +70,11 @@ This project is a starter template for an automated egg grading system using Con
 # Prepare dataset directories & data.yaml
 python src/train_yolo.py --prepare
 
+# Audit image/label pairing and split leakage before training
+python src/verify_detection_dataset.py \
+  --preview-dir /tmp/egg-box-previews \
+  --preview-per-split 20
+
 # Train (CPU — ~2.5hr for 100 epochs on M1)
 python src/train_yolo.py --train
 
@@ -99,7 +104,19 @@ rsync -avz /path/to/egg-cv/egg_detection/train1/weights/best.pt \
     user@this-machine:/path/egg-cv/models/
 ```
 
-The `data/detection/data.yaml` uses relative paths so it works anywhere.
+The audit writes `data/detection/manifest.csv` and
+`reports/detection_dataset_report.json`. Training should not begin if the
+audit reports duplicate or near-duplicate leakage, invalid labels, missing
+image/label pairs, or unverified annotation problems. The current generated
+labels are heuristic contour boxes and require visual verification before
+detector metrics are considered valid. With `--preview-dir`, inspect the
+annotated samples under `/tmp/egg-box-previews/{train,val,test}`. The report
+also lists boxes covering at least 75% of an image under `oversized_boxes`;
+these require particular attention because they may indicate classification
+images rather than tightly annotated egg locations.
+
+The `data/detection/data.yaml` uses repository-relative paths and
+`train_yolo.py` resolves them independently of the caller's working directory.
 
 ### Static Tray Detection
 ```bash

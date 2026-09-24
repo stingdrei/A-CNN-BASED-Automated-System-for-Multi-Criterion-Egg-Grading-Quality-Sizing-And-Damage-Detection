@@ -6,9 +6,12 @@ Usage:
 """
 
 import os
+from pathlib import Path
 
 import yaml
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DATASET_DIR = REPO_ROOT / "data" / "detection"
 YOLO_MODEL = "yolov8s.pt"
 IMG_SIZE = 640
 EPOCHS = 100
@@ -19,33 +22,59 @@ RUN_NAME = "train1"
 
 def create_data_yaml():
     data_config = {
-        "path": ".",  # relative path works regardless of machine
+        "path": str(DATASET_DIR),
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
         "nc": 2,
         "names": {0: "not_damaged", 1: "damaged"},
     }
-    with open("data/detection/data.yaml", "w") as f:
+    with open(DATASET_DIR / "data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
     print("Created data/detection/data.yaml")
 
 
 def prepare_directories():
     dirs = [
-        "data/detection/images/train",
-        "data/detection/images/val",
-        "data/detection/images/test",
-        "data/detection/labels/train",
-        "data/detection/labels/val",
-        "data/detection/labels/test",
+        DATASET_DIR / "images" / "train",
+        DATASET_DIR / "images" / "val",
+        DATASET_DIR / "images" / "test",
+        DATASET_DIR / "labels" / "train",
+        DATASET_DIR / "labels" / "val",
+        DATASET_DIR / "labels" / "test",
     ]
     for d in dirs:
         os.makedirs(d, exist_ok=True)
     print("Created dataset directories.")
 
 
+def validate_dataset():
+    """Fail early with an actionable message when images are unavailable."""
+    missing_splits = []
+    for split in ("train", "val"):
+        image_dir = DATASET_DIR / "images" / split
+        image_count = sum(
+            1
+            for path in image_dir.iterdir()
+            if path.is_file() and path.suffix.lower() in {".jpg", ".jpeg", ".png"}
+        ) if image_dir.is_dir() else 0
+        if image_count == 0:
+            missing_splits.append(f"{split}: {image_dir}")
+
+    if missing_splits:
+        details = "\n".join(f"  - {item}" for item in missing_splits)
+        raise FileNotFoundError(
+            "YOLO training cannot start because no detector images were found:\n"
+            f"{details}\n"
+            "Run `python src/convert_to_yolo.py` after placing source images in "
+            "`data/damage/`, or restore the tracked `data/detection/images/` files."
+        )
+
+
 def train_yolo(device="cpu"):
+    create_data_yaml()
+    validate_dataset()
+
     try:
         from ultralytics import YOLO
     except ImportError:
@@ -54,7 +83,7 @@ def train_yolo(device="cpu"):
 
     model = YOLO(YOLO_MODEL)
     results = model.train(
-        data="data/detection/data.yaml",
+        data=str(DATASET_DIR / "data.yaml"),
         epochs=EPOCHS,
         imgsz=IMG_SIZE,
         batch=BATCH,

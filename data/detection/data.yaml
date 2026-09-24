@@ -2,7 +2,7 @@ names:
   0: not_damaged
   1: damaged
 nc: 2
-path: .
+path: data/detection
 test: images/test
 train: images/train
 val: images/val
