@@ -108,7 +108,7 @@ def main():
         os.makedirs(f"{OUTPUT_BASE}/labels/{split}", exist_ok=True)
     
     # Detection has one class: egg. Damage is classified downstream.
-    damaged = [(p, 0) for p in Path(DAMAGED_DIR).glob("*.jpg")]
+    damaged = [(p, 1) for p in Path(DAMAGED_DIR).glob("*.jpg")]
     not_damaged = [(p, 0) for p in Path(NOT_DAMAGED_DIR).glob("*.jpg")]
     all_images = damaged + not_damaged
     np.random.shuffle(all_images)
@@ -139,10 +139,19 @@ def main():
         'test': d_test + nd_test,
     }
     
+    # Clean up stale cache files
+    labels_dir = Path(OUTPUT_BASE) / "labels"
+    if labels_dir.is_dir():
+        for cache_file in labels_dir.glob("*.cache"):
+            try:
+                cache_file.unlink()
+            except Exception:
+                pass
+
     for split_name, items in splits.items():
         np.random.shuffle(items)
         print(f"Processing {split_name} ({len(items)} images)...")
-        for i, (img_path, class_id) in enumerate(items):
+        for i, (img_path, original_cls) in enumerate(items):
             img = cv2.imread(str(img_path))
             if img is None:
                 continue
@@ -151,7 +160,7 @@ def main():
             cv2.imwrite(dest_img, img)
             
             dest_label = f"{OUTPUT_BASE}/labels/{split_name}/{img_path.stem}.txt"
-            convert_to_yolo(img_path, dest_label, w, h, class_id=class_id)
+            convert_to_yolo(img_path, dest_label, w, h, class_id=0)
             
             if (i + 1) % 100 == 0:
                 print(f"  {i+1}/{len(items)}")

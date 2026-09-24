@@ -10,7 +10,7 @@ imgsz: 640
 save: true
 save_period: -1
 cache: false
-device: cuda:0
+device: cuda
 workers: 0
 project: C:\Users\USER_1\Thesis\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\egg_detection
 name: train1
