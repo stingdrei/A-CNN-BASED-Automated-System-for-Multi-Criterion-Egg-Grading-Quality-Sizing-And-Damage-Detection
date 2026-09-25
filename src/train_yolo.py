@@ -21,53 +21,53 @@ PROJECT_NAME = "egg_detection"
 RUN_NAME = "train1"
 
 
-def get_data_config() -> dict:
-    yaml_path = DATASET_DIR / "data.yaml"
+def get_data_config(dataset_dir: Path = DATASET_DIR) -> dict:
+    yaml_path = dataset_dir / "data.yaml"
     if yaml_path.is_file():
         with open(yaml_path, "r") as f:
             cfg = yaml.safe_load(f)
-            cfg["path"] = str(DATASET_DIR)
+            cfg["path"] = str(dataset_dir.resolve())
             return cfg
     return {
-        "path": str(DATASET_DIR),
+        "path": str(dataset_dir.resolve()),
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
-        "nc": 2,
-        "names": ["B-eggs", "W-eggs"],
+        "nc": 1,
+        "names": ["egg"],
     }
 
 
-def create_data_yaml():
-    data_config = get_data_config()
-    with open(DATASET_DIR / "data.yaml", "w") as f:
+def create_data_yaml(dataset_dir: Path = DATASET_DIR):
+    data_config = get_data_config(dataset_dir)
+    with open(dataset_dir / "data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
-    print("Created data/detection/data.yaml")
+    print(f"Created {dataset_dir / 'data.yaml'}")
 
 
-def data_config() -> dict:
-    return get_data_config()
+def data_config(dataset_dir: Path = DATASET_DIR) -> dict:
+    return get_data_config(dataset_dir)
 
 
-def prepare_directories():
+def prepare_directories(dataset_dir: Path = DATASET_DIR):
     dirs = [
-        DATASET_DIR / "images" / "train",
-        DATASET_DIR / "images" / "val",
-        DATASET_DIR / "images" / "test",
-        DATASET_DIR / "labels" / "train",
-        DATASET_DIR / "labels" / "val",
-        DATASET_DIR / "labels" / "test",
+        dataset_dir / "images" / "train",
+        dataset_dir / "images" / "val",
+        dataset_dir / "images" / "test",
+        dataset_dir / "labels" / "train",
+        dataset_dir / "labels" / "val",
+        dataset_dir / "labels" / "test",
     ]
     for d in dirs:
         os.makedirs(d, exist_ok=True)
     print("Created dataset directories.")
 
 
-def validate_dataset():
+def validate_dataset(dataset_dir: Path = DATASET_DIR):
     """Fail early with an actionable message when images are unavailable."""
     missing_splits = []
     for split in ("train", "val", "test"):
-        image_dir = DATASET_DIR / "images" / split
+        image_dir = dataset_dir / "images" / split
         image_count = sum(
             1
             for path in image_dir.iterdir()
@@ -81,13 +81,12 @@ def validate_dataset():
         raise FileNotFoundError(
             "YOLO training cannot start because no detector images were found:\n"
             f"{details}\n"
-            "Run `python src/convert_to_yolo.py` after placing source images in "
-            "`data/damage/`, or restore the tracked `data/detection/images/` files."
+            "Prepare the dataset before training, or restore the required image files."
         )
 
 
-def clean_cache_files():
-    labels_dir = DATASET_DIR / "labels"
+def clean_cache_files(dataset_dir: Path = DATASET_DIR):
+    labels_dir = dataset_dir / "labels"
     if labels_dir.is_dir():
         for cache_file in labels_dir.glob("*.cache"):
             try:
@@ -97,10 +96,24 @@ def clean_cache_files():
                 print(f"Failed to remove cache file {cache_file}: {e}")
 
 
-def train_yolo(device="cpu"):
-    clean_cache_files()
-    create_data_yaml()
-    validate_dataset()
+def train_yolo(
+    device="cpu",
+    model_path=YOLO_MODEL,
+    dataset_dir=DATASET_DIR,
+    project=PROJECT_NAME,
+    run_name=RUN_NAME,
+    epochs=EPOCHS,
+    imgsz=IMG_SIZE,
+    batch=BATCH,
+):
+    checkpoint = Path(model_path)
+    if not checkpoint.is_absolute():
+        checkpoint = (REPO_ROOT / checkpoint).resolve()
+    if not checkpoint.is_file():
+        raise FileNotFoundError(f"Starting checkpoint not found: {checkpoint}")
+    clean_cache_files(dataset_dir)
+    create_data_yaml(dataset_dir)
+    validate_dataset(dataset_dir)
 
     try:
         from ultralytics import YOLO
@@ -109,20 +122,22 @@ def train_yolo(device="cpu"):
         return
 
     with NamedTemporaryFile("w", suffix=".yaml", delete=False) as runtime_file:
-        yaml.safe_dump(data_config(), runtime_file)
+        yaml.safe_dump(data_config(dataset_dir), runtime_file)
         runtime_data_path = runtime_file.name
     try:
-        model = YOLO(YOLO_MODEL)
+        model = YOLO(str(checkpoint))
         results = model.train(
             data=runtime_data_path,
-            epochs=EPOCHS,
-            imgsz=IMG_SIZE,
-            batch=BATCH,
+            epochs=epochs,
+            imgsz=imgsz,
+            batch=batch,
             workers=0,
-            project=os.path.abspath(PROJECT_NAME),
-            name=RUN_NAME,
+            project=str((REPO_ROOT / project).resolve())
+            if not os.path.isabs(project)
+            else project,
+            name=run_name,
             device=device,
-            exist_ok=True,
+            exist_ok=False,
             pretrained=True,
             optimizer="SGD",
             lr0=0.01,
@@ -149,7 +164,7 @@ def train_yolo(device="cpu"):
     print("========================")
     print("\nTraining complete!")
     print(f"Results: {results}")
-    print(f"Best model: {PROJECT_NAME}/{RUN_NAME}/weights/best.pt")
+    print(f"Best model: {project}/{run_name}/weights/best.pt")
     print("========================")
 
 
@@ -164,14 +179,30 @@ if __name__ == "__main__":
     parser.add_argument(
         "--device", default="cpu", help="Device: cpu, cuda:0, mps (default: cpu)"
     )
+    parser.add_argument("--model", default=YOLO_MODEL, help="Starting YOLO checkpoint")
+    parser.add_argument("--data-root", type=Path, default=DATASET_DIR)
+    parser.add_argument("--project", default=PROJECT_NAME)
+    parser.add_argument("--name", default=RUN_NAME)
+    parser.add_argument("--epochs", type=int, default=EPOCHS)
+    parser.add_argument("--imgsz", type=int, default=IMG_SIZE)
+    parser.add_argument("--batch", type=int, default=BATCH)
     args = parser.parse_args()
 
     if args.prepare:
-        prepare_directories()
-        create_data_yaml()
+        prepare_directories(args.data_root)
+        create_data_yaml(args.data_root)
     elif args.train:
-        train_yolo(device=args.device)
+        train_yolo(
+            device=args.device,
+            model_path=args.model,
+            dataset_dir=args.data_root,
+            project=args.project,
+            run_name=args.name,
+            epochs=args.epochs,
+            imgsz=args.imgsz,
+            batch=args.batch,
+        )
     else:
-        prepare_directories()
-        create_data_yaml()
+        prepare_directories(args.data_root)
+        create_data_yaml(args.data_root)
         print("\nTo train: python train_yolo.py --train")

@@ -89,6 +89,36 @@ python src/train_yolo.py --train --device cuda:0
 python src/train_yolo.py --train --device mps       # Apple Silicon
 ```
 
+### Safe Fine-Tuning From the Current Detector
+
+Create a separate one-class dataset and fine-tune from the current detector
+without modifying its images, labels, or checkpoint:
+
+```bash
+python src/prepare_detector_finetune.py \
+    --source-yaml data/detection/data.yaml \
+    --output-root data/detection_finetune
+
+python src/verify_detection_dataset.py \
+    --data-yaml data/detection_finetune/data.yaml \
+    --annotation-source "manually verified; fine-tuning dataset"
+
+python src/train_yolo.py --train \
+    --model egg_detection/train1/weights/best.pt \
+    --data-root data/detection_finetune \
+    --project egg_detection \
+    --name finetune_egg_v1 \
+    --device mps \
+    --epochs 50
+```
+
+The fine-tuning run writes to `egg_detection/finetune_egg_v1/`; it does not
+overwrite `egg_detection/train1/weights/best.pt`. Fine-tuning starts from a
+copy of the learned weights, so it retains prior egg-localization knowledge,
+but new training can still reduce performance when labels are wrong or the
+dataset is narrow. Keep the original checkpoint and compare both models on
+the same locked test set before replacing it.
+
 ### Training on Another Machine
 Transfer the 307MB dataset to any machine with Python:
 
