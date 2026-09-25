@@ -1,5 +1,68 @@
 # Enhanced Egg Detection System - Architecture & Data Flow
 
+## Current Target Data Flow
+
+The detector and classifiers have separate responsibilities. YOLO must detect
+only eggs; the damage and cleanliness models classify each detected egg crop.
+The grading engine combines those results with calibrated geometry.
+
+```mermaid
+flowchart TD
+    A[Camera or static tray image] --> B[YOLO egg detector<br/>class: egg]
+    B --> C{Confidence and bounds validation}
+    C -->|valid detection| D[Crop each egg<br/>with padding and clipping]
+    C -->|invalid or low confidence| U[Unknown / surfaced failure]
+
+    D --> E[Damage classifier<br/>Damaged / Not Damaged]
+    D --> F[Cleanliness classifier<br/>Clean / Stained]
+    D --> G[Geometry measurement<br/>major axis L, minor axis B]
+
+    G --> H[Camera calibration<br/>pixels to millimeters]
+    H --> I[Size and weight estimator<br/>size bins + W = k × L × B²]
+
+    E --> J[Per-egg result record]
+    F --> J
+    I --> J
+    B --> J
+    J --> K{Deterministic grading rules}
+    K -->|Damaged or Stained| L[Reject]
+    K -->|Clean + Large| M[Grade A]
+    K -->|Clean + Medium| N[Grade B]
+    K -->|Clean + Small| O[Grade C]
+    K -->|Unknown or invalid| P[N/A or abstain]
+
+    J --> Q[API response / CSV / database]
+    L --> Q
+    M --> Q
+    N --> Q
+    O --> Q
+    P --> Q
+    Q --> R[Dashboard, annotated image, audit metadata]
+```
+
+### Model connection contract
+
+| Stage | Input | Output | Next stage |
+|---|---|---|---|
+| YOLO egg detector | Full tray frame | One `egg` box and detection confidence per egg | Cropper |
+| Cropper | Frame plus box | One bounded egg crop per detection | Damage, cleanliness, geometry |
+| Damage classifier | Egg crop | `damage_status`, damage confidence | Grading |
+| Cleanliness classifier | Egg crop | `cleanliness_status`, cleanliness confidence | Grading |
+| Geometry/calibration | Egg crop and camera calibration | `L`, `B`, millimeters, size, weight | Grading |
+| Grading engine | All per-egg outputs | `grade` (`A`, `B`, `C`, `Reject`, or `N/A`) | API/storage/UI |
+
+The detector should not use `damaged` and `not_damaged` as its object classes.
+Those are classifier outputs. This separation allows one tray image to produce
+up to five independent egg results and prevents non-egg objects from being
+treated as damaged or undamaged eggs.
+
+## Legacy Prototype Flow
+
+The ASCII diagram below describes the earlier tracking prototype and is retained
+for historical reference only. It is not the current static-tray target
+architecture: do not add video tracking, FPS requirements, or tracking IDs to
+the final implementation.
+
 ## System Architecture Diagram
 
 ```

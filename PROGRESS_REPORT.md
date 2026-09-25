@@ -1,6 +1,63 @@
 # Progress Report
 
-Date: 2026-09-24
+Date: 2026-09-25
+
+## Detector Demonstration Findings
+
+The current YOLO detector was trained using a dataset composed primarily of
+single-egg images. This dataset does not represent the intended deployment
+scenario: a tray image containing up to five eggs under varied lighting and
+capture conditions.
+
+During live-view testing, the detector showed the following behavior:
+
+- At a confidence threshold of `0.75`, it usually detected only one or two
+  eggs in a five-egg tray.
+- At a confidence threshold of `0.50`, it sometimes detected three eggs when
+  the eggs were well separated and the lighting and camera distance were
+  favorable.
+- In favorable conditions it occasionally detected all five eggs, but the
+  detections were not consistently precise.
+- The detector can therefore demonstrate partial multi-egg detection, but it
+  cannot currently be presented as a reliable five-egg tray detector.
+
+The problem is not only the confidence threshold. The current annotations are
+heuristic single-image boxes rather than verified tray-level bounding boxes.
+The audit identified 298 oversized boxes covering at least 75% of the image
+area. On held-out single-egg images, the detector often returns broad
+image-spanning boxes and may produce duplicate boxes. This indicates that the
+model has not learned precise egg boundaries.
+
+## Current Assessment
+
+The trained model is a prototype and is not ready for final deployment or
+accuracy claims. Its live-view behavior is useful for demonstrating progress,
+but the results are limited by dataset mismatch, annotation quality, and
+unrepresented tray conditions.
+
+## Corrective Data-Collection Plan
+
+The next work package is to collect a new detector dataset that matches the
+intended task:
+
+1. Capture images containing five eggs arranged on a tray, plus valid examples
+   containing fewer eggs and an empty tray where appropriate.
+2. Vary lighting, shadows, camera distance, camera angle, background, tray
+   position, egg orientation, shell color, and partial overlap.
+3. Record the damage and cleanliness classification for each egg so the
+   detector and downstream classifiers can be aligned with the same samples.
+4. Draw one tight, manually verified `egg` bounding box around every visible
+   egg. Do not use damage status as detector class IDs.
+5. Split images by tray, capture session, and source egg before training so
+   related images cannot leak across train, validation, and test sets.
+6. Freeze a representative tray-level test set and select the confidence
+   threshold using validation data only.
+
+After collection and annotation, the detector will be retrained with the
+single `egg` class and evaluated using per-egg recall, precision, mAP,
+missed-eggs-per-tray, false-positives-per-tray, and exact tray-count accuracy.
+The current model will remain the baseline until the new model passes that
+comparison.
 
 ## Current Status
 
