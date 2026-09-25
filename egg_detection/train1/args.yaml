@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: yolov8s.pt
-data: C:\Users\USER_1\Thesis\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\data\detection\data.yaml
+data: C:\Users\USER_1\AppData\Local\Temp\tmp33lb1pyn.yaml
 epochs: 100
 time: null
 patience: 50
@@ -10,7 +10,7 @@ imgsz: 640
 save: true
 save_period: -1
 cache: false
-device: cuda
+device: cuda:0
 workers: 0
 project: C:\Users\USER_1\Thesis\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\egg_detection
 name: train1

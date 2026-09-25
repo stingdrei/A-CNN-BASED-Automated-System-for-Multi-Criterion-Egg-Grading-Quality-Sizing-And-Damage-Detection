@@ -8,17 +8,11 @@ damage, cleanliness, and geometry measurements.
 
 ## Current state
 
-- Artifact: `models/egg_detection_finetuned/weights/best.pt`
-- Framework: YOLO
-- Dataset class: `egg`; damage is handled by the downstream classifier
-- The checked-in checkpoint predates this correction and must be retrained
-  before deployment.
-- Training log: 50 epochs in `models/egg_detection_finetuned/results.csv`
-- Best logged mAP@50: approximately 0.835 at epoch 46
-- Final logged epoch: precision approximately 0.740, recall approximately 0.750,
-  mAP@50 approximately 0.815, mAP@50–95 approximately 0.616
-
-These are baseline training-run metrics, not a final independent test result.
+- Artifact: `egg_detection/train1/weights/best.pt`
+- Framework: YOLOv8 (`yolov8s.pt` fine-tuned)
+- Dataset classes: `B-eggs` (Brown eggs) and `W-eggs` (White eggs) sourced from `Egg-detection model.v3i.yolov8`
+- Dataset split: Train (168 images), Validation (24 images), Test (19 images)
+- Active dataset location: `data/detection/` (configured in `data/detection/data.yaml`)
 
 ## Requirements
 

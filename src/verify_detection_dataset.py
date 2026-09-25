@@ -42,7 +42,7 @@ def image_hash(path: Path) -> str:
 def perceptual_hash(path: Path) -> int:
     with Image.open(path) as source:
         resized = source.convert("L").resize((9, 8))
-        pixels = list(resized.get_flattened_data())
+        pixels = list(resized.getdata())
     differences = [
         pixels[row * 9 + column + 1] > pixels[row * 9 + column]
         for row in range(8)
