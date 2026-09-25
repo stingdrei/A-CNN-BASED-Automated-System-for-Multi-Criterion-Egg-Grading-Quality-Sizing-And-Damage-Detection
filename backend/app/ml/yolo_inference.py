@@ -20,7 +20,16 @@ class YOLOPredictor:
         if self._model is None:
             from ultralytics import YOLO
             self._model = YOLO(self.model_path)
+            if hasattr(self._model, "names") and self._model.names:
+                self.class_names = self._model.names
         return self._model
+
+    def get_class_name(self, class_id: int) -> str:
+        if isinstance(self.class_names, dict):
+            return self.class_names.get(class_id, f"class_{class_id}")
+        elif isinstance(self.class_names, list) and 0 <= class_id < len(self.class_names):
+            return self.class_names[class_id]
+        return "egg"
 
     def load_model(self) -> bool:
         if not os.path.exists(self.model_path):
@@ -88,10 +97,11 @@ class YOLOPredictor:
                 diameter_px = max(x2 - x1, y2 - y1)
                 size_cat = self.calculate_size_category(diameter_px)
                 weight = self.estimate_weight(diameter_px)
-                grade = self.map_to_grade(self.class_names[int(clss[i])], size_cat)
+                class_name = self.get_class_name(int(clss[i]))
+                grade = self.map_to_grade(class_name, size_cat)
                 
                 detections.append({
-                    "class": self.class_names[int(clss[i])],
+                    "class": class_name,
                     "confidence": float(confs[i]),
                     "bbox": [x1, y1, x2, y2],
                     "size_category": size_cat,

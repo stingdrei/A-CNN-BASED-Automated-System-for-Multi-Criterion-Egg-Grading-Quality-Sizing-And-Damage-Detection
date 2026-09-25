@@ -21,29 +21,32 @@ PROJECT_NAME = "egg_detection"
 RUN_NAME = "train1"
 
 
-def create_data_yaml():
-    data_config = {
-        "path": ".",
+def get_data_config() -> dict:
+    yaml_path = DATASET_DIR / "data.yaml"
+    if yaml_path.is_file():
+        with open(yaml_path, "r") as f:
+            cfg = yaml.safe_load(f)
+            cfg["path"] = str(DATASET_DIR)
+            return cfg
+    return {
+        "path": str(DATASET_DIR),
         "train": "images/train",
         "val": "images/val",
         "test": "images/test",
-        "nc": 1,
-        "names": {0: "egg"},
+        "nc": 2,
+        "names": ["B-eggs", "W-eggs"],
     }
+
+
+def create_data_yaml():
+    data_config = get_data_config()
     with open(DATASET_DIR / "data.yaml", "w") as f:
         yaml.dump(data_config, f, default_flow_style=False)
     print("Created data/detection/data.yaml")
 
 
 def data_config() -> dict:
-    return {
-        "path": str(DATASET_DIR),
-        "train": "images/train",
-        "val": "images/val",
-        "test": "images/test",
-        "nc": 1,
-        "names": {0: "egg"},
-    }
+    return get_data_config()
 
 
 def prepare_directories():

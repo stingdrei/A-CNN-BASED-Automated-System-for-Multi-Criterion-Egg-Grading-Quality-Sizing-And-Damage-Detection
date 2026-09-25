@@ -3,16 +3,16 @@
   "data_yaml": "C:\\Users\\USER_1\\Thesis\\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\\data\\detection\\data.yaml",
   "split": "test",
   "confidence": 0.75,
-  "images": 119,
-  "exact_tray_count_accuracy": 0.6470588235294118,
-  "false_positives_per_tray": 0.0,
-  "missed_eggs_per_tray": 0.35294117647058826,
-  "ground_truth_eggs": 119,
+  "images": 19,
+  "exact_tray_count_accuracy": 0.631578947368421,
+  "false_positives_per_tray": 0.3157894736842105,
+  "missed_eggs_per_tray": 0.3157894736842105,
+  "ground_truth_eggs": 57,
   "ultralytics_metrics": {
-    "metrics/precision(B)": 0.9066666666666666,
-    "metrics/recall(B)": 0.5714285714285714,
-    "metrics/mAP50(B)": 0.754984592376426,
-    "metrics/mAP50-95(B)": 0.4848519802421142,
-    "fitness": 0.5118652414555454
+    "metrics/precision(B)": 0.8983375959079284,
+    "metrics/recall(B)": 0.9107142857142857,
+    "metrics/mAP50(B)": 0.8953659207161125,
+    "metrics/mAP50-95(B)": 0.7784011610405344,
+    "fitness": 0.7900976370080922
   }
 }

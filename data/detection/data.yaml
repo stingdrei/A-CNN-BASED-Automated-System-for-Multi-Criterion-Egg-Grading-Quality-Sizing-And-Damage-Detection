@@ -1,7 +1,8 @@
 names:
-  0: egg
-nc: 1
-path: .
+- B-eggs
+- W-eggs
+nc: 2
+path: C:\Users\USER_1\Thesis\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\data\detection
 test: images/test
 train: images/train
 val: images/val
