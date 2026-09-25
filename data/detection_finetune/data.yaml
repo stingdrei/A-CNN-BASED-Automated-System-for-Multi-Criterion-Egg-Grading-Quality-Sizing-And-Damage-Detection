@@ -1,7 +1,7 @@
-path: .
-train: images/train
-val: images/val
-test: images/test
-nc: 1
 names:
 - egg
+nc: 1
+path: C:\Users\USER_1\Thesis\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\data\detection_finetune
+test: images/test
+train: images/train
+val: images/val
