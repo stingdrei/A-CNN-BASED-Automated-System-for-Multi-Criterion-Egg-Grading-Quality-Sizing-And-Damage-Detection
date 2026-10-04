@@ -51,11 +51,21 @@ class FileService:
         stored_name = f"{file_id}{ext}"
         file_path = self.upload_dir / stored_name
         
-        content = file.file.read()
-        with open(file_path, "wb") as f:
-            f.write(content)
-        
-        file_type = self.get_file_type(file.filename)
+        max_bytes = settings.MAX_FILE_SIZE_MB * 1024 * 1024
+        total_bytes = 0
+        try:
+            with open(file_path, "wb") as f:
+                while chunk := file.file.read(1024 * 1024):
+                    total_bytes += len(chunk)
+                    if total_bytes > max_bytes:
+                        raise ValueError(
+                            f"File exceeds the {settings.MAX_FILE_SIZE_MB} MB limit"
+                        )
+                    f.write(chunk)
+            file_type = self.get_file_type(file.filename)
+        except Exception:
+            file_path.unlink(missing_ok=True)
+            raise
         return str(file_path), file_type
     
     def delete_file(self, file_path: str) -> bool:

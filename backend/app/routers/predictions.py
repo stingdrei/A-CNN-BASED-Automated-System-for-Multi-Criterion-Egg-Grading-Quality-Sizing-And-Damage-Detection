@@ -7,8 +7,10 @@ from app.database import get_db
 from app.models import User, Prediction
 from app.schemas import PredictionResponse, PredictionDetail
 from app.security import get_current_user
-from app.services import file_service, prediction_service
-from app.ml.yolo_inference import YOLOPredictor
+from app.services.file_service import file_service
+from app.services.prediction_service import prediction_service
+from app.ml.model_registry import model_registry
+from app.services.prediction_service import PredictionService
 
 router = APIRouter(prefix="/predictions", tags=["predictions"])
 
@@ -27,29 +29,45 @@ async def upload_file(
             detail="Unsupported file type. Allowed: jpg, jpeg, png, webp, bmp, mp4, avi, mov, mkv"
         )
 
-    file_path, file_type = file_service.save_file_sync(file)
-    
-    prediction = prediction_service.create_prediction(
-        db, current_user.id, file.filename, file_path, file_type
-    )
-    
     try:
-        predictor = YOLOPredictor(
-            confidence=confidence_threshold,
-            mm_per_pixel=current_user.mm_per_pixel
+        file_path, file_type = file_service.save_file_sync(file)
+        prediction = prediction_service.create_prediction(
+            db, current_user.id, file.filename, file_path, file_type
         )
-        pred_service = prediction_service.__class__(predictor)
+        if (
+            not model_registry.detector_loaded
+            or not model_registry.damage_loaded
+            or model_registry.detector is None
+            or model_registry.damage is None
+        ):
+            raise RuntimeError("Required prediction models are not available")
+        model_registry.detector.confidence = confidence_threshold
+        model_registry.detector.mm_per_pixel = current_user.mm_per_pixel
+        pred_service = PredictionService(
+            model_registry.detector,
+            model_registry.damage,
+        )
         prediction = pred_service.run_prediction(
             db, prediction.id, confidence_threshold, save_annotated
         )
+    except ValueError as e:
+        if "file_path" in locals():
+            file_service.delete_file(file_path)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from e
     except Exception as e:
-        prediction.status = "failed"
-        prediction.error_message = str(e)
-        db.commit()
+        if "file_path" in locals() and "prediction" not in locals():
+            file_service.delete_file(file_path)
+        if "prediction" in locals():
+            prediction.status = "failed"
+            prediction.error_message = "Prediction processing failed"
+            db.commit()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Prediction failed: {str(e)}"
-        )
+            detail="Prediction processing failed",
+        ) from e
     
     return prediction
 

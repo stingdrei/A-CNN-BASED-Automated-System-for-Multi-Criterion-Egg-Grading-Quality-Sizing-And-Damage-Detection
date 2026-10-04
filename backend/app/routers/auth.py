@@ -10,8 +10,7 @@ from app.schemas import (
     DashboardStats, HealthResponse
 )
 from app.security import get_current_user
-from app.services import auth_service, file_service, prediction_service
-from app.ml.yolo_inference import YOLOPredictor
+from app.services.auth_service import auth_service
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")

@@ -1,3 +1,5 @@
-from app.services.auth_service import auth_service
-from app.services.file_service import file_service
-from app.services.prediction_service import prediction_service
+"""Backend service modules.
+
+Services are imported by their consumers so lightweight modules can be tested
+without eagerly loading database or model dependencies.
+"""

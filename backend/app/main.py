@@ -6,18 +6,21 @@ from contextlib import asynccontextmanager
 from app.config import settings
 from app.database import engine, Base
 from app.routers import auth, predictions, dashboard, user_settings
-from app.ml.yolo_inference import YOLOPredictor
+from app.ml.model_registry import model_registry
 
 model_loaded = False
+damage_model_loaded = False
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global model_loaded
+    global model_loaded, damage_model_loaded
     try:
-        predictor = YOLOPredictor()
-        model_loaded = predictor.load_model()
-        print("YOLO model loaded successfully")
+        model_loaded, damage_model_loaded = model_registry.load()
+        print(
+            "Models loaded: "
+            f"detector={model_loaded}, damage_classifier={damage_model_loaded}"
+        )
     except Exception as e:
         print(f"Warning: Could not load YOLO model: {e}")
     

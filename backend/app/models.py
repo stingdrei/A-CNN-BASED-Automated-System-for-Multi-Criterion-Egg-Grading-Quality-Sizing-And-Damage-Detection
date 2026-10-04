@@ -40,6 +40,7 @@ class Prediction(Base):
     total_detections = Column(Integer, nullable=False, default=0)
     damaged_count = Column(Integer, nullable=False, default=0)
     not_damaged_count = Column(Integer, nullable=False, default=0)
+    needs_review_count = Column(Integer, nullable=False, default=0)
     processing_time_ms = Column(Integer, nullable=True)
     result_json = Column(JSON, nullable=True)
     annotated_path = Column(Text, nullable=True)
@@ -73,5 +74,9 @@ class DetectionBox(Base):
     size_category = Column(String(20), nullable=True)
     weight_g = Column(Float, nullable=True)
     grade = Column(String(10), nullable=True)
+    damage_status = Column(String(20), nullable=True)
+    damage_confidence = Column(Float, nullable=True)
+    damage_model_version = Column(String(255), nullable=True)
+    review_reason = Column(String(100), nullable=True)
 
     prediction = relationship("Prediction", back_populates="detection_boxes")

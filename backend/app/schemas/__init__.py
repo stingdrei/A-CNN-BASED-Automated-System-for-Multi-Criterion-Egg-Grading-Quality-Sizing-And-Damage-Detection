@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
 
@@ -47,6 +47,10 @@ class DetectionBoxResponse(BaseModel):
     size_category: Optional[str] = None
     weight_g: Optional[float] = None
     grade: Optional[str] = None
+    damage_status: Optional[str] = None
+    damage_confidence: Optional[float] = None
+    damage_model_version: Optional[str] = None
+    review_reason: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -60,6 +64,7 @@ class PredictionResponse(BaseModel):
     total_detections: int
     damaged_count: int
     not_damaged_count: int
+    needs_review_count: int
     processing_time_ms: Optional[int]
     created_at: datetime
     completed_at: Optional[datetime]
@@ -71,7 +76,7 @@ class PredictionResponse(BaseModel):
 class PredictionDetail(PredictionResponse):
     result_json: Optional[dict]
     annotated_path: Optional[str]
-    detection_boxes: List[DetectionBoxResponse] = []
+    detection_boxes: List[DetectionBoxResponse] = Field(default_factory=list)
 
     class Config:
         from_attributes = True
@@ -95,6 +100,7 @@ class DashboardStats(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool
+    damage_model_loaded: bool = False
     database_connected: bool
 
 

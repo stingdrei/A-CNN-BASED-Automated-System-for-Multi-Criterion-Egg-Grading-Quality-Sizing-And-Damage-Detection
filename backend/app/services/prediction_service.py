@@ -9,11 +9,18 @@ import cv2
 from app.models import Prediction, DetectionBox
 from app.ml.yolo_inference import YOLOPredictor
 from app.config import settings
+from app.ml.damage_inference import DamageClassifier
+from app.services.grading_service import calculate_grade
 
 
 class PredictionService:
-    def __init__(self, predictor: Optional[YOLOPredictor] = None):
+    def __init__(
+        self,
+        predictor: Optional[YOLOPredictor] = None,
+        damage_classifier: Optional[DamageClassifier] = None,
+    ):
         self.predictor = predictor or YOLOPredictor()
+        self.damage_classifier = damage_classifier
     
     def create_prediction(
         self,
@@ -52,19 +59,42 @@ class PredictionService:
         
         try:
             if prediction.file_type == "image":
+                img = cv2.imread(prediction.file_path)
+                if img is None:
+                    raise ValueError("Uploaded image could not be decoded")
                 result = self.predictor.predict_image(prediction.file_path)
+                if self.damage_classifier is None:
+                    raise RuntimeError("Damage classifier is not configured")
+                for det in result["detections"]:
+                    crop = crop_detection(
+                        img,
+                        det["bbox"],
+                        settings.DETECTION_CROP_PADDING,
+                        settings.MIN_CROP_SIZE,
+                    )
+                    damage = self.damage_classifier.classify_crop(crop)
+                    det["damage_status"] = damage.status
+                    det["damage_confidence"] = damage.confidence
+                    det["damage_model_version"] = damage.model_version
+                    det["review_reason"] = damage.review_reason
+                    det["grade"] = calculate_grade(
+                        damage.status,
+                        det.get("size_category"),
+                        det["confidence"],
+                        confidence,
+                    )
             else:
-                result = {"detections": [], "total": 0, "damaged": 0, "not_damaged": 0}
+                raise ValueError("Video prediction is not supported yet")
             
             annotated_path = None
             if save_annotated and result["detections"]:
-                img = cv2.imread(prediction.file_path)
                 if img is not None:
                     annotated = self.predictor.draw_boxes(img, result["detections"])
                     base_name = Path(prediction.file_path).stem
                     ext = Path(prediction.file_path).suffix
                     annotated_path = str(Path(prediction.file_path).parent / f"annotated_{base_name}{ext}")
-                    cv2.imwrite(annotated_path, annotated)
+                    if not cv2.imwrite(annotated_path, annotated):
+                        annotated_path = None
             
             for det in result["detections"]:
                 box = DetectionBox(
@@ -75,10 +105,14 @@ class PredictionService:
                     y1=det["bbox"][1],
                     x2=det["bbox"][2],
                     y2=det["bbox"][3],
-                    annotated=save_annotated,
+                    annotated=annotated_path is not None,
                     size_category=det.get("size_category"),
                     weight_g=det.get("weight_g"),
-                    grade=det.get("grade")
+                    grade=det.get("grade"),
+                    damage_status=det.get("damage_status"),
+                    damage_confidence=det.get("damage_confidence"),
+                    damage_model_version=det.get("damage_model_version"),
+                    review_reason=det.get("review_reason"),
                 )
                 db.add(box)
             
@@ -86,8 +120,17 @@ class PredictionService:
             prediction.result_json = result
             prediction.annotated_path = annotated_path
             prediction.total_detections = result["total"]
-            prediction.damaged_count = result["damaged"]
-            prediction.not_damaged_count = result["not_damaged"]
+            prediction.damaged_count = sum(
+                det.get("damage_status") == "Damaged" for det in result["detections"]
+            )
+            prediction.not_damaged_count = sum(
+                det.get("damage_status") == "Not Damaged"
+                for det in result["detections"]
+            )
+            prediction.needs_review_count = sum(
+                det.get("damage_status") == "Needs Review"
+                for det in result["detections"]
+            )
             prediction.processing_time_ms = int((time.time() - start_time) * 1000)
             prediction.completed_at = datetime.utcnow()
             
@@ -150,3 +193,25 @@ class PredictionService:
 
 
 prediction_service = PredictionService()
+
+
+def crop_detection(
+    image,
+    bbox: list[int],
+    padding_ratio: float,
+    min_crop_size: int,
+):
+    height, width = image.shape[:2]
+    x1, y1, x2, y2 = bbox
+    box_width, box_height = x2 - x1, y2 - y1
+    if box_width <= 0 or box_height <= 0:
+        return image[0:0, 0:0]
+    pad_x = int(box_width * padding_ratio)
+    pad_y = int(box_height * padding_ratio)
+    left = max(0, x1 - pad_x)
+    top = max(0, y1 - pad_y)
+    right = min(width, x2 + pad_x)
+    bottom = min(height, y2 + pad_y)
+    if right - left < min_crop_size or bottom - top < min_crop_size:
+        return image[0:0, 0:0]
+    return image[top:bottom, left:right]

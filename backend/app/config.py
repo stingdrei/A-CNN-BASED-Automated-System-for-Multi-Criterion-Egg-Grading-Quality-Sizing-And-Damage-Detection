@@ -23,7 +23,11 @@ class Settings(BaseSettings):
     MODEL_PATH: str = str(
         PROJECT_ROOT / "egg_detection" / "finetune_egg_v1" / "weights" / "best.pt"
     )
+    DAMAGE_MODEL_PATH: str = str(PROJECT_ROOT / "models" / "egg_grader.pth")
     CONFIDENCE_THRESHOLD: float = 0.75
+    DAMAGE_REVIEW_THRESHOLD: float = 0.75
+    DETECTION_CROP_PADDING: float = 0.1
+    MIN_CROP_SIZE: int = 8
     MM_PER_PIXEL: float = 0.09
 
     class Config:

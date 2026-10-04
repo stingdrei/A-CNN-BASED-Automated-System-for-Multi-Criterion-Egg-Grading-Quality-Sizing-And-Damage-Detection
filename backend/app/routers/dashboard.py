@@ -6,8 +6,7 @@ from app.database import get_db
 from app.models import User, Prediction, DetectionBox
 from app.schemas import DashboardStats, HealthResponse, GradeDistribution
 from app.security import get_current_user
-from app.ml.yolo_inference import YOLOPredictor
-from app.config import settings
+from app.ml.model_registry import model_registry
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -63,13 +62,6 @@ def get_dashboard_stats(
 
 @router.get("/health", response_model=HealthResponse)
 def health_check():
-    model_loaded = False
-    try:
-        predictor = YOLOPredictor()
-        model_loaded = predictor.load_model()
-    except Exception:
-        pass
-    
     database_connected = False
     try:
         db = next(get_db())
@@ -79,8 +71,15 @@ def health_check():
         pass
     
     return HealthResponse(
-        status="healthy" if (model_loaded and database_connected) else "degraded",
-        model_loaded=model_loaded,
+        status="healthy"
+        if (
+            model_registry.detector_loaded
+            and model_registry.damage_loaded
+            and database_connected
+        )
+        else "degraded",
+        model_loaded=model_registry.detector_loaded,
+        damage_model_loaded=model_registry.damage_loaded,
         database_connected=database_connected
     )
 
