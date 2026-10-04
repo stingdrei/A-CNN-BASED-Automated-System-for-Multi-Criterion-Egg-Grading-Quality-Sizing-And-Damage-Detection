@@ -1,7 +1,7 @@
 {
   "checkpoint": "models/egg_grader.pth",
   "samples": 120,
-  "device": "cuda",
+  "device": "mps",
   "accuracy": 0.8666666666666667,
   "balanced_accuracy": 0.7978947368421052,
   "macro_precision": 0.7978947368421052,
