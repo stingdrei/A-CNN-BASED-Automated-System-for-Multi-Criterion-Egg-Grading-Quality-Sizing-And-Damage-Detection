@@ -1,0 +1,49 @@
+{
+  "id": "damage-classifier-improvement-12",
+  "seq": "12",
+  "title": "Execute custom-arch experiment batch (6 training runs)",
+  "description": "Execute matrix cells arch=custom x strategy {sampler,class_weighted} x seeds {42,43,44} via src/run_experiments.py --batch custom --execute. 6 training runs sequential within batch. Long-running (minutes to hours). Checkpoints -> models/experiments/, metrics -> reports/experiments/runs/. Independent of batch 13 (resnet18) — runs can proceed in parallel with it. NO WRITES/EXEC WITHOUT APPROVAL.",
+  "status": "pending",
+  "depends_on": ["11"],
+  "parallel": true,
+  "requires_approval": true,
+  "approval_note": "needs approval before exec — long-running training batch (6 runs)",
+  "suggested_agent": "CoderAgent",
+  "phase": 6,
+  "context_files": [],
+  "reference_files": [
+    "src/run_experiments.py",
+    "src/train_classifier.py",
+    "data/damage/manifests/train.csv",
+    "data/damage/manifests/val.csv"
+  ],
+  "files": {
+    "create": [
+      "models/experiments/custom_sampler_seed42.pth",
+      "models/experiments/custom_sampler_seed43.pth",
+      "models/experiments/custom_sampler_seed44.pth",
+      "models/experiments/custom_class_weighted_seed42.pth",
+      "models/experiments/custom_class_weighted_seed43.pth",
+      "models/experiments/custom_class_weighted_seed44.pth",
+      "reports/experiments/runs/custom_sampler_seed42.json",
+      "reports/experiments/runs/custom_sampler_seed43.json",
+      "reports/experiments/runs/custom_sampler_seed44.json",
+      "reports/experiments/runs/custom_class_weighted_seed42.json",
+      "reports/experiments/runs/custom_class_weighted_seed43.json",
+      "reports/experiments/runs/custom_class_weighted_seed44.json"
+    ],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "6 checkpoint files exist under models/experiments/ (custom arch)",
+    "6 metrics json files exist under reports/experiments/runs/",
+    "Each metrics json has seed 42/43/44, arch=custom, strategy, val metrics, hyperparams",
+    "class_names order ('Damaged','Not Damaged') in every checkpoint",
+    "Test manifest untouched"
+  ],
+  "deliverables": [
+    "6 custom-arch checkpoints (models/experiments/)",
+    "6 metrics jsons (reports/experiments/runs/)"
+  ],
+  "validation": "./.venv/bin/python -c \"import json,glob; files=glob.glob('reports/experiments/runs/custom_*.json'); assert len(files)==6, files; [json.load(open(f)) for f in files]; print('ok', len(files))\""
+}

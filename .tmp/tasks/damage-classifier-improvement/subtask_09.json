@@ -1,0 +1,32 @@
+{
+  "id": "damage-classifier-improvement-09",
+  "seq": "09",
+  "title": "Eval collects softmax probabilities",
+  "description": "Extend src/evaluate_classifier.py: optional --probs-output writes per-sample CSV (filename, true_label, pred_label, p_damaged, p_not_damaged) using softmax over logits; p_damaged = column 0 (label 0 = Damaged). Default decision threshold stays 0.50 so existing metrics/confusion reproduce unchanged. Device auto-select cuda>mps>cpu preserved.",
+  "status": "pending",
+  "depends_on": ["08"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 5,
+  "context_files": [],
+  "reference_files": [
+    "src/evaluate_classifier.py",
+    "src/dataset.py",
+    "src/utils.py",
+    "src/model_factory.py",
+    "src/model.py"
+  ],
+  "files": {
+    "create": ["tests/test_eval_probs.py"],
+    "edit": ["src/evaluate_classifier.py"]
+  },
+  "acceptance_criteria": [
+    "--probs-output CSV has columns filename, true_label, pred_label, p_damaged, p_not_damaged",
+    "p_damaged + p_not_damaged sums to ~1.0 per row",
+    "Metrics without --probs-output byte-compatible with pre-change output (threshold 0.50)",
+    "p_damaged maps to class index 0 = Damaged",
+    "pytest tests/test_eval_probs.py passes"
+  ],
+  "deliverables": ["src/evaluate_classifier.py (edited)", "tests/test_eval_probs.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_eval_probs.py -q"
+}

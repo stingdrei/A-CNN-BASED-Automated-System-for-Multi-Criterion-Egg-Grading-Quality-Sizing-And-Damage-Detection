@@ -1,0 +1,29 @@
+{
+  "id": "damage-classifier-improvement-06",
+  "seq": "06",
+  "title": "Moderate augmentation transforms",
+  "description": "Extend src/utils.py get_transforms with 'moderate' train preset: horizontal flip, rotation <=10deg, mild brightness/contrast jitter. Eval/test transforms unchanged (no aug). Wire --aug {off,moderate} flag into src/train_classifier.py, default off reproduces current behavior. Moderate only — no aggressive crop/color transforms that hide cracks. Label 0 = Damaged untouched.",
+  "status": "pending",
+  "depends_on": ["05"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 4,
+  "context_files": [],
+  "reference_files": [
+    "src/utils.py",
+    "src/train_classifier.py",
+    "src/dataset.py"
+  ],
+  "files": {
+    "create": ["tests/test_moderate_aug.py"],
+    "edit": ["src/utils.py", "src/train_classifier.py"]
+  },
+  "acceptance_criteria": [
+    "get_transforms('train', aug='moderate') applies flip + rotation<=10deg + mild jitter",
+    "Eval/test transforms identical to pre-change (no augmentation)",
+    "Default aug='off' reproduces current flip-only training behavior",
+    "pytest tests/test_moderate_aug.py passes"
+  ],
+  "deliverables": ["src/utils.py (edited)", "src/train_classifier.py (edited)", "tests/test_moderate_aug.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_moderate_aug.py -q"
+}

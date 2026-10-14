@@ -1,0 +1,51 @@
+{
+  "id": "damage-classifier-improvement",
+  "name": "Damage Classifier Improvement (8-Phase Plan)",
+  "status": "active",
+  "objective": "Lift damage classifier from baseline (acc 86.7%, bal 79.8%, recall 91.6%, 8 FN) to acc>=90%, bal>=85%, recall>=95%, FN<5 with zero backend inference regression.",
+  "context_files": [],
+  "reference_files": [
+    "src/train_classifier.py",
+    "src/model.py",
+    "src/utils.py",
+    "src/dataset.py",
+    "src/evaluate_classifier.py",
+    "src/create_damage_split.py",
+    "src/verify_damage_dataset.py",
+    "backend/app/ml/damage_inference.py",
+    "backend/app/config.py",
+    "backend/app/services/prediction_service.py",
+    "backend/app/services/grading_service.py",
+    "tests/test_backend_grading.py",
+    "tests/test_detector_artifacts.py",
+    "reports/damage_test_report.json",
+    "data/damage/manifests/train.csv",
+    "data/damage/manifests/val.csv",
+    "data/damage/manifests/test.csv"
+  ],
+  "exit_criteria": [
+    "Baseline report reproduced/saved (reports/damage_baseline_report.json)",
+    "Error audit CSV generated; FN/FP inspected (user-informed label fixes)",
+    "Model factory + resnet18 training path works; checkpoint carries arch metadata",
+    "Backend loads arch from checkpoint metadata (custom + resnet18 both)",
+    "Threshold sweep executed on val; selected threshold written to config/metadata",
+    "Experiment comparison report in reports/",
+    "Winner copied to models/egg_grader_resnet18_v1.pth (or best candidate name)",
+    "Backend regression tests pass (7 crop cases + existing tests green)",
+    "Acceptance checklist: acc>=90, bal>=85, recall>=95, FN<5, no leakage, backend OK"
+  ],
+  "subtask_count": 18,
+  "completed_count": 0,
+  "created_at": "2026-10-13T09:00:00Z",
+  "constraints": [
+    "Label 0 = Damaged, label 1 = Not Damaged; class_names order (Damaged, Not Damaged)",
+    "Test set untouched until threshold finalized (leak prevention)",
+    "Moderate aug only — no transforms hiding cracks",
+    "Model selection: balanced accuracy + damaged recall, never plain accuracy",
+    "Reject model if acc>=90 but damaged recall regressed vs baseline 91.6%",
+    "No backend regression: damage_status, damage_confidence, damage_model_version, review_reason, Needs Review",
+    "Reports under reports/; venv ./.venv/bin/python; scripts from repo root",
+    "Approval gate: training runs need approval; Phase 2 label edits irreversible → user decides",
+    "STOP on test fail; report → propose → approve → fix"
+  ]
+}

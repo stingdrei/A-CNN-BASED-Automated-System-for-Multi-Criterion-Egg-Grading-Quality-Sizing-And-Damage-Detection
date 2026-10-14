@@ -1,0 +1,41 @@
+{
+  "id": "damage-classifier-improvement-15",
+  "seq": "15",
+  "title": "Promote winner checkpoint to models/",
+  "description": "Copy winner run checkpoint (from comparison_report.md) -> models/egg_grader_resnet18_v1.pth (use best-candidate name if arch differs, note in winner.json). Verify: loads via model_factory with checkpoint arch metadata, class_names order ('Damaged','Not Damaged'). Re-run src/sweep_threshold.py against winner on VAL only -> refresh reports/damage_threshold.json so selected threshold matches winner. Write reports/experiments/winner.json {source_run, arch, strategy, seed, val_metrics, threshold, destination}. Test set still untouched.",
+  "status": "pending",
+  "depends_on": ["14"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 7,
+  "context_files": [],
+  "reference_files": [
+    "reports/experiments/comparison_report.md",
+    "src/sweep_threshold.py",
+    "src/model_factory.py",
+    "src/model.py",
+    "data/damage/manifests/val.csv"
+  ],
+  "files": {
+    "create": [
+      "models/egg_grader_resnet18_v1.pth",
+      "reports/experiments/winner.json",
+      "reports/damage_threshold.json"
+    ],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "models/egg_grader_resnet18_v1.pth exists and loads via model_factory",
+    "Checkpoint has arch + arch_args + hyperparams metadata",
+    "class_names order ('Damaged', 'Not Damaged') preserved",
+    "reports/damage_threshold.json refreshed against winner (val only)",
+    "reports/experiments/winner.json records source run + threshold",
+    "Test manifest not read"
+  ],
+  "deliverables": [
+    "models/egg_grader_resnet18_v1.pth",
+    "reports/experiments/winner.json",
+    "reports/damage_threshold.json (refreshed)"
+  ],
+  "validation": "./.venv/bin/python -c \"import torch,json; ck=torch.load('models/egg_grader_resnet18_v1.pth',map_location='cpu'); assert 'arch' in ck and list(ck['class_names'])==['Damaged','Not Damaged'], ck.keys(); w=json.load(open('reports/experiments/winner.json')); t=json.load(open('reports/damage_threshold.json')); assert 0.50<=t['selected_threshold']<=0.95\" && ./.venv/bin/python src/sweep_threshold.py --labels data/damage/manifests/val.csv --image-root . --checkpoint models/egg_grader_resnet18_v1.pth --output-csv reports/threshold_sweep.csv --output-json reports/damage_threshold.json"
+}

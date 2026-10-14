@@ -1,0 +1,33 @@
+{
+  "id": "damage-classifier-improvement-11",
+  "seq": "11",
+  "title": "Experiment matrix runner",
+  "description": "New src/run_experiments.py: matrix = arch {custom,resnet18} x strategy {sampler,class_weighted} x seeds {42,43,44} (12 runs total), moderate aug, early stopping, scheduler, two-stage for resnet18, checkpoint via model_factory. Dry-run (default) prints planned runs + writes plan json; --batch {custom,resnet18} --execute runs cells of one arch sequentially (approval required before --execute). Per run: checkpoint models/experiments/{arch}_{strategy}_seed{seed}.pth, metrics reports/experiments/runs/{arch}_{strategy}_seed{seed}.json with val acc/bal-acc/damaged-recall/FN + full hyperparams. Test manifest never passed to runner.",
+  "status": "pending",
+  "depends_on": ["10"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 6,
+  "context_files": [],
+  "reference_files": [
+    "src/train_classifier.py",
+    "src/model_factory.py",
+    "src/utils.py",
+    "src/evaluate_classifier.py",
+    "data/damage/manifests/train.csv",
+    "data/damage/manifests/val.csv"
+  ],
+  "files": {
+    "create": ["src/run_experiments.py", "tests/test_run_experiments.py"],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "Dry-run lists 12 cells (2 arch x 2 strategy x 3 seeds) without training",
+    "--batch filter restricts execution to one arch",
+    "Runner never references data/damage/manifests/test.csv",
+    "Each metrics json contains val_acc, balanced_accuracy, damaged_recall, fn_count, seed, hyperparams",
+    "pytest tests/test_run_experiments.py passes"
+  ],
+  "deliverables": ["src/run_experiments.py", "tests/test_run_experiments.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_run_experiments.py -q && ./.venv/bin/python src/run_experiments.py --dry-run --output /tmp/exp_plan.json"
+}

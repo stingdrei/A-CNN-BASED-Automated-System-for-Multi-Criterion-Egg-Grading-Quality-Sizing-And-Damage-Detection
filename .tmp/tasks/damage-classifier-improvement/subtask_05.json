@@ -1,0 +1,35 @@
+{
+  "id": "damage-classifier-improvement-05",
+  "seq": "05",
+  "title": "Two-stage training + arch metadata in train_classifier.py",
+  "description": "Wire model_factory into src/train_classifier.py: --arch {custom,resnet18}, --pretrained flag, two-stage training (--stage1-epochs frozen backbone + head only, then unfreeze full net for --stage2-epochs). Checkpoint gains arch, arch_args, hyperparams (lr, epochs, seed, batch_size, stage config). Keep device behavior cuda-if-available else cpu per constraint; checkpoint keys (state_dict, class_names, img_size, seed, best_val_metrics) preserved for backward compat.",
+  "status": "pending",
+  "depends_on": ["04"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 3,
+  "context_files": [],
+  "reference_files": [
+    "src/train_classifier.py",
+    "src/model_factory.py",
+    "src/model.py",
+    "src/dataset.py",
+    "src/utils.py",
+    "data/damage/manifests/train.csv",
+    "data/damage/manifests/val.csv"
+  ],
+  "files": {
+    "create": ["tests/test_train_classifier_arch.py"],
+    "edit": ["src/train_classifier.py"]
+  },
+  "acceptance_criteria": [
+    "--arch resnet18 trains and saves checkpoint with arch metadata",
+    "--arch custom (default) reproduces existing behavior",
+    "Two-stage flags freeze/unfreeze backbone correctly (param.requires_grad asserts)",
+    "class_names order stays ['Damaged', 'Not Damaged']",
+    "Smoke run: 1 epoch on train manifest completes, checkpoint loads",
+    "pytest tests/test_train_classifier_arch.py passes"
+  ],
+  "deliverables": ["src/train_classifier.py (edited)", "tests/test_train_classifier_arch.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_train_classifier_arch.py -q && ./.venv/bin/python src/train_classifier.py --labels data/damage/manifests/train.csv --val-labels data/damage/manifests/val.csv --image-root . --arch resnet18 --stage1-epochs 1 --stage2-epochs 1 --epochs 2 --output /tmp/smoke_arch.pth --metrics /tmp/smoke_arch_metrics.json"
+}

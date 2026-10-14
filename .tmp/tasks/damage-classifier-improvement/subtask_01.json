@@ -1,0 +1,35 @@
+{
+  "id": "damage-classifier-improvement-01",
+  "seq": "01",
+  "title": "Reproduce baseline eval report",
+  "description": "Run existing evaluate_classifier.py on untouched test manifest with models/egg_grader.pth, save reports/damage_baseline_report.json. Verify matches known baseline: acc 0.8667, bal 0.7979, damaged recall 0.9158, confusion [[87,8],[8,17]], 120 samples, device mps. Scripts only, no code changes.",
+  "status": "in_progress",
+  "agent_id": "coder-agent",
+  "started_at": "2026-10-14T00:00:00Z",
+  "depends_on": [],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 1,
+  "context_files": [],
+  "reference_files": [
+    "src/evaluate_classifier.py",
+    "src/dataset.py",
+    "src/utils.py",
+    "src/model.py",
+    "reports/damage_test_report.json",
+    "data/damage/manifests/test.csv"
+  ],
+  "files": {
+    "create": ["reports/damage_baseline_report.json"],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "reports/damage_baseline_report.json exists",
+    "samples == 120",
+    "accuracy ~ 0.8667 and damaged_recall ~ 0.9158",
+    "confusion_matrix == [[87, 8], [8, 17]]",
+    "No source files modified"
+  ],
+  "deliverables": ["reports/damage_baseline_report.json"],
+  "validation": "./.venv/bin/python src/evaluate_classifier.py --labels data/damage/manifests/test.csv --image-root . --checkpoint models/egg_grader.pth --output reports/damage_baseline_report.json && ./.venv/bin/python -c \"import json; r=json.load(open('reports/damage_baseline_report.json')); assert r['samples']==120 and r['confusion_matrix']==[[87,8],[8,17]], r\""
+}

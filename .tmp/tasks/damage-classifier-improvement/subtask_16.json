@@ -1,0 +1,39 @@
+{
+  "id": "damage-classifier-improvement-16",
+  "seq": "16",
+  "title": "Arch-aware backend loader + threshold config",
+  "description": "backend/app/ml/damage_inference.py: replace inline hardcoded EggGradingCNN-only construction with metadata-driven load — read arch/arch_args from checkpoint, build via model_factory ('resnet18' or 'custom'); checkpoints WITHOUT arch metadata fall back to 'custom' (backward compat with models/egg_grader.pth). Preserve BGR->RGB conversion, review band -> Needs Review, model_version from checkpoint metadata. backend/app/config.py: set DAMAGE_REVIEW_THRESHOLD from reports/damage_threshold.json selected_threshold. No behavior regression for existing keys damage_status/confidence/review_reason.",
+  "status": "pending",
+  "depends_on": ["15"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 7,
+  "context_files": [],
+  "reference_files": [
+    "backend/app/ml/damage_inference.py",
+    "backend/app/config.py",
+    "backend/app/services/prediction_service.py",
+    "backend/app/services/grading_service.py",
+    "src/model_factory.py",
+    "src/model.py",
+    "reports/damage_threshold.json",
+    "models/egg_grader_resnet18_v1.pth"
+  ],
+  "files": {
+    "create": ["tests/test_damage_inference_arch.py"],
+    "edit": ["backend/app/ml/damage_inference.py", "backend/app/config.py"]
+  },
+  "acceptance_criteria": [
+    "Loader reads arch from checkpoint metadata and builds matching model (resnet18 + custom both)",
+    "Legacy checkpoint without arch metadata loads as custom (no crash)",
+    "DAMAGE_REVIEW_THRESHOLD equals selected_threshold from reports/damage_threshold.json",
+    "BGR->RGB conversion intact; review band still yields Needs Review",
+    "pytest tests/test_damage_inference_arch.py passes"
+  ],
+  "deliverables": [
+    "backend/app/ml/damage_inference.py (edited)",
+    "backend/app/config.py (edited)",
+    "tests/test_damage_inference_arch.py"
+  ],
+  "validation": "./.venv/bin/python -m pytest tests/test_damage_inference_arch.py -q"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "damage-classifier-improvement-07",
+  "seq": "07",
+  "title": "Sampler vs class-weighted CE strategy switch",
+  "description": "Add --strategy {sampler,class_weighted} to src/train_classifier.py: 'sampler' = current WeightedRandomSampler (default, backward compat), 'class_weighted' = plain shuffle + CrossEntropyLoss with weights from train manifest class counts. Record strategy + class counts in checkpoint hyperparams and metrics json so Phase 6 matrix is comparable. Unit test: class weights computed from counts, label 0 = Damaged mapping preserved (weight index 0 = Damaged). Tooling only — comparison runs happen in Phase 6 with approval.",
+  "status": "pending",
+  "depends_on": ["06"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 4,
+  "context_files": [],
+  "reference_files": [
+    "src/train_classifier.py",
+    "src/create_damage_split.py",
+    "src/dataset.py",
+    "data/damage/manifests/train.csv"
+  ],
+  "files": {
+    "create": ["tests/test_class_weighting.py"],
+    "edit": ["src/train_classifier.py"]
+  },
+  "acceptance_criteria": [
+    "--strategy sampler (default) reproduces existing WeightedRandomSampler behavior",
+    "--strategy class_weighted uses CrossEntropyLoss(weight=...) from train class counts",
+    "Class weights indexed by class_names order ('Damaged','Not Damaged') — Damaged weight at index 0",
+    "Checkpoint hyperparams + metrics json record strategy and class counts",
+    "pytest tests/test_class_weighting.py passes"
+  ],
+  "deliverables": ["src/train_classifier.py (edited)", "tests/test_class_weighting.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_class_weighting.py -q"
+}

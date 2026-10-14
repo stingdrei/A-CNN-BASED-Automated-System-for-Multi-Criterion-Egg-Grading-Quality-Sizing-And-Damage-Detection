@@ -1,0 +1,45 @@
+{
+  "id": "damage-classifier-improvement-10",
+  "seq": "10",
+  "title": "VAL threshold sweep + Needs Review policy + threshold metadata",
+  "description": "New src/sweep_threshold.py: runs eval + prob collection on VAL manifest ONLY (guard: refuse test.csv path), sweeps thresholds 0.50-0.95 step 0.01, computes acc/balanced-acc/damaged-recall/FN per threshold, selects best by balanced accuracy then damaged recall (never plain accuracy; reject candidates with damaged recall < 0.9158 baseline). Needs Review policy: sample with p_damaged < selected threshold and predicted Not Damaged flagged Needs Review (mirrors backend review band). Writes reports/threshold_sweep.csv + reports/damage_threshold.json {selected_threshold, val_metrics, selection_rule, sweep_range, class_names, generated_at} + backend_config_hint.DAMAGE_REVIEW_THRESHOLD. Test set NOT read anywhere.",
+  "status": "pending",
+  "depends_on": ["09"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 5,
+  "context_files": [],
+  "reference_files": [
+    "src/evaluate_classifier.py",
+    "src/utils.py",
+    "src/dataset.py",
+    "src/model.py",
+    "src/model_factory.py",
+    "backend/app/config.py",
+    "data/damage/manifests/val.csv"
+  ],
+  "files": {
+    "create": [
+      "src/sweep_threshold.py",
+      "tests/test_sweep_threshold.py",
+      "reports/threshold_sweep.csv",
+      "reports/damage_threshold.json"
+    ],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "Sweep covers 0.50-0.95 inclusive, step 0.01 (96 rows)",
+    "Selection rule = max balanced accuracy, tie-break damaged recall; never plain accuracy",
+    "Selected threshold written to reports/damage_threshold.json with val_metrics",
+    "Passing --labels data/damage/manifests/test.csv refused (leak guard)",
+    "label 0 = Damaged preserved in p_damaged column",
+    "pytest tests/test_sweep_threshold.py passes"
+  ],
+  "deliverables": [
+    "src/sweep_threshold.py",
+    "tests/test_sweep_threshold.py",
+    "reports/threshold_sweep.csv",
+    "reports/damage_threshold.json"
+  ],
+  "validation": "./.venv/bin/python -m pytest tests/test_sweep_threshold.py -q && ./.venv/bin/python src/sweep_threshold.py --labels data/damage/manifests/val.csv --image-root . --checkpoint models/egg_grader.pth --output-csv reports/threshold_sweep.csv --output-json reports/damage_threshold.json && ./.venv/bin/python -c \"import json; t=json.load(open('reports/damage_threshold.json')); assert 0.50 <= t['selected_threshold'] <= 0.95, t; import pandas as pd; df=pd.read_csv('reports/threshold_sweep.csv'); assert len(df)==96, len(df)\""
+}

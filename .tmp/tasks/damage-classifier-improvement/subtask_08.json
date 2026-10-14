@@ -1,0 +1,33 @@
+{
+  "id": "damage-classifier-improvement-08",
+  "seq": "08",
+  "title": "Early stopping, LR scheduler, macro-F1 best checkpoint, seed + hyperparam metadata",
+  "description": "Training hygiene in src/train_classifier.py: --early-stopping patience (monitor val macro-F1), --scheduler {none,cosine,plateau}, best checkpoint selected by val macro-F1 (NOT plain accuracy), deterministic seeding of torch/numpy/random from --seed, checkpoint metadata gains seed + full hyperparams (lr, epochs, batch_size, arch, aug, strategy, scheduler, early-stop, stages, seed) and metrics json logs seed. Existing checkpoint keys (state_dict, class_names, img_size, seed, best_val_metrics, arch, arch_args) preserved.",
+  "status": "pending",
+  "depends_on": ["07"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 4,
+  "context_files": [],
+  "reference_files": [
+    "src/train_classifier.py",
+    "src/model_factory.py",
+    "src/model.py",
+    "src/utils.py"
+  ],
+  "files": {
+    "create": ["tests/test_training_hygiene.py"],
+    "edit": ["src/train_classifier.py"]
+  },
+  "acceptance_criteria": [
+    "Early stopping stops training after patience epochs without val macro-F1 gain",
+    "Scheduler steps per epoch (cosine/plateau both wired)",
+    "Best checkpoint saved on val macro-F1, not accuracy",
+    "Same seed → identical split/shuffle init (seeded torch/numpy/random)",
+    "Checkpoint metadata contains seed + full hyperparams; backward-compat keys intact",
+    "class_names order stays ['Damaged', 'Not Damaged']",
+    "pytest tests/test_training_hygiene.py passes"
+  ],
+  "deliverables": ["src/train_classifier.py (edited)", "tests/test_training_hygiene.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_training_hygiene.py -q && ./.venv/bin/python src/train_classifier.py --labels data/damage/manifests/train.csv --val-labels data/damage/manifests/val.csv --image-root . --arch custom --epochs 1 --early-stopping 1 --scheduler cosine --seed 42 --aug moderate --strategy sampler --output /tmp/smoke_hygiene.pth --metrics /tmp/smoke_hygiene.json"
+}

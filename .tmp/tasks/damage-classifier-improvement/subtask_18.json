@@ -1,0 +1,37 @@
+{
+  "id": "damage-classifier-improvement-18",
+  "seq": "18",
+  "title": "Acceptance gate + final report",
+  "description": "Final test-set evaluation NOW (threshold finalized in 15): run src/evaluate_classifier.py on test manifest with winner checkpoint at selected threshold -> reports/damage_final_report.json. Full pytest suite green. Write reports/acceptance_report.md checklist: acc>=0.90, balanced acc>=0.85, damaged recall>=0.95, FN<5 (test=120), no leakage (test untouched until this point), model selection rule honored (bal-acc+recall, no plain-accuracy pick, no recall regression vs 0.9158), backend regression pass, winner artifact exists. STOP + report any failed criterion — do not auto-fix.",
+  "status": "pending",
+  "depends_on": ["17"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 8,
+  "context_files": [],
+  "reference_files": [
+    "src/evaluate_classifier.py",
+    "src/sweep_threshold.py",
+    "reports/damage_threshold.json",
+    "reports/experiments/comparison_report.md",
+    "reports/damage_test_report.json",
+    "models/egg_grader_resnet18_v1.pth",
+    "data/damage/manifests/test.csv"
+  ],
+  "files": {
+    "create": ["reports/damage_final_report.json", "reports/acceptance_report.md"],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "reports/damage_final_report.json exists with test metrics at selected threshold",
+    "accuracy >= 0.90",
+    "balanced_accuracy >= 0.85",
+    "damaged_recall >= 0.95",
+    "FN < 5 (test samples=120)",
+    "Full pytest suite green (src tests + backend tests)",
+    "acceptance_report.md documents all 9 exit criteria pass/fail",
+    "Any failed criterion -> STOP, report, no auto-fix"
+  ],
+  "deliverables": ["reports/damage_final_report.json", "reports/acceptance_report.md"],
+  "validation": "./.venv/bin/python -m pytest tests/ -q && ./.venv/bin/python src/evaluate_classifier.py --labels data/damage/manifests/test.csv --image-root . --checkpoint models/egg_grader_resnet18_v1.pth --threshold $(./.venv/bin/python -c \"import json; print(json.load(open('reports/damage_threshold.json'))['selected_threshold'])\") --output reports/damage_final_report.json && ./.venv/bin/python -c \"import json; r=json.load(open('reports/damage_final_report.json')); assert r['samples']==120 and r['accuracy']>=0.90 and r['balanced_accuracy']>=0.85 and r['damaged_recall']>=0.95 and (r['confusion_matrix'][0][1])<5, r\""
+}

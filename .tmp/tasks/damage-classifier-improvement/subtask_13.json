@@ -1,0 +1,50 @@
+{
+  "id": "damage-classifier-improvement-13",
+  "seq": "13",
+  "title": "Execute resnet18 experiment batch (6 training runs)",
+  "description": "Execute matrix cells arch=resnet18 x strategy {sampler,class_weighted} x seeds {42,43,44} via src/run_experiments.py --batch resnet18 --execute. Two-stage training (frozen backbone then unfreeze). 6 runs sequential within batch. Long-running. Checkpoints -> models/experiments/, metrics -> reports/experiments/runs/. Independent of batch 12 (custom) — parallel OK. Pretrained weight download: if offline, warn + random init (fallback from subtask 04). NO WRITES/EXEC WITHOUT APPROVAL.",
+  "status": "pending",
+  "depends_on": ["11"],
+  "parallel": true,
+  "requires_approval": true,
+  "approval_note": "needs approval before exec — long-running training batch (6 runs, may download pretrained weights)",
+  "suggested_agent": "CoderAgent",
+  "phase": 6,
+  "context_files": [],
+  "reference_files": [
+    "src/run_experiments.py",
+    "src/train_classifier.py",
+    "src/model_factory.py",
+    "data/damage/manifests/train.csv",
+    "data/damage/manifests/val.csv"
+  ],
+  "files": {
+    "create": [
+      "models/experiments/resnet18_sampler_seed42.pth",
+      "models/experiments/resnet18_sampler_seed43.pth",
+      "models/experiments/resnet18_sampler_seed44.pth",
+      "models/experiments/resnet18_class_weighted_seed42.pth",
+      "models/experiments/resnet18_class_weighted_seed43.pth",
+      "models/experiments/resnet18_class_weighted_seed44.pth",
+      "reports/experiments/runs/resnet18_sampler_seed42.json",
+      "reports/experiments/runs/resnet18_sampler_seed43.json",
+      "reports/experiments/runs/resnet18_sampler_seed44.json",
+      "reports/experiments/runs/resnet18_class_weighted_seed42.json",
+      "reports/experiments/runs/resnet18_class_weighted_seed43.json",
+      "reports/experiments/runs/resnet18_class_weighted_seed44.json"
+    ],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "6 checkpoint files exist under models/experiments/ (resnet18 arch)",
+    "6 metrics json files exist under reports/experiments/runs/",
+    "Each checkpoint carries arch='resnet18' + arch_args metadata",
+    "Offline pretrained fallback: training completes with random init + warning, no crash",
+    "Test manifest untouched"
+  ],
+  "deliverables": [
+    "6 resnet18 checkpoints (models/experiments/)",
+    "6 metrics jsons (reports/experiments/runs/)"
+  ],
+  "validation": "./.venv/bin/python -c \"import json,glob; files=glob.glob('reports/experiments/runs/resnet18_*.json'); assert len(files)==6, files; [json.load(open(f)) for f in files]; print('ok', len(files))\""
+}

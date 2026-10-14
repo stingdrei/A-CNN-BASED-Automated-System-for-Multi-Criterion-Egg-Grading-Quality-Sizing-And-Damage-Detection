@@ -1,0 +1,30 @@
+{
+  "id": "damage-classifier-improvement-14",
+  "seq": "14",
+  "title": "Experiment comparison report",
+  "description": "New src/compare_experiments.py: aggregate reports/experiments/runs/*.json (12 runs) -> reports/experiments/comparison_report.md. Per cell (arch x strategy): mean+std over 3 seeds for acc, balanced accuracy, damaged recall, FN. Rank by balanced accuracy, tie-break damaged recall — NEVER plain accuracy. Flag rejected cells: damaged recall < 0.9158 baseline, or acc>=0.90 with damaged recall regression (rule violation). Declare winner cell + per-seed table + decision rationale. Val metrics only — test set still untouched.",
+  "status": "pending",
+  "depends_on": ["12", "13"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 6,
+  "context_files": [],
+  "reference_files": [
+    "reports/experiments/runs/",
+    "reports/damage_test_report.json",
+    "reports/damage_threshold.json"
+  ],
+  "files": {
+    "create": ["src/compare_experiments.py", "reports/experiments/comparison_report.md"],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "Report aggregates all 12 runs (2 arch x 2 strategy x 3 seeds)",
+    "Ranking uses balanced accuracy then damaged recall; plain accuracy never sole rank key",
+    "Cells with damaged recall < 0.9158 marked rejected",
+    "Winner cell declared with seed-level breakdown",
+    "Test metrics not referenced (test set untouched)"
+  ],
+  "deliverables": ["src/compare_experiments.py", "reports/experiments/comparison_report.md"],
+  "validation": "./.venv/bin/python src/compare_experiments.py --runs-dir reports/experiments/runs --output reports/experiments/comparison_report.md && ./.venv/bin/python -c \"t=open('reports/experiments/comparison_report.md').read(); assert 'winner' in t.lower() and 'balanced' in t.lower(), 'missing winner/ranking'\""
+}

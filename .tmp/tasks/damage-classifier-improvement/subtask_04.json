@@ -1,0 +1,30 @@
+{
+  "id": "damage-classifier-improvement-04",
+  "seq": "04",
+  "title": "Model factory with arch metadata",
+  "description": "New src/model_factory.py: build_model(arch, num_classes=2, pretrained) returning 'resnet18' (torchvision, classifier head swapped for 2 classes) or 'custom' (EggGradingCNN). Write arch into checkpoint metadata (arch, arch_args). Offline fallback: if pretrained weight download fails, warn + random init. Single source of truth for arch names shared by train/eval/backend.",
+  "status": "pending",
+  "depends_on": ["03"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 3,
+  "context_files": [],
+  "reference_files": [
+    "src/model.py",
+    "src/train_classifier.py",
+    "src/evaluate_classifier.py"
+  ],
+  "files": {
+    "create": ["src/model_factory.py", "tests/test_model_factory.py"],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "build_model('custom') returns EggGradingCNN-compatible state_dict shape",
+    "build_model('resnet18') returns torchvision model with 2-class head",
+    "Unknown arch raises ValueError",
+    "Pretrained download failure falls back to random init with warning (no crash)",
+    "pytest tests/test_model_factory.py passes"
+  ],
+  "deliverables": ["src/model_factory.py", "tests/test_model_factory.py"],
+  "validation": "./.venv/bin/python -m pytest tests/test_model_factory.py -q"
+}

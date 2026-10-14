@@ -1,0 +1,32 @@
+{
+  "id": "damage-classifier-improvement-03",
+  "seq": "03",
+  "title": "Generate error audit CSV + FN/FP summary for user review",
+  "description": "Run dump tool on test manifest → reports/damage_error_audit.csv (120 rows, expect 8 FN + 8 FP). Write reports/damage_error_audit_summary.md grouping errors by filename for inspection. STOP HERE: label corrections require USER decision (irreversible). Task scope = tooling output only, no manifest edits.",
+  "status": "pending",
+  "depends_on": ["02"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "phase": 2,
+  "requires_user_input": true,
+  "user_input_reason": "Label corrections are irreversible — user inspects audit CSV and decides which labels to fix before Phase 4 training",
+  "context_files": [],
+  "reference_files": [
+    "src/dump_damage_errors.py",
+    "src/create_damage_split.py",
+    "reports/damage_test_report.json",
+    "data/damage/manifests/test.csv"
+  ],
+  "files": {
+    "create": ["reports/damage_error_audit.csv", "reports/damage_error_audit_summary.md"],
+    "edit": []
+  },
+  "acceptance_criteria": [
+    "reports/damage_error_audit.csv has 120 rows",
+    "FN count == 8, FP count == 8 (matches baseline confusion)",
+    "summary.md lists every FN and FP filename for review",
+    "No manifest CSV modified"
+  ],
+  "deliverables": ["reports/damage_error_audit.csv", "reports/damage_error_audit_summary.md"],
+  "validation": "./.venv/bin/python -c \"import pandas as pd; df=pd.read_csv('reports/damage_error_audit.csv'); assert len(df)==120; assert (df.error_type=='FN').sum()==8 and (df.error_type=='FP').sum()==8\""
+}
