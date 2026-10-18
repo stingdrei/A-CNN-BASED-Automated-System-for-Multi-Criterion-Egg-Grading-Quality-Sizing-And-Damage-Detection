@@ -1,0 +1,121 @@
+filename,true_label,pred_label,confidence,error_type
+data/damage/Damaged/damaged_629.jpg,0,0,0.995964,TP
+data/damage/Damaged/damaged_13.jpg,0,1,0.966649,FN
+data/damage/Damaged/damaged_325.jpg,0,0,0.999798,TP
+data/damage/Damaged/damaged_9.jpg,0,0,0.944378,TP
+data/damage/Damaged/damaged_285.jpg,0,0,0.998007,TP
+data/damage/Damaged/damaged_158.jpg,0,0,0.999995,TP
+data/damage/Damaged/damaged_446.jpg,0,0,0.983369,TP
+data/damage/Not Damaged/not_damaged_153.jpg,1,1,0.753237,TN
+data/damage/Damaged/damaged_537.jpg,0,0,0.996289,TP
+data/damage/Not Damaged/not_damaged_110.jpg,1,0,0.797331,FP
+data/damage/Not Damaged/not_damaged_34.jpg,1,1,1.0,TN
+data/damage/Damaged/damaged_476.jpg,0,0,0.910267,TP
+data/damage/Not Damaged/not_damaged_142.jpg,1,0,0.810379,FP
+data/damage/Damaged/damaged_519.jpg,0,0,0.993457,TP
+data/damage/Damaged/damaged_579.jpg,0,0,0.665848,TP
+data/damage/Damaged/damaged_553.jpg,0,0,0.999414,TP
+data/damage/Damaged/damaged_194.jpg,0,0,0.987982,TP
+data/damage/Damaged/damaged_514.jpg,0,0,0.850439,TP
+data/damage/Damaged/damaged_93.jpg,0,0,0.99962,TP
+data/damage/Damaged/damaged_451.jpg,0,0,0.99901,TP
+data/damage/Damaged/damaged_221.jpg,0,0,0.999646,TP
+data/damage/Damaged/damaged_181.jpg,0,0,0.910224,TP
+data/damage/Damaged/damaged_223.jpg,0,0,0.996295,TP
+data/damage/Not Damaged/not_damaged_17.jpg,1,1,0.843949,TN
+data/damage/Damaged/damaged_440.jpg,0,0,0.996816,TP
+data/damage/Not Damaged/not_damaged_80.jpg,1,0,0.639582,FP
+data/damage/Damaged/damaged_342.jpg,0,0,0.996553,TP
+data/damage/Damaged/damaged_207.jpg,0,0,0.999857,TP
+data/damage/Damaged/damaged_45.jpg,0,0,0.561892,TP
+data/damage/Damaged/damaged_295.jpg,0,0,0.991883,TP
+data/damage/Damaged/damaged_123.jpg,0,1,0.796374,FN
+data/damage/Damaged/damaged_138.jpg,0,0,0.995154,TP
+data/damage/Damaged/damaged_353.jpg,0,0,0.957696,TP
+data/damage/Damaged/damaged_411.jpg,0,0,0.998108,TP
+data/damage/Damaged/damaged_28.jpg,0,0,0.99599,TP
+data/damage/Damaged/damaged_128.jpg,0,0,0.990675,TP
+data/damage/Damaged/damaged_110.jpg,0,0,0.756044,TP
+data/damage/Not Damaged/not_damaged_79.jpg,1,1,0.996934,TN
+data/damage/Damaged/damaged_605.jpg,0,0,0.99965,TP
+data/damage/Damaged/damaged_381.jpg,0,0,0.990954,TP
+data/damage/Damaged/damaged_54.jpg,0,0,0.998109,TP
+data/damage/Damaged/damaged_511.jpg,0,0,0.988132,TP
+data/damage/Not Damaged/not_damaged_32.jpg,1,1,0.952787,TN
+data/damage/Damaged/damaged_252.jpg,0,0,0.9991,TP
+data/damage/Damaged/damaged_10.jpg,0,0,0.989785,TP
+data/damage/Damaged/damaged_377.jpg,0,0,0.999951,TP
+data/damage/Not Damaged/not_damaged_89.jpg,1,1,0.999968,TN
+data/damage/Damaged/damaged_354.jpg,0,0,0.726181,TP
+data/damage/Damaged/damaged_602.jpg,0,0,0.99939,TP
+data/damage/Damaged/damaged_202.jpg,0,0,0.988345,TP
+data/damage/Damaged/damaged_196.jpg,0,0,0.991095,TP
+data/damage/Damaged/damaged_559.jpg,0,0,0.890409,TP
+data/damage/Damaged/damaged_573.jpg,0,0,0.999687,TP
+data/damage/Damaged/damaged_460.jpg,0,0,0.998713,TP
+data/damage/Damaged/damaged_457.jpg,0,1,0.85051,FN
+data/damage/Damaged/damaged_385.jpg,0,0,0.99999,TP
+data/damage/Damaged/damaged_375.jpg,0,0,0.997215,TP
+data/damage/Not Damaged/not_damaged_155.jpg,1,1,0.702917,TN
+data/damage/Damaged/damaged_188.jpg,0,0,0.998357,TP
+data/damage/Damaged/damaged_249.jpg,0,1,0.587585,FN
+data/damage/Not Damaged/not_damaged_62.jpg,1,0,0.983828,FP
+data/damage/Not Damaged/not_damaged_116.jpg,1,0,0.716032,FP
+data/damage/Damaged/damaged_268.jpg,0,0,0.877468,TP
+data/damage/Damaged/damaged_535.jpg,0,0,0.999512,TP
+data/damage/Damaged/damaged_139.jpg,0,0,0.994683,TP
+data/damage/Not Damaged/not_damaged_73.jpg,1,1,0.998594,TN
+data/damage/Damaged/damaged_253.jpg,0,0,0.996457,TP
+data/damage/Damaged/damaged_397.jpg,0,0,0.99256,TP
+data/damage/Not Damaged/not_damaged_27.jpg,1,1,0.980995,TN
+data/damage/Damaged/damaged_326.jpg,0,0,0.99999,TP
+data/damage/Damaged/damaged_356.jpg,0,0,0.999864,TP
+data/damage/Damaged/damaged_251.jpg,0,0,0.965492,TP
+data/damage/Damaged/damaged_595.jpg,0,0,0.999406,TP
+data/damage/Damaged/damaged_382.jpg,0,0,0.997459,TP
+data/damage/Damaged/damaged_589.jpg,0,0,0.996785,TP
+data/damage/Damaged/damaged_191.jpg,0,0,0.998616,TP
+data/damage/Damaged/damaged_69.jpg,0,0,0.860228,TP
+data/damage/Not Damaged/not_damaged_42.jpg,1,0,0.599373,FP
+data/damage/Damaged/damaged_271.jpg,0,0,0.996404,TP
+data/damage/Not Damaged/not_damaged_87.jpg,1,0,0.506556,FP
+data/damage/Damaged/damaged_267.jpg,0,0,1.0,TP
+data/damage/Damaged/damaged_294.jpg,0,0,0.999958,TP
+data/damage/Not Damaged/not_damaged_44.jpg,1,1,0.512975,TN
+data/damage/Damaged/damaged_185.jpg,0,1,0.758098,FN
+data/damage/Damaged/damaged_607.jpg,0,0,0.999758,TP
+data/damage/Damaged/damaged_216.jpg,0,0,0.946624,TP
+data/damage/Not Damaged/not_damaged_1.jpg,1,1,0.984259,TN
+data/damage/Damaged/damaged_580.jpg,0,0,0.999426,TP
+data/damage/Damaged/damaged_551.jpg,0,0,0.971707,TP
+data/damage/Not Damaged/not_damaged_112.jpg,1,0,0.999757,FP
+data/damage/Damaged/damaged_146.jpg,0,1,0.870403,FN
+data/damage/Damaged/damaged_509.jpg,0,0,0.969577,TP
+data/damage/Damaged/damaged_195.jpg,0,0,0.99323,TP
+data/damage/Damaged/damaged_527.jpg,0,0,0.610154,TP
+data/damage/Damaged/damaged_171.jpg,0,0,0.999944,TP
+data/damage/Damaged/damaged_517.jpg,0,1,0.534988,FN
+data/damage/Damaged/damaged_213.jpg,0,0,0.999703,TP
+data/damage/Damaged/damaged_429.jpg,0,0,0.999607,TP
+data/damage/Damaged/damaged_318.jpg,0,0,0.999905,TP
+data/damage/Damaged/damaged_94.jpg,0,0,0.935416,TP
+data/damage/Damaged/damaged_447.jpg,0,0,0.847271,TP
+data/damage/Not Damaged/not_damaged_156.jpg,1,1,0.988191,TN
+data/damage/Not Damaged/not_damaged_164.jpg,1,1,0.991471,TN
+data/damage/Damaged/damaged_85.jpg,0,0,0.835803,TP
+data/damage/Damaged/damaged_118.jpg,0,0,0.993071,TP
+data/damage/Damaged/damaged_568.jpg,0,0,0.999754,TP
+data/damage/Damaged/damaged_247.jpg,0,0,0.99863,TP
+data/damage/Damaged/damaged_434.jpg,0,0,0.880174,TP
+data/damage/Not Damaged/not_damaged_70.jpg,1,1,0.998265,TN
+data/damage/Damaged/damaged_341.jpg,0,0,0.999998,TP
+data/damage/Damaged/damaged_243.jpg,0,0,0.896488,TP
+data/damage/Damaged/damaged_163.jpg,0,0,0.999686,TP
+data/damage/Not Damaged/not_damaged_43.jpg,1,1,0.992385,TN
+data/damage/Not Damaged/not_damaged_135.jpg,1,1,0.985516,TN
+data/damage/Damaged/damaged_83.jpg,0,0,0.995093,TP
+data/damage/Damaged/damaged_317.jpg,0,0,0.99988,TP
+data/damage/Not Damaged/not_damaged_22.jpg,1,1,0.98857,TN
+data/damage/Damaged/damaged_471.jpg,0,0,0.999721,TP
+data/damage/Damaged/damaged_465.jpg,0,1,0.90402,FN
+data/damage/Damaged/damaged_155.jpg,0,0,0.993973,TP
