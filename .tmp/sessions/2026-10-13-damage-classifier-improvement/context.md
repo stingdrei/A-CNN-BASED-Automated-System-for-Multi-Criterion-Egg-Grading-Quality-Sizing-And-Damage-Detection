@@ -63,10 +63,12 @@ Implement full 8-phase Damage Detection Improvement Implementation Plan. Improve
 | 2026-10-18 | Subtask 03 artifacts generated: `reports/damage_error_audit.csv` (120 rows) + `reports/damage_error_audit_summary.md`. BLOCKED: waiting user label-triage decision (16 error images). No manifests modified. |
 | 2026-10-18 | Commits: `20bfefa` (test cache), `8ce7ff5` (audit tooling + baseline audit). |
 | 2026-10-18 | Tests: `python -m unittest discover -s tests` → 11/11 pass. |
+| 2026-10-18 | Subtask 03 CLOSED. User verified all 16 FN/FP labels correct. No manifest edits; test set remains locked. Errors treated as genuine model errors → proceed to Phase 3 (model factory). |
+| 2026-10-18 | Subtask 04 done: `src/model_factory.py` (build_model custom/resnet18, checkpoint_metadata) + `tests/test_model_factory.py` (6 tests). Pretrained-download fallback warns + random init. Full suite 17/17. |
 
 ## Exit Criteria
 - [x] Baseline report reproduced/saved
-- [~] Error audit CSV generated; FN/FP inspected (user-informed label fixes) — CSV generated, awaiting user inspection/decision
+- [x] Error audit CSV generated; FN/FP inspected (user-informed label fixes) — labels verified correct, no edits
 - [ ] Model factory + resnet18 training path works; checkpoint carries arch metadata
 - [ ] Backend loads arch from checkpoint metadata (custom + resnet18 both)
 - [ ] Threshold sweep executed on val; selected threshold written to config/metadata
