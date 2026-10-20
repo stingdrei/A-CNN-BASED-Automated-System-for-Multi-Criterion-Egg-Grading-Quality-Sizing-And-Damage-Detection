@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     DETECTION_CROP_PADDING: float = 0.1
     MIN_CROP_SIZE: int = 8
     MM_PER_PIXEL: float = 0.09
+    # Fitted coefficient for W = k * L * B^2; 0.0 means not yet calibrated.
+    WEIGHT_K: float = 0.0
 
     class Config:
         env_file = ".env"

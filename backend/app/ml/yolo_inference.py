@@ -5,13 +5,24 @@ from typing import Dict, Any, List, Optional
 import cv2
 
 from app.config import settings
+from src.grading import estimate_weight as estimate_egg_weight
+from src.grading import map_to_grade as map_egg_grade
+from src.grading import size_category as classify_egg_size
+from src.geometry import bbox_geometry
 
 
 class YOLOPredictor:
-    def __init__(self, model_path: Optional[str] = None, confidence: float = 0.75, mm_per_pixel: Optional[float] = None):
+    def __init__(
+        self,
+        model_path: Optional[str] = None,
+        confidence: float = 0.75,
+        mm_per_pixel: Optional[float] = None,
+        weight_k: Optional[float] = None,
+    ):
         self.model_path = model_path or settings.MODEL_PATH
         self.confidence = confidence
         self.mm_per_pixel = mm_per_pixel or settings.MM_PER_PIXEL
+        self.weight_k = settings.WEIGHT_K if weight_k is None else weight_k
         self.class_names = ["egg"]
         self._model = None
 
@@ -42,34 +53,6 @@ class YOLOPredictor:
             print(f"Error loading model: {e}")
             return False
 
-    def calculate_size_category(self, diameter_px: int) -> str:
-        if diameter_px <= 0:
-            return "unknown"
-        diameter_mm = diameter_px * self.mm_per_pixel
-        if diameter_mm < 50:
-            return "small"
-        elif diameter_mm < 60:
-            return "medium"
-        else:
-            return "large"
-
-    def estimate_weight(self, diameter_px: int) -> Optional[float]:
-        if diameter_px <= 0:
-            return None
-        diameter_mm = diameter_px * self.mm_per_pixel
-        weight = 0.0005 * (diameter_mm ** 3)
-        return round(max(30, min(80, weight)), 1)
-
-    def map_to_grade(self, class_name: str, size_category: Optional[str]) -> str:
-        if not size_category or size_category == "unknown":
-            return "N/A"
-        if size_category == "large":
-            return "A"
-        elif size_category == "medium":
-            return "B"
-        else:
-            return "C"
-
     def predict_image(self, image_path: str) -> Dict[str, Any]:
         results = self.model(image_path, conf=self.confidence)
         return self._parse_results(results[0])
@@ -94,12 +77,21 @@ class YOLOPredictor:
 
             for i, box in enumerate(xyxy):
                 x1, y1, x2, y2 = [int(x) for x in box]
-                diameter_px = max(x2 - x1, y2 - y1)
-                size_cat = self.calculate_size_category(diameter_px)
-                weight = self.estimate_weight(diameter_px)
+                geometry = bbox_geometry(x2 - x1, y2 - y1, self.mm_per_pixel)
+                if geometry is None:
+                    size_cat = "unknown"
+                    weight = None
+                else:
+                    size_cat = classify_egg_size(geometry.length_mm).lower()
+                    weight = estimate_egg_weight(
+                        geometry.length_mm,
+                        geometry.breadth_mm,
+                        self.weight_k,
+                    )
                 class_name = self.get_class_name(int(clss[i]))
-                grade = self.map_to_grade(class_name, size_cat)
-                
+                # Provisional: final grade is set after damage/cleanliness run.
+                grade = map_egg_grade("Unknown", "Unknown", size_cat.capitalize())
+
                 detections.append({
                     "class": class_name,
                     "confidence": float(confs[i]),
