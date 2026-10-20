@@ -2,7 +2,7 @@
 
 Session ID: 2026-10-13-damage-classifier-improvement
 Created: 2026-10-13T08:35:19Z
-Status: in_progress
+Status: in_progress (blocked at Phase 2 label-decision gate)
 
 ## Current Request
 Implement full 8-phase Damage Detection Improvement Implementation Plan. Improve damage classifier from baseline (acc 86.7%, balanced acc 79.8%, damaged recall 91.6%, test=120 samples, 8 FN) to targets: acc >=90%, balanced acc >=85%, damaged recall >=95%, FN <5, no backend inference regression. User approved proposed approach (delegate to TaskManager, batched CoderAgent execution) and said "implement plan".
@@ -54,9 +54,19 @@ Implement full 8-phase Damage Detection Improvement Implementation Plan. Improve
 - Approval gate: no writes/exec without approval; Phase 2 label edits = irreversible → user decides
 - STOP on test fail/build error, report → propose → approve → fix
 
+## Progress Log
+
+| Date | Update |
+|---|---|
+| 2026-10-18 | Subtask 01 done: baseline eval re-verified, acc 0.8667, damaged recall 0.9158, confusion [[87,8],[8,17]], `reports/damage_baseline_report.json`. |
+| 2026-10-18 | Subtask 02 done: `src/dump_damage_errors.py` + `tests/test_dump_damage_errors.py` (unittest, 3 tests pass; pytest not installed in repo). Tool reproduces baseline exactly: TP 87, TN 17, FN 8, FP 8. |
+| 2026-10-18 | Subtask 03 artifacts generated: `reports/damage_error_audit.csv` (120 rows) + `reports/damage_error_audit_summary.md`. BLOCKED: waiting user label-triage decision (16 error images). No manifests modified. |
+| 2026-10-18 | Commits: `20bfefa` (test cache), `8ce7ff5` (audit tooling + baseline audit). |
+| 2026-10-18 | Tests: `python -m unittest discover -s tests` → 11/11 pass. |
+
 ## Exit Criteria
-- [ ] Baseline report reproduced/saved
-- [ ] Error audit CSV generated; FN/FP inspected (user-informed label fixes)
+- [x] Baseline report reproduced/saved
+- [~] Error audit CSV generated; FN/FP inspected (user-informed label fixes) — CSV generated, awaiting user inspection/decision
 - [ ] Model factory + resnet18 training path works; checkpoint carries arch metadata
 - [ ] Backend loads arch from checkpoint metadata (custom + resnet18 both)
 - [ ] Threshold sweep executed on val; selected threshold written to config/metadata
