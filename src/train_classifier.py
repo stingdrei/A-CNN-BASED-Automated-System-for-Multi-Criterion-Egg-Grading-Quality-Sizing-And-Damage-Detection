@@ -4,6 +4,11 @@ Usage:
     python src/train_classifier.py --labels data/damage/manifests/train.csv \
       --val-labels data/damage/manifests/val.csv --image-root . \
       --output models/egg_grader.pth
+
+Two-stage transfer-learning example:
+    python src/train_classifier.py --labels ... --val-labels ... \
+      --image-root . --arch resnet18 --pretrained \
+      --stage1-epochs 3 --stage2-epochs 12
 """
 
 import argparse
@@ -27,8 +32,16 @@ from torch import nn
 from torch.utils.data import DataLoader, WeightedRandomSampler
 
 from dataset import EggDataset
-from model import EggGradingCNN
+from model_factory import (
+    ARCH_CUSTOM,
+    ARCH_RESNET18,
+    build_model,
+    checkpoint_metadata,
+)
 from utils import get_transforms
+
+CLASS_NAMES = ["Damaged", "Not Damaged"]
+WEIGHT_DECAY = 1e-4
 
 
 def seed_everything(seed: int) -> None:
@@ -86,6 +99,72 @@ def evaluate(model, loader, device) -> Tuple[float, Dict[str, object]]:
     return total_loss / max(len(loader.dataset), 1), metrics(y_true, y_pred)
 
 
+def resolve_stage_epochs(
+    total_epochs: int, stage1_epochs: int, stage2_epochs: int
+) -> Tuple[int, int]:
+    """Return (stage1, stage2) epoch counts.
+
+    Explicit stage counts win; otherwise fall back to a single full-network
+    stage for the legacy ``--epochs`` value.
+    """
+    if stage1_epochs < 0 or stage2_epochs < 0:
+        raise ValueError("stage epochs must be non-negative")
+    if stage1_epochs + stage2_epochs > 0:
+        return stage1_epochs, stage2_epochs
+    return 0, total_epochs
+
+
+def head_module(model, arch: str):
+    if arch == ARCH_RESNET18:
+        return model.fc
+    if arch == ARCH_CUSTOM:
+        return model.fc2
+    raise ValueError(f"Unknown architecture {arch!r}")
+
+
+def set_backbone_frozen(model, arch: str) -> None:
+    """Freeze the backbone and keep only the classification head trainable."""
+    for parameter in model.parameters():
+        parameter.requires_grad = False
+    for parameter in head_module(model, arch).parameters():
+        parameter.requires_grad = True
+
+
+def unfreeze_all(model) -> None:
+    for parameter in model.parameters():
+        parameter.requires_grad = True
+
+
+def set_frozen_bn_eval(model) -> None:
+    """Prevent frozen BatchNorm layers from updating running statistics."""
+    for module in model.modules():
+        if isinstance(module, nn.BatchNorm2d):
+            module.eval()
+
+
+def build_checkpoint(
+    model,
+    arch: str,
+    pretrained: bool,
+    img_size: int,
+    seed: int,
+    record: dict,
+    hyperparams: dict,
+) -> dict:
+    checkpoint = {
+        "state_dict": model.state_dict(),
+        "class_names": list(CLASS_NAMES),
+        "img_size": img_size,
+        "seed": seed,
+        "best_val_metrics": record,
+    }
+    checkpoint.update(
+        checkpoint_metadata(arch, num_classes=2, pretrained=pretrained)
+    )
+    checkpoint["hyperparams"] = dict(hyperparams)
+    return checkpoint
+
+
 def train(args: argparse.Namespace) -> None:
     seed_everything(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -100,33 +179,79 @@ def train(args: argparse.Namespace) -> None:
     sampler = WeightedRandomSampler(weights, len(weights), replacement=True)
     train_loader = DataLoader(train_ds, args.batch_size, sampler=sampler)
     val_loader = DataLoader(val_ds, args.batch_size, shuffle=False)
-    model = EggGradingCNN(num_classes=2).to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
+
+    stage1_epochs, stage2_epochs = resolve_stage_epochs(
+        args.epochs, args.stage1_epochs, args.stage2_epochs
+    )
+    hyperparams = {
+        "lr": args.lr,
+        "batch_size": args.batch_size,
+        "stage1_epochs": stage1_epochs,
+        "stage2_epochs": stage2_epochs,
+        "total_epochs": stage1_epochs + stage2_epochs,
+        "img_size": args.img_size,
+        "seed": args.seed,
+        "weight_decay": WEIGHT_DECAY,
+    }
+
+    model = build_model(
+        args.arch, num_classes=2, pretrained=args.pretrained
+    ).to(device)
     loss_fn = nn.CrossEntropyLoss()
-    best_f1, history = -1.0, []
-    for epoch in range(args.epochs):
-        model.train()
-        for images, labels in train_loader:
-            optimizer.zero_grad(set_to_none=True)
-            loss_fn(model(images.to(device)), labels.to(device)).backward()
-            optimizer.step()
-        val_loss, val_metrics = evaluate(model, val_loader, device)
-        record = {"epoch": epoch + 1, "val_loss": val_loss, **val_metrics}
-        record.pop("report", None)
-        history.append(record)
-        if val_metrics["f1"] > best_f1:
-            best_f1 = val_metrics["f1"]
-            Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-            torch.save(
-                {
-                    "state_dict": model.state_dict(),
-                    "class_names": ["Damaged", "Not Damaged"],
-                    "img_size": args.img_size,
-                    "seed": args.seed,
-                    "best_val_metrics": record,
-                },
-                args.output,
-            )
+    best_f1, epoch_number = -1.0, 0
+    history = []
+    optimizer = None
+
+    def run_epochs(epochs: int, stage_name: str) -> None:
+        nonlocal best_f1, epoch_number
+        for _ in range(epochs):
+            epoch_number += 1
+            model.train()
+            if stage_name == "stage1" and args.arch == ARCH_RESNET18:
+                set_frozen_bn_eval(model)
+            for images, labels in train_loader:
+                optimizer.zero_grad(set_to_none=True)
+                loss_fn(model(images.to(device)), labels.to(device)).backward()
+                optimizer.step()
+            val_loss, val_metrics = evaluate(model, val_loader, device)
+            record = {
+                "epoch": epoch_number,
+                "stage": stage_name,
+                "val_loss": val_loss,
+                **val_metrics,
+            }
+            record.pop("report", None)
+            history.append(record)
+            if val_metrics["f1"] > best_f1:
+                best_f1 = val_metrics["f1"]
+                checkpoint = build_checkpoint(
+                    model,
+                    args.arch,
+                    args.pretrained,
+                    args.img_size,
+                    args.seed,
+                    record,
+                    hyperparams,
+                )
+                Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+                torch.save(checkpoint, args.output)
+
+    if stage1_epochs > 0:
+        set_backbone_frozen(model, args.arch)
+        optimizer = torch.optim.AdamW(
+            [p for p in model.parameters() if p.requires_grad],
+            lr=args.lr,
+            weight_decay=WEIGHT_DECAY,
+        )
+        run_epochs(stage1_epochs, "stage1")
+
+    if stage2_epochs > 0:
+        unfreeze_all(model)
+        optimizer = torch.optim.AdamW(
+            model.parameters(), lr=args.lr, weight_decay=WEIGHT_DECAY
+        )
+        run_epochs(stage2_epochs, "stage2")
+
     Path(args.metrics).parent.mkdir(parents=True, exist_ok=True)
     Path(args.metrics).write_text(json.dumps(history, indent=2))
 
@@ -143,6 +268,12 @@ def main() -> None:
     parser.add_argument("--img-size", type=int, default=224)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--arch", choices=[ARCH_CUSTOM, ARCH_RESNET18], default=ARCH_CUSTOM
+    )
+    parser.add_argument("--pretrained", action="store_true")
+    parser.add_argument("--stage1-epochs", type=int, default=0)
+    parser.add_argument("--stage2-epochs", type=int, default=0)
     train(parser.parse_args())
 
 

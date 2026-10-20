@@ -65,6 +65,7 @@ Implement full 8-phase Damage Detection Improvement Implementation Plan. Improve
 | 2026-10-18 | Tests: `python -m unittest discover -s tests` → 11/11 pass. |
 | 2026-10-18 | Subtask 03 CLOSED. User verified all 16 FN/FP labels correct. No manifest edits; test set remains locked. Errors treated as genuine model errors → proceed to Phase 3 (model factory). |
 | 2026-10-18 | Subtask 04 done: `src/model_factory.py` (build_model custom/resnet18, checkpoint_metadata) + `tests/test_model_factory.py` (6 tests). Pretrained-download fallback warns + random init. Full suite 17/17. |
+| 2026-10-18 | Subtask 05 Part A done: `train_classifier.py` now takes --arch/--pretrained/--stage1-epochs/--stage2-epochs, freeze/unfreeze helpers, frozen-BN eval, checkpoint arch+hyperparams metadata; `tests/test_train_classifier_arch.py` (9 tests). Full suite 26/26. Part B smoke (2-epoch resnet18) pending approval. |
 
 ## Exit Criteria
 - [x] Baseline report reproduced/saved
