@@ -65,12 +65,13 @@ Implement full 8-phase Damage Detection Improvement Implementation Plan. Improve
 | 2026-10-18 | Tests: `python -m unittest discover -s tests` → 11/11 pass. |
 | 2026-10-18 | Subtask 03 CLOSED. User verified all 16 FN/FP labels correct. No manifest edits; test set remains locked. Errors treated as genuine model errors → proceed to Phase 3 (model factory). |
 | 2026-10-18 | Subtask 04 done: `src/model_factory.py` (build_model custom/resnet18, checkpoint_metadata) + `tests/test_model_factory.py` (6 tests). Pretrained-download fallback warns + random init. Full suite 17/17. |
-| 2026-10-18 | Subtask 05 Part A done: `train_classifier.py` now takes --arch/--pretrained/--stage1-epochs/--stage2-epochs, freeze/unfreeze helpers, frozen-BN eval, checkpoint arch+hyperparams metadata; `tests/test_train_classifier_arch.py` (9 tests). Full suite 26/26. Part B smoke (2-epoch resnet18) pending approval. |
+| 2026-10-18 | Subtask 05 Part A done: `train_classifier.py` now takes --arch/--pretrained/--stage1-epochs/--stage2-epochs, freeze/unfreeze helpers, frozen-BN eval, checkpoint arch+hyperparams metadata; `tests/test_train_classifier_arch.py` (9 tests). Full suite 26/26. |
+| 2026-10-18 | Subtask 05 CLOSED. Smoke (2-epoch resnet18, random init) ran on other machine. Checkpoint arch=resnet18, arch_args, hyperparams verified; reload OK. Metrics degenerate (all class 1, acc 0.20) — expected, plumbing only. |
 
 ## Exit Criteria
 - [x] Baseline report reproduced/saved
 - [x] Error audit CSV generated; FN/FP inspected (user-informed label fixes) — labels verified correct, no edits
-- [ ] Model factory + resnet18 training path works; checkpoint carries arch metadata
+- [x] Model factory + resnet18 training path works; checkpoint carries arch metadata
 - [ ] Backend loads arch from checkpoint metadata (custom + resnet18 both)
 - [ ] Threshold sweep executed on val; selected threshold written to config/metadata
 - [ ] Experiment comparison report in reports/
