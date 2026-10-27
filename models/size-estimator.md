@@ -14,9 +14,10 @@ chosen measurement convention before release.
 
 ## Current state
 
-The backend currently derives a diameter from the larger bounding-box side and
-uses obsolete `<50 / 50–60 / >60 mm` thresholds. This is not a sufficiently
-precise measurement method for the final model.
+The backend uses the correct `<53 / 53–60 / >60 mm` class boundaries but still
+derives axes from the detection bounding box, marked `bbox_fallback`. This is
+not a sufficiently precise measurement method for the final model. A physical
+reference object and camera calibration are still required.
 
 ## Requirements
 
@@ -38,7 +39,7 @@ precise measurement method for the final model.
 - [ ] Build a calibration dataset with known reference dimensions.
 - [ ] Measure pixel-to-mm error across the tray field, not only at the center.
 - [ ] Implement major/minor axis extraction with quality checks.
-- [ ] Replace the old diameter thresholds in backend inference.
+- [x] Replace the old diameter thresholds in backend inference.
 - [ ] Evaluate size MAE, per-class recall, macro F1, and edge cases near
   53 mm and 60 mm.
 - [ ] Store `length_mm`, `breadth_mm`, `size`, calibration version, and quality

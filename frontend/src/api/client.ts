@@ -63,10 +63,12 @@ class ApiClient {
   async uploadFile(file: File, confidenceThreshold: number = 0.75, saveAnnotated: boolean = true) {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('confidence_threshold', confidenceThreshold.toString());
-    formData.append('save_annotated', saveAnnotated.toString());
 
     const response = await this.client.post('/predictions/upload', formData, {
+      params: {
+        confidence_threshold: confidenceThreshold,
+        save_annotated: saveAnnotated,
+      },
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;

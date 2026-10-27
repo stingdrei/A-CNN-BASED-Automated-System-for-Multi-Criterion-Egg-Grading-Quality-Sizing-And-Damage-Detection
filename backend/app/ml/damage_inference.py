@@ -16,6 +16,25 @@ class DamageResult:
     review_reason: Optional[str] = None
 
 
+def decide_damage(
+    damaged_probability: float,
+    damaged_threshold: float,
+    review_threshold: float,
+) -> tuple[str, float, Optional[str]]:
+    """Map P(Damaged) to status, confidence, and review reason.
+
+    A damaged prediction is never downgraded to review: the decision threshold
+    is selected on validation to keep damaged recall high. Review applies only
+    when a not-damaged prediction is below the confidence threshold.
+    """
+    if damaged_probability >= damaged_threshold:
+        return "Damaged", damaged_probability, None
+    confidence = 1.0 - damaged_probability
+    if confidence < review_threshold:
+        return "Needs Review", confidence, "low_confidence"
+    return "Not Damaged", confidence, None
+
+
 class DamageClassifier:
     """Inference wrapper for the binary damage CNN checkpoint."""
 
@@ -25,6 +44,7 @@ class DamageClassifier:
         self,
         checkpoint_path: Optional[str] = None,
         review_threshold: Optional[float] = None,
+        damaged_threshold: Optional[float] = None,
         device: Optional[str] = None,
     ):
         self.checkpoint_path = Path(checkpoint_path or settings.DAMAGE_MODEL_PATH)
@@ -33,11 +53,19 @@ class DamageClassifier:
             if review_threshold is not None
             else settings.DAMAGE_REVIEW_THRESHOLD
         )
+        self.damaged_threshold = (
+            damaged_threshold
+            if damaged_threshold is not None
+            else settings.DAMAGE_DECISION_THRESHOLD
+        )
+        self._explicit_damaged_threshold = damaged_threshold is not None
         self.device_name = device
         self._model = None
         self._torch = None
         self._transform = None
         self.class_names = self.EXPECTED_CLASSES
+        self.arch = "unknown"
+        self.img_size = 224
 
     @property
     def model_version(self) -> str:
@@ -58,8 +86,9 @@ class DamageClassifier:
             return
 
         import torch
-        from torch import nn
         from torchvision import transforms
+
+        from src.model_factory import build_model
 
         checkpoint = torch.load(
             self.checkpoint_path,
@@ -72,31 +101,44 @@ class DamageClassifier:
                 f"Unexpected damage checkpoint classes: {class_names!r}"
             )
 
-        class EggGradingCNN(nn.Module):
-            def __init__(self) -> None:
-                super().__init__()
-                self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
-                self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
-                self.pool = nn.MaxPool2d(2, 2)
-                self.fc1 = nn.Linear(64 * 56 * 56, 128)
-                self.fc2 = nn.Linear(128, 2)
+        arch = str(checkpoint.get("arch", "custom"))
+        arch_args = checkpoint.get("arch_args") or {}
+        num_classes = int(arch_args.get("num_classes", len(class_names)))
+        if num_classes != len(class_names):
+            raise ValueError(
+                f"Checkpoint num_classes={num_classes} does not match "
+                f"class_names={class_names!r}"
+            )
+        img_size = int(checkpoint.get("img_size", 224))
+        if img_size <= 0:
+            raise ValueError(f"Invalid checkpoint img_size: {img_size}")
+        if not self._explicit_damaged_threshold:
+            checkpoint_threshold = checkpoint.get("damaged_threshold")
+            if checkpoint_threshold is not None:
+                checkpoint_threshold = float(checkpoint_threshold)
+                if not 0 < checkpoint_threshold < 1:
+                    raise ValueError(
+                        "Invalid checkpoint damaged_threshold: "
+                        f"{checkpoint_threshold}"
+                    )
+                self.damaged_threshold = checkpoint_threshold
 
-            def forward(self, x):
-                x = self.pool(torch.relu(self.conv1(x)))
-                x = self.pool(torch.relu(self.conv2(x)))
-                x = x.view(x.size(0), -1)
-                return self.fc2(torch.relu(self.fc1(x)))
-
-        model = EggGradingCNN()
+        model = build_model(
+            arch,
+            num_classes=num_classes,
+            pretrained=False,
+        )
         model.load_state_dict(checkpoint["state_dict"])
         model.to(self._select_device(torch))
         model.eval()
         self._torch = torch
         self._model = model
+        self.arch = arch
+        self.img_size = img_size
         self._transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
-                transforms.Resize((checkpoint.get("img_size", 224),) * 2),
+                transforms.Resize((img_size,) * 2),
                 transforms.ToTensor(),
                 transforms.Normalize(
                     [0.485, 0.456, 0.406],
@@ -133,17 +175,15 @@ class DamageClassifier:
         tensor = self._transform(crop).unsqueeze(0).to(self._model.parameters().__next__().device)
         with self._torch.no_grad():
             probabilities = self._torch.softmax(self._model(tensor), dim=1)[0]
-        confidence, class_index = self._torch.max(probabilities, dim=0)
-        confidence_value = float(confidence.item())
-        if confidence_value < self.review_threshold:
-            return DamageResult(
-                "Needs Review",
-                confidence_value,
-                self.model_version,
-                "low_confidence",
-            )
+        damaged_probability = float(probabilities[0].item())
+        status, confidence, review_reason = decide_damage(
+            damaged_probability,
+            self.damaged_threshold,
+            self.review_threshold,
+        )
         return DamageResult(
-            self.class_names[int(class_index.item())],
-            confidence_value,
+            status,
+            confidence,
             self.model_version,
+            review_reason,
         )

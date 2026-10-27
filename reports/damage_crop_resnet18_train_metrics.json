@@ -1,0 +1,182 @@
+[
+  {
+    "epoch": 1,
+    "stage": "stage1",
+    "val_loss": 0.4301517382264137,
+    "accuracy": 0.765625,
+    "balanced_accuracy": 0.7502564102564102,
+    "precision": 0.7083333333333334,
+    "recall": 0.68,
+    "f1": 0.6938775510204082
+  },
+  {
+    "epoch": 2,
+    "stage": "stage1",
+    "val_loss": 0.34065813571214676,
+    "accuracy": 0.8671875,
+    "balanced_accuracy": 0.8694871794871795,
+    "precision": 0.8,
+    "recall": 0.88,
+    "f1": 0.8380952380952381
+  },
+  {
+    "epoch": 3,
+    "stage": "stage1",
+    "val_loss": 0.29281313344836235,
+    "accuracy": 0.8984375,
+    "balanced_accuracy": 0.8987179487179487,
+    "precision": 0.8490566037735849,
+    "recall": 0.9,
+    "f1": 0.8737864077669902
+  },
+  {
+    "epoch": 4,
+    "stage": "stage2",
+    "val_loss": 0.16217152029275894,
+    "accuracy": 0.953125,
+    "balanced_accuracy": 0.9471794871794872,
+    "precision": 0.9583333333333334,
+    "recall": 0.92,
+    "f1": 0.9387755102040817
+  },
+  {
+    "epoch": 5,
+    "stage": "stage2",
+    "val_loss": 0.062140596099197865,
+    "accuracy": 0.9609375,
+    "balanced_accuracy": 0.9571794871794872,
+    "precision": 0.9591836734693877,
+    "recall": 0.94,
+    "f1": 0.9494949494949495
+  },
+  {
+    "epoch": 6,
+    "stage": "stage2",
+    "val_loss": 0.0667005346622318,
+    "accuracy": 0.9765625,
+    "balanced_accuracy": 0.97,
+    "precision": 1.0,
+    "recall": 0.94,
+    "f1": 0.9690721649484536
+  },
+  {
+    "epoch": 7,
+    "stage": "stage2",
+    "val_loss": 0.02017929300200194,
+    "accuracy": 0.9921875,
+    "balanced_accuracy": 0.9935897435897436,
+    "precision": 0.9803921568627451,
+    "recall": 1.0,
+    "f1": 0.9900990099009901
+  },
+  {
+    "epoch": 8,
+    "stage": "stage2",
+    "val_loss": 0.03898611641488969,
+    "accuracy": 0.984375,
+    "balanced_accuracy": 0.98,
+    "precision": 1.0,
+    "recall": 0.96,
+    "f1": 0.9795918367346939
+  },
+  {
+    "epoch": 9,
+    "stage": "stage2",
+    "val_loss": 0.05300771165639162,
+    "accuracy": 0.9765625,
+    "balanced_accuracy": 0.97,
+    "precision": 1.0,
+    "recall": 0.94,
+    "f1": 0.9690721649484536
+  },
+  {
+    "epoch": 10,
+    "stage": "stage2",
+    "val_loss": 0.24115616083145142,
+    "accuracy": 0.9375,
+    "balanced_accuracy": 0.9235897435897436,
+    "precision": 0.9772727272727273,
+    "recall": 0.86,
+    "f1": 0.9148936170212766
+  },
+  {
+    "epoch": 11,
+    "stage": "stage2",
+    "val_loss": 0.3082260563969612,
+    "accuracy": 0.8671875,
+    "balanced_accuracy": 0.891025641025641,
+    "precision": 0.746268656716418,
+    "recall": 1.0,
+    "f1": 0.8547008547008547
+  },
+  {
+    "epoch": 12,
+    "stage": "stage2",
+    "val_loss": 0.05123460665345192,
+    "accuracy": 0.9765625,
+    "balanced_accuracy": 0.9771794871794872,
+    "precision": 0.9607843137254902,
+    "recall": 0.98,
+    "f1": 0.9702970297029703
+  },
+  {
+    "epoch": 13,
+    "stage": "stage2",
+    "val_loss": 0.08565346407704055,
+    "accuracy": 0.9609375,
+    "balanced_accuracy": 0.9535897435897436,
+    "precision": 0.9787234042553191,
+    "recall": 0.92,
+    "f1": 0.9484536082474226
+  },
+  {
+    "epoch": 14,
+    "stage": "stage2",
+    "val_loss": 0.08501961070578545,
+    "accuracy": 0.9609375,
+    "balanced_accuracy": 0.9535897435897436,
+    "precision": 0.9787234042553191,
+    "recall": 0.92,
+    "f1": 0.9484536082474226
+  },
+  {
+    "epoch": 15,
+    "stage": "stage2",
+    "val_loss": 0.08124640537425876,
+    "accuracy": 0.96875,
+    "balanced_accuracy": 0.9635897435897436,
+    "precision": 0.9791666666666666,
+    "recall": 0.94,
+    "f1": 0.9591836734693877
+  },
+  {
+    "epoch": 16,
+    "stage": "stage2",
+    "val_loss": 0.040706527477595955,
+    "accuracy": 0.9921875,
+    "balanced_accuracy": 0.9935897435897436,
+    "precision": 0.9803921568627451,
+    "recall": 1.0,
+    "f1": 0.9900990099009901
+  },
+  {
+    "epoch": 17,
+    "stage": "stage2",
+    "val_loss": 0.046502096636686474,
+    "accuracy": 0.9765625,
+    "balanced_accuracy": 0.9735897435897436,
+    "precision": 0.9795918367346939,
+    "recall": 0.96,
+    "f1": 0.9696969696969697
+  },
+  {
+    "epoch": 18,
+    "stage": "stage2",
+    "val_loss": 0.03779571963241324,
+    "accuracy": 0.984375,
+    "balanced_accuracy": 0.9835897435897436,
+    "precision": 0.98,
+    "recall": 0.98,
+    "f1": 0.98
+  }
+]

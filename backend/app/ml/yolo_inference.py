@@ -6,7 +6,6 @@ import cv2
 
 from app.config import settings
 from src.grading import estimate_weight as estimate_egg_weight
-from src.grading import map_to_grade as map_egg_grade
 from src.grading import size_category as classify_egg_size
 from src.geometry import bbox_geometry
 
@@ -25,6 +24,10 @@ class YOLOPredictor:
         self.weight_k = settings.WEIGHT_K if weight_k is None else weight_k
         self.class_names = ["egg"]
         self._model = None
+
+    @property
+    def model_version(self) -> str:
+        return Path(self.model_path).name
 
     @property
     def model(self):
@@ -75,36 +78,50 @@ class YOLOPredictor:
             confs = boxes.conf.cpu().numpy()
             clss = boxes.cls.cpu().numpy()
 
-            for i, box in enumerate(xyxy):
+            ordered = sorted(
+                range(len(xyxy)),
+                key=lambda index: (float(xyxy[index][1]), float(xyxy[index][0])),
+            )
+            for egg_id, index in enumerate(ordered, start=1):
+                box = xyxy[index]
                 x1, y1, x2, y2 = [int(x) for x in box]
                 geometry = bbox_geometry(x2 - x1, y2 - y1, self.mm_per_pixel)
                 if geometry is None:
-                    size_cat = "unknown"
+                    size_cat = "Unknown"
+                    length_mm = None
+                    breadth_mm = None
+                    geometry_quality = "unknown"
                     weight = None
                 else:
-                    size_cat = classify_egg_size(geometry.length_mm).lower()
+                    size_cat = classify_egg_size(geometry.length_mm)
+                    length_mm = round(geometry.length_mm, 2)
+                    breadth_mm = round(geometry.breadth_mm, 2)
+                    geometry_quality = geometry.quality
                     weight = estimate_egg_weight(
                         geometry.length_mm,
                         geometry.breadth_mm,
                         self.weight_k,
                     )
-                class_name = self.get_class_name(int(clss[i]))
-                # Provisional: final grade is set after damage/cleanliness run.
-                grade = map_egg_grade("Unknown", "Unknown", size_cat.capitalize())
-
+                class_name = self.get_class_name(int(clss[index]))
                 detections.append({
+                    "egg_id": egg_id,
                     "class": class_name,
-                    "confidence": float(confs[i]),
+                    "confidence": float(confs[index]),
                     "bbox": [x1, y1, x2, y2],
-                    "size_category": size_cat,
+                    "size": size_cat,
+                    "length_mm": length_mm,
+                    "breadth_mm": breadth_mm,
+                    "geometry_quality": geometry_quality,
                     "weight_g": weight,
-                    "grade": grade
+                    "grade": "N/A",
+                    "provisional_grade": "N/A",
+                    "detection_model_version": self.model_version,
+                    "calibration_version": settings.CALIBRATION_VERSION,
                 })
 
         return {
             "detections": detections,
             "total": len(detections),
-            # Damage is intentionally unknown until the damage classifier runs.
             "damaged": 0,
             "not_damaged": 0,
         }
@@ -122,18 +139,29 @@ class YOLOPredictor:
 
         for det in detections:
             x1, y1, x2, y2 = det["bbox"]
-            cls = det["class"]
             conf = det["confidence"]
-            grade = det.get("grade", "N/A")
-            weight = det.get("weight_g", 0)
-
-            color = grade_colors.get(grade, (128, 128, 128))
-            label = f"{grade} {conf:.2f}"
+            final_grade = det.get("grade", "N/A")
+            provisional = det.get("provisional_grade", "N/A")
+            if final_grade == "N/A" and provisional not in (None, "N/A"):
+                grade = provisional
+                label = f"P:{grade} {conf:.2f}"
+            else:
+                grade = final_grade
+                label = f"{grade} {conf:.2f}"
+            weight = det.get("weight_g")
             if weight:
                 label += f" {weight}g"
 
+            color = grade_colors.get(grade, (128, 128, 128))
             cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
-            cv2.putText(img, label, (x1, y1 - 10),
-                      cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.putText(
+                img,
+                label,
+                (x1, y1 - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                color,
+                2,
+            )
 
         return img

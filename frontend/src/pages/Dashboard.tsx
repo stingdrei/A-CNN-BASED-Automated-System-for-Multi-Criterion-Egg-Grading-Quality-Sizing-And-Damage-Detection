@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileImage, Film, Target, Clock, AlertTriangle, TrendingUp, Lightbulb, X } from 'lucide-react';
+import { FileImage, Target, Clock, AlertTriangle, TrendingUp, Lightbulb, X } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/common/Card';
 import { apiClient } from '../api/client';
 import { DashboardStats, GradeDistribution } from '../types';
-
-const statCards = [
-  { key: 'total_predictions', label: 'Total Predictions', icon: Target, color: 'text-primary-600', bg: 'bg-primary-50', tooltip: 'Total image/video analyses performed' },
-  { key: 'total_images', label: 'Images', icon: FileImage, color: 'text-blue-600', bg: 'bg-blue-50', tooltip: 'Number of image files analyzed' },
-  { key: 'total_videos', label: 'Videos', icon: Film, color: 'text-purple-600', bg: 'bg-purple-50', tooltip: 'Number of video files analyzed' },
-  { key: 'total_detections', label: 'Total Detections', icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50', tooltip: 'Total eggs detected across all analyses' },
-];
 
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -31,6 +24,7 @@ export function Dashboard() {
         setGradeData(gradeDistribution);
       } catch (error) {
         console.error('Failed to fetch stats:', error);
+        setError('Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -87,6 +81,9 @@ export function Dashboard() {
               <p className="text-sm text-blue-800 mt-1">
                 Click <strong>New Prediction</strong> to upload an image → Adjust confidence threshold → View results in History
               </p>
+              <p className="text-xs text-blue-700 mt-2">
+                Beta note: cleanliness is unavailable, so final grades are N/A. Provisional damage+size grades are shown.
+              </p>
               <button
                 onClick={() => setShowHelp(false)}
                 className="text-xs text-blue-600 hover:text-blue-800 mt-2 flex items-center gap-1"
@@ -112,9 +109,9 @@ export function Dashboard() {
               <PieChart>
                 <Pie
                   data={[
-                    { name: 'Grade AA', value: gradeData.grade_aa, fill: '#22c55e' },
-                    { name: 'Grade A', value: gradeData.grade_a, fill: '#3b82f6' },
-                    { name: 'Grade B', value: gradeData.grade_b, fill: '#f59e0b' },
+                    { name: 'Grade A', value: gradeData.grade_a, fill: '#22c55e' },
+                    { name: 'Grade B', value: gradeData.grade_b, fill: '#3b82f6' },
+                    { name: 'Grade C', value: gradeData.grade_c, fill: '#f59e0b' },
                     { name: 'N/A', value: gradeData.grade_na, fill: '#6b7280' },
                     { name: 'Reject', value: gradeData.grade_reject, fill: '#ef4444' },
                   ]}
@@ -127,9 +124,9 @@ export function Dashboard() {
                   label={({ name, value }) => `${name}: ${value}`}
                 >
                   {[
-                    { name: 'Grade AA', value: gradeData.grade_aa, fill: '#22c55e' },
-                    { name: 'Grade A', value: gradeData.grade_a, fill: '#3b82f6' },
-                    { name: 'Grade B', value: gradeData.grade_b, fill: '#f59e0b' },
+                    { name: 'Grade A', value: gradeData.grade_a, fill: '#22c55e' },
+                    { name: 'Grade B', value: gradeData.grade_b, fill: '#3b82f6' },
+                    { name: 'Grade C', value: gradeData.grade_c, fill: '#f59e0b' },
                     { name: 'N/A', value: gradeData.grade_na, fill: '#6b7280' },
                     { name: 'Reject', value: gradeData.grade_reject, fill: '#ef4444' },
                   ].map((entry, index) => (

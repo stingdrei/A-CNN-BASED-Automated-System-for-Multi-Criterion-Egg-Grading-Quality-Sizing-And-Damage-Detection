@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-10-26T16:42:24.393123+00:00",
+  "manifest_dir": "data/damage/manifests_v2",
+  "image_root": ".",
+  "splits": {
+    "train": {
+      "total": 811,
+      "damaged": 559,
+      "not_damaged": 252,
+      "missing": [],
+      "source_counts": {
+        "brokeneggs_2023-04-09": 260,
+        "legacy_damaged": 437,
+        "legacy_not_damaged": 114
+      }
+    },
+    "val": {
+      "total": 174,
+      "damaged": 120,
+      "not_damaged": 54,
+      "missing": [],
+      "source_counts": {
+        "brokeneggs_2023-04-09": 50,
+        "legacy_damaged": 99,
+        "legacy_not_damaged": 25
+      }
+    },
+    "test": {
+      "total": 174,
+      "damaged": 120,
+      "not_damaged": 54,
+      "missing": [],
+      "source_counts": {
+        "brokeneggs_2023-04-09": 59,
+        "legacy_damaged": 94,
+        "legacy_not_damaged": 21
+      }
+    }
+  },
+  "exact_duplicate_groups": [],
+  "errors": 0,
+  "exact_duplicate_count": 0
+}

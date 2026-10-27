@@ -9,21 +9,23 @@ model system and must be tested as strictly as the learned components.
 ## Locked grading policy
 
 ```text
-if damage_status == "Damaged":
+if damage_status == "Damaged" or cleanliness_status == "Stained":
     grade = "Reject"
-elif cleanliness_status == "Stained":
-    grade = "Reject"
-elif size == "Large":
-    grade = "A"
-elif size == "Medium":
-    grade = "B"
-elif size == "Small":
-    grade = "C"
+elif damage_status == "Not Damaged" and cleanliness_status == "Clean":
+    grade = {"Large": "A", "Medium": "B", "Small": "C"}.get(size, "N/A")
 else:
     grade = "N/A"
 ```
 
 Unknown, invalid, or below-threshold inputs must not receive A, B, or C.
+Cleanliness is currently `Unavailable`, so final grades are `N/A` and the API
+exposes `provisional_grade` from damage + size only.
+
+Damage status is decided from `P(Damaged)` using a validation-selected
+threshold stored in the checkpoint (`0.18` for the current ResNet18 crop
+model). A damaged prediction is never downgraded to `Needs Review`: it rejects
+even when its confidence is below the review threshold. Review applies only
+when a not-damaged prediction is below the confidence threshold.
 
 ## Requirements
 
@@ -39,12 +41,12 @@ Unknown, invalid, or below-threshold inputs must not receive A, B, or C.
 
 ## TODO
 
-- [ ] Implement the locked cleanliness branch in the backend.
-- [ ] Finalize the per-egg JSON schema and use it everywhere.
-- [ ] Add exhaustive grading-rule unit tests.
+- [x] Implement the locked cleanliness branch in the backend (unavailable -> N/A).
+- [x] Finalize the per-egg JSON schema and use it in API, DB, CSV, frontend.
+- [x] Add exhaustive grading-rule unit tests.
 - [ ] Add end-to-end tests for damaged, stained, clean-small,
-  clean-medium, and clean-large eggs.
-- [ ] Add low-confidence and invalid-input behavior.
-- [ ] Remove stale `AA` and incompatible grade terminology from frontend types.
+  clean-medium, and clean-large eggs (stained/clean blocked by missing model).
+- [x] Add low-confidence and invalid-input behavior.
+- [x] Remove stale `AA` and incompatible grade terminology from frontend types.
 - [ ] Evaluate complete-tray grading accuracy on the frozen test set.
-- [ ] Add model and calibration metadata to persisted predictions.
+- [x] Add model and calibration metadata to persisted predictions.

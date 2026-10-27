@@ -23,14 +23,24 @@ class Settings(BaseSettings):
     MODEL_PATH: str = str(
         PROJECT_ROOT / "egg_detection" / "finetune_egg_v1" / "weights" / "best.pt"
     )
-    DAMAGE_MODEL_PATH: str = str(PROJECT_ROOT / "models" / "egg_grader.pth")
+    DAMAGE_MODEL_PATH: str = str(
+        PROJECT_ROOT / "models" / "egg_grader_crop_resnet18_v1.pth"
+    )
+    EGG_CSV_PATH: str = str(PROJECT_ROOT / "reports" / "egg_statistics_v2.csv")
     CONFIDENCE_THRESHOLD: float = 0.75
+    DAMAGE_DECISION_THRESHOLD: float = 0.5
     DAMAGE_REVIEW_THRESHOLD: float = 0.75
+    CLEANLINESS_MODEL_PATH: str = str(
+        PROJECT_ROOT / "models" / "egg_grader_cleanliness_v1.pth"
+    )
+    CLEANLINESS_DECISION_THRESHOLD: float = 0.5
+    CLEANLINESS_REVIEW_THRESHOLD: float = 0.75
     DETECTION_CROP_PADDING: float = 0.1
     MIN_CROP_SIZE: int = 8
     MM_PER_PIXEL: float = 0.09
     # Fitted coefficient for W = k * L * B^2; 0.0 means not yet calibrated.
     WEIGHT_K: float = 0.0
+    CALIBRATION_VERSION: str = "uncalibrated"
 
     class Config:
         env_file = ".env"

@@ -1,0 +1,177 @@
+{
+  "generated_at": "2026-10-26T17:16:30.463430+00:00",
+  "manifest": "data/damage/manifests_v2/val.csv",
+  "image_root": ".",
+  "detector": "egg_detection/finetune_egg_v1/weights/best.pt",
+  "output": "data/damage_crops/val",
+  "confidence_threshold": 0.75,
+  "padding": 0.1,
+  "min_crop_size": 8,
+  "source_images": 174,
+  "detected_images": 162,
+  "usable_images": 128,
+  "missed_images": 12,
+  "failed_read_images": [],
+  "detection_coverage": 0.931034,
+  "usable_coverage": 0.735632,
+  "multi_detection_skipped": 34,
+  "crops": 128,
+  "label_counts": {
+    "0": 78,
+    "1": 50
+  },
+  "source_counts": {
+    "brokeneggs_2023-04-09": 49,
+    "legacy_damaged": 58,
+    "legacy_not_damaged": 21
+  },
+  "multi_detection_images": [
+    {
+      "source_image": "data/damage/Damaged/damaged_133.jpg",
+      "detections": 5
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_265.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_9.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_14.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_133.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_138.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_73.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_173.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_136.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_263.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_148.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_289.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_395.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_72.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_48.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_361.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_604.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_572.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_153.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_95.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_26.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_560.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_595.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_42.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_399.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_510.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_123.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_607.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_105.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_529.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_276.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_204.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_462.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_154.jpg",
+      "detections": 3
+    }
+  ],
+  "detection_confidence": {
+    "min": 0.783098,
+    "max": 0.971997,
+    "mean": 0.929586
+  },
+  "crop_manifest": "data/damage_crops/val/manifest.csv",
+  "limitations": [
+    "Crops inherit the source image label.",
+    "Missed detections are excluded from the crop manifest.",
+    "This set is for pipeline evaluation, not detector mAP."
+  ]
+}

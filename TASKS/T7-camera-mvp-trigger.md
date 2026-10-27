@@ -11,31 +11,39 @@ press Capture -> grab 1 frame -> detect -> grade all eggs -> display -> next tra
 Do **not** start implementation until every trigger condition below is true.
 This keeps UI work from racing ahead of an unproven model.
 
+> **Beta override:** the browser camera UI was implemented on explicit user
+> request before these gates passed. It is not release approval; the trigger
+> remains closed and physical camera/model acceptance is still required.
+
 ## Trigger Conditions (all required)
 
 ### 1. Multi-criterion grading is implemented
-- [ ] Damage classification wired into inference.
+- [x] Damage classification wired into inference.
 - [ ] Cleanliness classification wired into inference (`Clean` / `Stained`).
 - [ ] Size class computed from calibrated major axis (`<53 / 53–60 / >60` mm).
 - [ ] Weight computed as `W = k × L × B²` with fitted `k` (not `null`).
-- [ ] Deterministic grading rules applied:
+- [x] Deterministic grading rules applied:
   `Damaged -> Reject`, `Stained -> Reject`, `Clean + Large/Medium/Small -> A/B/C`,
-  unknown/low-confidence -> `N/A`.
+  unknown/low-confidence -> `N/A` (cleanliness unavailable -> final `N/A`).
 
 ### 2. Per-egg output contract is complete
-- [ ] Every detection returns:
+- [x] Every detection returns:
   `egg_id`, `grade`, `size`, `weight_g`, `damage_status`,
-  `cleanliness_status`, `confidence.{detection,damage,cleanliness}`.
-- [ ] API, CSV, database, and frontend use the **same field names**.
-- [ ] No damaged or stained egg can receive `A`, `B`, or `C`.
+  `cleanliness_status`, `confidence.{detection,damage,cleanliness}`
+  (`weight_g` may be null until calibrated; `cleanliness_status=Unavailable`).
+- [x] API, CSV, database, and frontend use the **same field names**.
+- [x] No damaged or stained egg can receive `A`, `B`, or `C`.
 
 ### 3. "True results" are proven on a locked test set
 Reports committed under `reports/`, evaluated once on a frozen egg-level set:
 
-- [ ] Detector: mAP50 >= 0.98, recall >= 0.99.
+- [x] Detector: mAP50 >= 0.98, recall >= 0.99 (full 19-image/57-egg test).
 - [ ] Detector: exact tray-count accuracy >= 0.95 on **0–5 egg** trays.
 - [ ] Detector: <= 0.10 false positives per tray; <= 0.02 missed eggs per tray.
 - [ ] Damage: balanced accuracy >= 0.93; damaged recall >= 0.98.
+      Numeric result at validation-selected 0.18: balanced 0.9792, damaged
+      recall 1.0000. Keep unchecked until source leakage is resolved and the
+      test is rerun under a single locked protocol.
 - [ ] Cleanliness: balanced accuracy >= 0.95; stained recall >= 0.98.
 - [ ] Size: macro F1 >= 0.90; MAE <= 1.5 mm.
 - [ ] Weight: MAE <= 3 g; R² >= 0.85; >= 90% within ±3 g.
@@ -51,6 +59,18 @@ Treat "model is 90%+ done" as: **sections 1–3 all checked**, plus:
 - [ ] Model versions, thresholds, calibration version stored per inference batch.
 
 If any item above is unchecked, the trigger is **closed**.
+
+## Implementation Status (Beta Override)
+
+- [x] `CameraCapture` starts the rear camera, previews it, captures one JPEG,
+  and stops tracks on unmount.
+- [x] Permission/API errors produce readable messages and a retry action.
+- [x] Upload page supports `/upload?mode=camera` and file upload tabs.
+- [x] Result page has **Next Tray** returning to camera mode.
+- [x] Backend has a 0-detection completion test.
+- [ ] Real browser/camera test on HTTPS.
+- [ ] Physical 5-egg tray returns exactly 5 rows.
+- [ ] Manual double-submit and camera-permission-denied test.
 
 ## Trigger Action
 

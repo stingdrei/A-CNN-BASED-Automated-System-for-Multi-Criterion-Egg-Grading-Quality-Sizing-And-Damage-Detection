@@ -43,9 +43,15 @@ async def upload_file(
             raise RuntimeError("Required prediction models are not available")
         model_registry.detector.confidence = confidence_threshold
         model_registry.detector.mm_per_pixel = current_user.mm_per_pixel
+        cleanliness_classifier = (
+            model_registry.cleanliness
+            if model_registry.cleanliness_loaded
+            else None
+        )
         pred_service = PredictionService(
             model_registry.detector,
             model_registry.damage,
+            cleanliness_classifier,
         )
         prediction = pred_service.run_prediction(
             db, prediction.id, confidence_threshold, save_annotated

@@ -74,6 +74,7 @@ class CheckpointTests(unittest.TestCase):
             seed=42,
             record={"epoch": 1, "val_loss": 0.5, "f1": 0.6},
             hyperparams={"lr": 1e-4, "stage1_epochs": 1, "stage2_epochs": 1},
+            class_names=["Damaged", "Not Damaged"],
         )
 
         self.assertEqual(checkpoint["arch"], ARCH_RESNET18)
@@ -89,7 +90,14 @@ class CheckpointTests(unittest.TestCase):
     def test_custom_checkpoint_keeps_legacy_keys(self):
         model = build_model(ARCH_CUSTOM)
         checkpoint = build_checkpoint(
-            model, ARCH_CUSTOM, False, 224, 42, {}, {}
+            model,
+            ARCH_CUSTOM,
+            False,
+            224,
+            42,
+            {},
+            {},
+            ["Damaged", "Not Damaged"],
         )
 
         for key in (

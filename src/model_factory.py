@@ -8,7 +8,10 @@ import warnings
 
 import torch.nn as nn
 
-from model import EggGradingCNN
+try:  # top-level import when src/ is on sys.path
+    from model import EggGradingCNN
+except ModuleNotFoundError:  # package import from the repository root
+    from .model import EggGradingCNN
 
 ARCH_CUSTOM = "custom"
 ARCH_RESNET18 = "resnet18"

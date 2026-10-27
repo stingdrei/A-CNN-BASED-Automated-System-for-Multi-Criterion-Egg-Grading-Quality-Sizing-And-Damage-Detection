@@ -59,6 +59,9 @@ uploads/
 *.swo
 .DS_Store
 
+# Training caches
+*.cache
+
 # Test
 .coverage
 htmlcov/

@@ -1,0 +1,122 @@
+{
+  "generated_at": "2026-10-26T17:04:32.587186+00:00",
+  "source_yaml": "data/detection_finetune/data.yaml",
+  "source_root": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/data/detection_finetune",
+  "output": "data/detection_smoke",
+  "min_eggs": 1,
+  "max_eggs": 5,
+  "test_images_before": 19,
+  "test_images_selected": 17,
+  "test_images_excluded": 2,
+  "test_egg_distribution_before": {
+    "1": 3,
+    "2": 9,
+    "3": 2,
+    "4": 1,
+    "5": 2,
+    "6": 1,
+    "10": 1
+  },
+  "selected_eggs_total": 41,
+  "selected_images": [
+    {
+      "image": "IMG_20180410_171938_jpg.rf.7335fb990bb559058cd45cc20a1eafdb.jpg",
+      "label": "IMG_20180410_171938_jpg.rf.7335fb990bb559058cd45cc20a1eafdb.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172008_jpg.rf.25373d0c804be251cc32fc598a0d660a.jpg",
+      "label": "IMG_20180410_172008_jpg.rf.25373d0c804be251cc32fc598a0d660a.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172037_jpg.rf.60b37a793b38a348c8ea8dfea963e6aa.jpg",
+      "label": "IMG_20180410_172037_jpg.rf.60b37a793b38a348c8ea8dfea963e6aa.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172407_jpg.rf.dd8d1d16d9e072c46cbcef73196e19f7.jpg",
+      "label": "IMG_20180410_172407_jpg.rf.dd8d1d16d9e072c46cbcef73196e19f7.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172435_jpg.rf.6e7da3b4d90a2d2c9fe1905360e38fdf.jpg",
+      "label": "IMG_20180410_172435_jpg.rf.6e7da3b4d90a2d2c9fe1905360e38fdf.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172459_jpg.rf.2697e9cac775b52d590e2839c94739d9.jpg",
+      "label": "IMG_20180410_172459_jpg.rf.2697e9cac775b52d590e2839c94739d9.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172522_jpg.rf.621b634e9b4401c2d3e878a3be87c22f.jpg",
+      "label": "IMG_20180410_172522_jpg.rf.621b634e9b4401c2d3e878a3be87c22f.txt",
+      "eggs": 2
+    },
+    {
+      "image": "IMG_20180410_172628_jpg.rf.2313ce40d6838e2ac9fb8f3bd4bb8c9c.jpg",
+      "label": "IMG_20180410_172628_jpg.rf.2313ce40d6838e2ac9fb8f3bd4bb8c9c.txt",
+      "eggs": 1
+    },
+    {
+      "image": "IMG_20180410_172632_jpg.rf.33a79bcec16d6d65f6e1c051c59a043f.jpg",
+      "label": "IMG_20180410_172632_jpg.rf.33a79bcec16d6d65f6e1c051c59a043f.txt",
+      "eggs": 1
+    },
+    {
+      "image": "brown2_jpeg.rf.b0c07f5ac961732dd8557f50c75bc16c.jpg",
+      "label": "brown2_jpeg.rf.b0c07f5ac961732dd8557f50c75bc16c.txt",
+      "eggs": 1
+    },
+    {
+      "image": "mix9_jpeg.rf.9d5a02f86a7ec17b9229e8d563c8c91c.jpg",
+      "label": "mix9_jpeg.rf.9d5a02f86a7ec17b9229e8d563c8c91c.txt",
+      "eggs": 2
+    },
+    {
+      "image": "white14_jpeg.rf.ae15d462753d5063667b8e156c6bdbac.jpg",
+      "label": "white14_jpeg.rf.ae15d462753d5063667b8e156c6bdbac.txt",
+      "eggs": 3
+    },
+    {
+      "image": "white18_jpeg.rf.c21e110ac199bb6122bbfdbb8ff6246c.jpg",
+      "label": "white18_jpeg.rf.c21e110ac199bb6122bbfdbb8ff6246c.txt",
+      "eggs": 2
+    },
+    {
+      "image": "white3_jpeg.rf.834f9f038bcf3390837a7ff1a2628492.jpg",
+      "label": "white3_jpeg.rf.834f9f038bcf3390837a7ff1a2628492.txt",
+      "eggs": 4
+    },
+    {
+      "image": "white4_jpeg.rf.449d589674891c0c628d760c992b7047.jpg",
+      "label": "white4_jpeg.rf.449d589674891c0c628d760c992b7047.txt",
+      "eggs": 3
+    },
+    {
+      "image": "white8_jpeg.rf.8dcd5f58cb99db0c1ce3334504125303.jpg",
+      "label": "white8_jpeg.rf.8dcd5f58cb99db0c1ce3334504125303.txt",
+      "eggs": 5
+    },
+    {
+      "image": "white9_jpeg.rf.641f61b041a9dcf23499c4590e410f6b.jpg",
+      "label": "white9_jpeg.rf.641f61b041a9dcf23499c4590e410f6b.txt",
+      "eggs": 5
+    }
+  ],
+  "excluded_images": [
+    {
+      "image": "mix6_jpeg.rf.4429f8b50108079ed02e26bd70f3ab40.jpg",
+      "eggs": 6
+    },
+    {
+      "image": "white2_jpeg.rf.9cb7374893a930d831db3283a8c70519.jpg",
+      "eggs": 10
+    }
+  ],
+  "limitations": [
+    "Smoke subset only; not a beta acceptance gate.",
+    "Filtering by ground-truth tray count is not possible at inference."
+  ]
+}

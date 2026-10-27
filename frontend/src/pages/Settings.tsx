@@ -5,6 +5,7 @@ import { Button } from '../components/common/Button';
 import { Input } from '../components/common/Input';
 import { apiClient } from '../api/client';
 import { UserSettings } from '../types';
+import { getErrorMessage } from '../utils/errorHandler';
 
 export function Settings() {
   const [settings, setSettings] = useState<UserSettings>({ mm_per_pixel: 0.5 });
@@ -133,7 +134,7 @@ export function Settings() {
             <ul className="list-disc list-inside space-y-1">
               <li>Correct size categorization (Small/Medium/Large)</li>
               <li>Accurate weight estimation</li>
-              <li>Proper grade assignment (AA/A/B)</li>
+              <li>Proper grade assignment (A/B/C)</li>
             </ul>
             <p className="mt-3">
               <strong>Formula used:</strong>

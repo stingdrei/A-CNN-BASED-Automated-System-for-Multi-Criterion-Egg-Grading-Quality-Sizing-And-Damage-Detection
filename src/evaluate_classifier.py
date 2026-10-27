@@ -18,7 +18,7 @@ from sklearn.metrics import (
 from torch.utils.data import DataLoader
 
 from dataset import EggDataset
-from model import EggGradingCNN
+from model_factory import ARCH_CUSTOM, build_model
 from utils import get_transforms
 
 
@@ -37,12 +37,36 @@ def choose_device() -> torch.device:
 
 def evaluate(args: argparse.Namespace) -> dict:
     labels = read_labels(args.labels)
-    dataset = EggDataset(args.image_root, labels, get_transforms(False, args.img_size))
-    loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
     device = choose_device()
     checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
     state_dict = checkpoint.get("state_dict", checkpoint)
-    model = EggGradingCNN(num_classes=2)
+    class_names = checkpoint.get("class_names", ["Damaged", "Not Damaged"])
+    if list(class_names) != ["Damaged", "Not Damaged"]:
+        raise ValueError(f"Unexpected checkpoint class names: {class_names!r}")
+    arch = str(checkpoint.get("arch", ARCH_CUSTOM))
+    arch_args = checkpoint.get("arch_args") or {}
+    num_classes = int(arch_args.get("num_classes", len(class_names)))
+    if num_classes != len(class_names):
+        raise ValueError(
+            f"Checkpoint num_classes={num_classes} does not match "
+            f"class_names={class_names!r}"
+        )
+    img_size = int(args.img_size or checkpoint.get("img_size", 224))
+    if img_size <= 0:
+        raise ValueError(f"Invalid image size: {img_size}")
+    if args.threshold is None:
+        threshold = float(checkpoint.get("damaged_threshold", 0.5))
+        threshold_source = "checkpoint"
+    else:
+        threshold = float(args.threshold)
+        threshold_source = "cli"
+    if not 0 < threshold < 1:
+        raise ValueError(f"Invalid damaged threshold: {threshold}")
+    dataset = EggDataset(
+        args.image_root, labels, get_transforms(False, img_size)
+    )
+    loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
+    model = build_model(arch, num_classes=num_classes, pretrained=False)
     model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
@@ -50,7 +74,12 @@ def evaluate(args: argparse.Namespace) -> dict:
     y_true, y_pred = [], []
     with torch.no_grad():
         for images, batch_labels in loader:
-            predictions = model(images.to(device)).argmax(dim=1).cpu().tolist()
+            probabilities = torch.softmax(model(images.to(device)), dim=1)
+            damaged_probability = probabilities[:, 0].cpu().tolist()
+            predictions = [
+                0 if probability >= threshold else 1
+                for probability in damaged_probability
+            ]
             y_true.extend(batch_labels.tolist())
             y_pred.extend(predictions)
 
@@ -59,6 +88,10 @@ def evaluate(args: argparse.Namespace) -> dict:
     damaged_recall = float(matrix[0, 0] / damaged_total) if damaged_total else 0.0
     result = {
         "checkpoint": str(args.checkpoint),
+        "arch": arch,
+        "img_size": img_size,
+        "damaged_threshold": threshold,
+        "damaged_threshold_source": threshold_source,
         "samples": len(y_true),
         "device": str(device),
         "accuracy": float(accuracy_score(y_true, y_pred)),
@@ -86,7 +119,16 @@ def main() -> None:
     parser.add_argument("--image-root", default=".")
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--batch-size", type=int, default=32)
-    parser.add_argument("--img-size", type=int, default=224)
+    parser.add_argument("--img-size", type=int, default=None)
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=None,
+        help=(
+            "Damaged probability threshold; defaults to checkpoint metadata "
+            "or 0.5"
+        ),
+    )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     result = evaluate(args)
@@ -97,6 +139,7 @@ def main() -> None:
     print(f"Macro precision: {result['macro_precision']:.4f}")
     print(f"Macro recall: {result['macro_recall']:.4f}")
     print(f"Macro F1: {result['macro_f1']:.4f}")
+    print(f"Damaged threshold: {result['damaged_threshold']:.4f}")
     print(f"Damaged recall: {result['damaged_recall']:.4f}")
     print("Confusion matrix [Damaged, Not Damaged]:")
     for row in result["confusion_matrix"]:

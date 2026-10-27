@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, text
+from sqlalchemy import func, select, text
 
 from app.database import get_db
 from app.models import User, Prediction, DetectionBox
@@ -70,16 +70,18 @@ def health_check():
     except Exception:
         pass
     
+    cleanliness_loaded = model_registry.cleanliness_loaded
+    ready = (
+        model_registry.detector_loaded
+        and model_registry.damage_loaded
+        and cleanliness_loaded
+        and database_connected
+    )
     return HealthResponse(
-        status="healthy"
-        if (
-            model_registry.detector_loaded
-            and model_registry.damage_loaded
-            and database_connected
-        )
-        else "degraded",
+        status="healthy" if ready else "degraded",
         model_loaded=model_registry.detector_loaded,
         damage_model_loaded=model_registry.damage_loaded,
+        cleanliness_model_loaded=cleanliness_loaded,
         database_connected=database_connected
     )
 
@@ -89,9 +91,9 @@ def get_grade_distribution(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    prediction_ids = db.query(Prediction.id).filter(
+    prediction_ids = select(Prediction.id).where(
         Prediction.user_id == current_user.id
-    ).subquery()
+    )
     
     grade_counts = db.query(
         DetectionBox.grade,
@@ -100,17 +102,19 @@ def get_grade_distribution(
         DetectionBox.prediction_id.in_(prediction_ids)
     ).group_by(DetectionBox.grade).all()
     
-    grades_dict = {"AA": 0, "A": 0, "B": 0, "N/A": 0, "Reject": 0}
+    grades_dict = {"A": 0, "B": 0, "C": 0, "N/A": 0, "Reject": 0}
     for grade, count in grade_counts:
+        if grade == "AA":
+            grade = "A"
         if grade in grades_dict:
-            grades_dict[grade] = count
-    
+            grades_dict[grade] += count
+
     total = sum(grades_dict.values())
-    
+
     return GradeDistribution(
-        grade_aa=grades_dict["AA"],
         grade_a=grades_dict["A"],
         grade_b=grades_dict["B"],
+        grade_c=grades_dict["C"],
         grade_na=grades_dict["N/A"],
         grade_reject=grades_dict["Reject"],
         total=total

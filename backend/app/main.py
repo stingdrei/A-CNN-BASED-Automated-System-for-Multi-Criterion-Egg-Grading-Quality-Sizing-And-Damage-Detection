@@ -19,7 +19,8 @@ async def lifespan(app: FastAPI):
         model_loaded, damage_model_loaded = model_registry.load()
         print(
             "Models loaded: "
-            f"detector={model_loaded}, damage_classifier={damage_model_loaded}"
+            f"detector={model_loaded}, damage_classifier={damage_model_loaded}, "
+            f"cleanliness_classifier={model_registry.cleanliness_loaded}"
         )
     except Exception as e:
         print(f"Warning: Could not load YOLO model: {e}")

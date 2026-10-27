@@ -4,6 +4,7 @@ import { FileImage, Film, Trash2, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/common/Card';
 import { apiClient } from '../api/client';
 import { Prediction } from '../types';
+import { getErrorMessage } from '../utils/errorHandler';
 
 export function History() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
@@ -50,6 +51,10 @@ export function History() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Prediction History</h1>
+
+      {error && (
+        <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">{error}</div>
+      )}
 
       {predictions.length === 0 ? (
         <Card>

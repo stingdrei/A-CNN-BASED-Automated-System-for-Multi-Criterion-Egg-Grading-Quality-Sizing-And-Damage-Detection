@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User, Token } from '../types';
 import { apiClient } from '../api/client';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface AuthState {
   user: User | null;

@@ -1,0 +1,18 @@
+{
+  "model": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/egg_detection/finetune_egg_v1/weights/best.pt",
+  "data_yaml": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/data/detection_smoke/data.yaml",
+  "split": "test",
+  "confidence": 0.75,
+  "images": 17,
+  "exact_tray_count_accuracy": 0.9411764705882353,
+  "false_positives_per_tray": 0.058823529411764705,
+  "missed_eggs_per_tray": 0.0,
+  "ground_truth_eggs": 41,
+  "ultralytics_metrics": {
+    "metrics/precision(B)": 0.9761904761904762,
+    "metrics/recall(B)": 1.0,
+    "metrics/mAP50(B)": 0.9880952380952381,
+    "metrics/mAP50-95(B)": 0.9245310060396605,
+    "fitness": 0.9308874292452183
+  }
+}

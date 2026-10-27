@@ -8,8 +8,23 @@ define borderline cases and whether small cosmetic marks count as stained.
 
 ## Current state
 
-No cleanliness checkpoint, dataset, training script, or inference integration
-exists. This is a required model, not an optional enhancement.
+No cleanliness dataset or checkpoint exists. The shared classifier training
+pipeline, validation threshold selection, and API contract are ready for a
+checkpoint, but the model is not trained. The backend reports
+`cleanliness_status="Unavailable"` until a compatible checkpoint is present.
+
+Implemented scaffolding:
+
+- `src/train_classifier.py --class-names "Clean,Stained"` uses the shared
+  two-stage CNN/ResNet18 pipeline with balanced sampling and per-class recall.
+- `backend/app/ml/cleanliness_inference.py` validates class order, loads
+  architecture metadata, and applies a `stained_threshold`.
+- `backend/app/ml/model_registry.py` loads the checkpoint when
+  `CLEANLINESS_MODEL_PATH` exists; health is `degraded` without it.
+- `PredictionService` returns `Stained`, `Clean`, or `Needs Review` per crop,
+  and the grading rules reject `Stained` eggs.
+- Tests prove stained results cannot receive A/B/C using a fake classifier.
+  Real-model evidence is still blocked by missing data.
 
 ## Requirements
 
@@ -34,10 +49,12 @@ exists. This is a required model, not an optional enhancement.
 - [ ] Collect and label clean/stained crops with source metadata.
 - [ ] Measure inter-labeler agreement and adjudicate disagreements.
 - [ ] Create leakage-safe train/validation/test manifests.
-- [ ] Implement a binary training pipeline with class balancing and
+- [x] Implement a shared binary training pipeline with class balancing and
   reproducibility controls.
 - [ ] Compare a transfer-learning baseline with the shared CNN architecture.
+  The shared pipeline supports `--arch resnet18 --pretrained`.
 - [ ] Tune the threshold to protect stained-egg recall.
 - [ ] Freeze and checksum the selected checkpoint.
-- [ ] Integrate inference and return `cleanliness_status` plus confidence.
-- [ ] Add end-to-end tests proving stained eggs cannot receive A/B/C.
+- [x] Integrate inference and return `cleanliness_status` plus confidence.
+- [x] Add end-to-end tests proving stained eggs cannot receive A/B/C using a
+  fake classifier.

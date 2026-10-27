@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-10-26T16:42:24.172351+00:00",
+  "source": "data/damage",
+  "output": "data/damage/manifests_v2",
+  "images_found": 1163,
+  "images_used": 1159,
+  "duplicates_removed": 4,
+  "conflicting_duplicate_groups": [
+    {
+      "sha256": "049daf45d2dae68bfab04cac1b257dcc0184e7ef460121a0c0d469256e453967",
+      "paths": [
+        "data/damage/Damaged/damaged_155.jpg",
+        "data/damage/Not Damaged/not_damaged_150.jpg"
+      ],
+      "labels": [
+        0,
+        1
+      ]
+    },
+    {
+      "sha256": "2cba639a3dfededa73b97b919ddc79e55fb8bbde9520540f73a70bbd2d2ac251",
+      "paths": [
+        "data/damage/Damaged/damaged_49.jpg",
+        "data/damage/Not Damaged/not_damaged_149.jpg"
+      ],
+      "labels": [
+        0,
+        1
+      ]
+    }
+  ],
+  "same_label_duplicate_groups": [],
+  "source_groups_found": {
+    "brokeneggs_2023-04-09": 369,
+    "legacy_damaged": 632,
+    "legacy_not_damaged": 162
+  },
+  "strict_source_split": false,
+  "split_strategy": "stratified_image_level_exact_duplicates_removed",
+  "source_split_note": "Images are split at image level after exact duplicate removal. The source folder only exposes legacy damaged, legacy not-damaged, and one broken-egg capture session, so strict source/session isolation cannot be guaranteed.",
+  "seed": 42,
+  "val_size": 0.15,
+  "test_size": 0.15,
+  "splits": {
+    "train": {
+      "images": 811,
+      "damaged": 559,
+      "not_damaged": 252,
+      "source_counts": {
+        "brokeneggs_2023-04-09": 260,
+        "legacy_damaged": 437,
+        "legacy_not_damaged": 114
+      }
+    },
+    "val": {
+      "images": 174,
+      "damaged": 120,
+      "not_damaged": 54,
+      "source_counts": {
+        "brokeneggs_2023-04-09": 50,
+        "legacy_damaged": 99,
+        "legacy_not_damaged": 25
+      }
+    },
+    "test": {
+      "images": 174,
+      "damaged": 120,
+      "not_damaged": 54,
+      "source_counts": {
+        "brokeneggs_2023-04-09": 59,
+        "legacy_damaged": 94,
+        "legacy_not_damaged": 21
+      }
+    }
+  }
+}

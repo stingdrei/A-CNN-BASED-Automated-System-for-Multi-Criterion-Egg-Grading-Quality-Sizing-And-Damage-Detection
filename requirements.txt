@@ -7,5 +7,5 @@ pyyaml
 pandas
 tqdm
 scikit-learn
-roboflow
 requests
+Pillow>=10.0

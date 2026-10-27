@@ -11,7 +11,7 @@ import { Result } from './pages/Result';
 import { Settings } from './pages/Settings';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token, checkAuth, isLoading } = useAuthStore();
+  const { checkAuth, isLoading } = useAuthStore();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   
   useEffect(() => {

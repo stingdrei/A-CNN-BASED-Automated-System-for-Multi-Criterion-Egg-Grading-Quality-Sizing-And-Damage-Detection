@@ -19,6 +19,16 @@ Do not hardcode the historical `0.05 × D³` or `0.0005 × D³` formulas as the
 final method. A placeholder `k` may be used only during development and must be
 clearly marked as uncalibrated.
 
+Fit `k` with `src/calibrate_weight.py` after collecting a CSV with
+`length_mm`, `breadth_mm`, and `actual_weight_g`:
+
+```bash
+python src/calibrate_weight.py     --data data/weight_calibration.csv     --output reports/weight_calibration_report.json
+```
+
+The backend uses `WEIGHT_K=0.0` until the fit is accepted. Set `WEIGHT_K` and
+`CALIBRATION_VERSION` in the environment to activate calibrated estimates.
+
 ## Requirements
 
 - Weigh calibration eggs with a validated scale and record actual grams.
@@ -33,10 +43,10 @@ clearly marked as uncalibrated.
 ## TODO
 
 - [ ] Collect paired `(L, B, actual_weight_g)` calibration records.
-- [ ] Implement a fitting script at `src/calibrate_weight.py`.
+- [x] Implement a fitting script at `src/calibrate_weight.py`.
 - [ ] Compare a single global `k` with a validated regression alternative.
-- [ ] Report fitted `k`, confidence interval, R², MAE, RMSE, and ±3 g rate.
+- [x] Report fitted `k`, confidence interval, R², MAE, RMSE, and ±3 g rate.
 - [ ] Add calibration version and sample count to model metadata.
-- [ ] Replace the current diameter-cubed implementation.
-- [ ] Add unit tests for units, zero/invalid axes, and out-of-range values.
+- [x] Replace the current diameter-cubed implementation with `k × L × B²`.
+- [x] Add unit tests for the fit, zero axes, invalid rows, and weight alias.
 - [ ] Validate weight estimates on a locked test set before deployment.

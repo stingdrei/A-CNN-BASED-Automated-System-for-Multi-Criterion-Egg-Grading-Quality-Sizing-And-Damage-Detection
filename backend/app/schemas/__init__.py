@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 from typing import Optional, List
 from datetime import datetime
 
@@ -35,22 +35,95 @@ class TokenData(BaseModel):
     user_id: Optional[int] = None
 
 
+class EggConfidence(BaseModel):
+    detection: float
+    damage: Optional[float] = None
+    cleanliness: Optional[float] = None
+
+
+class EggGeometry(BaseModel):
+    length_mm: Optional[float] = None
+    breadth_mm: Optional[float] = None
+    quality: Optional[str] = None
+
+
+class ModelVersions(BaseModel):
+    detector: Optional[str] = None
+    damage: Optional[str] = None
+    cleanliness: Optional[str] = None
+    calibration: Optional[str] = None
+
+
 class DetectionBoxResponse(BaseModel):
     id: int
+    prediction_id: int
+    egg_id: Optional[int] = None
     class_name: str
-    confidence: float
+    detection_confidence: float = Field(
+        validation_alias="confidence", exclude=True
+    )
     x1: int
     y1: int
     x2: int
     y2: int
     annotated: bool
-    size_category: Optional[str] = None
-    weight_g: Optional[float] = None
     grade: Optional[str] = None
+    provisional_grade: Optional[str] = None
+    size: Optional[str] = None
+    weight_g: Optional[float] = None
     damage_status: Optional[str] = None
-    damage_confidence: Optional[float] = None
-    damage_model_version: Optional[str] = None
+    damage_confidence: Optional[float] = Field(
+        default=None, exclude=True
+    )
+    cleanliness_status: Optional[str] = None
+    cleanliness_confidence: Optional[float] = Field(
+        default=None, exclude=True
+    )
+    length_mm: Optional[float] = Field(default=None, exclude=True)
+    breadth_mm: Optional[float] = Field(default=None, exclude=True)
+    geometry_quality: Optional[str] = Field(default=None, exclude=True)
+    detection_model_version: Optional[str] = Field(
+        default=None, exclude=True
+    )
+    damage_model_version: Optional[str] = Field(
+        default=None, exclude=True
+    )
+    cleanliness_model_version: Optional[str] = Field(
+        default=None, exclude=True
+    )
+    calibration_version: Optional[str] = Field(
+        default=None, exclude=True
+    )
+    requires_review: bool = False
     review_reason: Optional[str] = None
+
+    @computed_field
+    @property
+    def confidence(self) -> EggConfidence:
+        return EggConfidence(
+            detection=self.detection_confidence,
+            damage=self.damage_confidence,
+            cleanliness=self.cleanliness_confidence,
+        )
+
+    @computed_field
+    @property
+    def geometry(self) -> EggGeometry:
+        return EggGeometry(
+            length_mm=self.length_mm,
+            breadth_mm=self.breadth_mm,
+            quality=self.geometry_quality,
+        )
+
+    @computed_field
+    @property
+    def model_versions(self) -> ModelVersions:
+        return ModelVersions(
+            detector=self.detection_model_version,
+            damage=self.damage_model_version,
+            cleanliness=self.cleanliness_model_version,
+            calibration=self.calibration_version,
+        )
 
     class Config:
         from_attributes = True
@@ -60,6 +133,8 @@ class PredictionResponse(BaseModel):
     id: int
     file_name: str
     file_type: str
+    tray_id: Optional[str] = None
+    captured_at: Optional[datetime] = None
     status: str
     total_detections: int
     damaged_count: int
@@ -98,9 +173,12 @@ class DashboardStats(BaseModel):
 
 
 class HealthResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     status: str
     model_loaded: bool
     damage_model_loaded: bool = False
+    cleanliness_model_loaded: bool = False
     database_connected: bool
 
 
@@ -116,9 +194,9 @@ class UserSettingsUpdate(BaseModel):
 
 
 class GradeDistribution(BaseModel):
-    grade_aa: int = 0
     grade_a: int = 0
     grade_b: int = 0
+    grade_c: int = 0
     grade_na: int = 0
     grade_reject: int = 0
     total: int = 0

@@ -1,0 +1,661 @@
+{
+  "generated_at": "2026-10-26T17:16:08.918636+00:00",
+  "manifest": "data/damage/manifests_v2/train.csv",
+  "image_root": ".",
+  "detector": "egg_detection/finetune_egg_v1/weights/best.pt",
+  "output": "data/damage_crops/train",
+  "confidence_threshold": 0.75,
+  "padding": 0.1,
+  "min_crop_size": 8,
+  "source_images": 811,
+  "detected_images": 726,
+  "usable_images": 571,
+  "missed_images": 85,
+  "failed_read_images": [],
+  "detection_coverage": 0.895191,
+  "usable_coverage": 0.704069,
+  "multi_detection_skipped": 155,
+  "crops": 571,
+  "label_counts": {
+    "0": 357,
+    "1": 214
+  },
+  "source_counts": {
+    "brokeneggs_2023-04-09": 240,
+    "legacy_damaged": 255,
+    "legacy_not_damaged": 76
+  },
+  "multi_detection_images": [
+    {
+      "source_image": "data/damage/Damaged/damaged_308.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_147.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/brokeneggs_2023-04-09 21_14_37.908701.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_115.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_473.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_47.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_30.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_540.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_230.jpg",
+      "detections": 5
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_427.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_61.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_469.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_57.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_433.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_198.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_585.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_606.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_73.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_168.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_354.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_123.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_140.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_80.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_94.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/brokeneggs_2023-04-09 21_16_03.379083.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_70.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_114.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_627.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_111.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_135.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_499.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_523.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_106.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_260.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_128.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_128.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/brokeneggs_2023-04-09 21_14_45.127457.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_597.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_104.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_549.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_464.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_436.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_77.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_161.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_500.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_99.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_456.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_134.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_45.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_2.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_502.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_66.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_229.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_389.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_142.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_446.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_79.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_480.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_319.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_98.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_152.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_144.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_614.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_100.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_243.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_298.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_125.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_185.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_584.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_4.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_496.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_349.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_109.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_130.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/brokeneggs_2023-04-09 21_16_13.214616.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_118.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_52.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_152.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_24.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_384.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_623.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_457.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_86.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_383.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_84.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_501.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_400.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_514.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_234.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_108.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_471.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_34.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_591.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_93.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_31.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_32.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_131.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_290.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_536.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_311.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_69.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_64.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/brokeneggs_2023-04-09 21_17_54.135702.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_171.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_553.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_54.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_451.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_105.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_146.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_558.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_90.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_512.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_610.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_76.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_364.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_438.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_299.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_117.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_482.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_195.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_316.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_532.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_197.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_75.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_46.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_134.jpg",
+      "detections": 4
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_103.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_132.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_98.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_393.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_220.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_41.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_150.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_269.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_223.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_129.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_280.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_111.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_74.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_620.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_214.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/brokeneggs_2023-04-09 21_14_52.016225.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_61.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_517.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_227.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_412.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_602.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_136.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_586.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_420.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_93.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Damaged/damaged_465.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_85.jpg",
+      "detections": 2
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_121.jpg",
+      "detections": 3
+    },
+    {
+      "source_image": "data/damage/Not Damaged/not_damaged_148.jpg",
+      "detections": 3
+    }
+  ],
+  "detection_confidence": {
+    "min": 0.755467,
+    "max": 0.97176,
+    "mean": 0.929149
+  },
+  "crop_manifest": "data/damage_crops/train/manifest.csv",
+  "limitations": [
+    "Crops inherit the source image label.",
+    "Missed detections are excluded from the crop manifest.",
+    "This set is for pipeline evaluation, not detector mAP."
+  ]
+}

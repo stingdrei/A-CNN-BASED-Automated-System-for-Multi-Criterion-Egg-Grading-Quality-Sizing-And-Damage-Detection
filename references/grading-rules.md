@@ -67,17 +67,24 @@ operator decision) — never silently converted into a passing grade.
 }
 ```
 
-The API, CSV (`egg_statistics.csv`), database, and frontend must use these
-identical field names.
+The API, CSV (`reports/egg_statistics_v2.csv`), database, and frontend must use
+these identical field names.
 
 ## Label / status conventions
 
 - Damage classifier labels: `0 = Damaged`, `1 = Not Damaged`.
-- Class order in checkpoints: `("Damaged", "Not Damaged")`.
+- Damage class order in checkpoints: `("Damaged", "Not Damaged")`.
+- Cleanliness class order in checkpoints: `("Clean", "Stained")`.
 - Detector has a single class: `egg` (damage classified downstream).
 - Terminology: use `Grade A/B/C` everywhere; legacy `AA` is not supported.
 
 ## Confidence thresholds
 
 - Detector: `0.75` (locked target).
-- Damage review: `0.75` → below threshold routes to `Needs Review`.
+- Damage decision: `P(Damaged) >= 0.18` for the current ResNet18 crop model.
+  The threshold is stored in the checkpoint and selected on validation only.
+- Damage review: `0.75` for reporting low confidence. A `Damaged` prediction is
+  never downgraded to `Needs Review`; it remains `Reject`.
+- Cleanliness: no checkpoint exists yet. The schema expects
+  `("Clean", "Stained")` and a checkpoint-level `stained_threshold`.
+- Unknown/low-confidence cleanliness or size falls back to final `N/A`.

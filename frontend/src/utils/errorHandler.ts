@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 /**
  * Extracts a user-friendly error message from an unknown error.

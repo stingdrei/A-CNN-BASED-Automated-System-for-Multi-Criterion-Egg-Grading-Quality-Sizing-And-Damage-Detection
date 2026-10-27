@@ -3,14 +3,22 @@ import time
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
+from uuid import uuid4
 from sqlalchemy.orm import Session
 import cv2
 
 from app.models import Prediction, DetectionBox
 from app.ml.yolo_inference import YOLOPredictor
 from app.config import settings
+from app.ml.cleanliness_inference import CleanlinessClassifier
 from app.ml.damage_inference import DamageClassifier
-from app.services.grading_service import calculate_grade
+from app.services.csv_service import append_prediction
+from app.services.grading_service import (
+    calculate_grade,
+    collect_review_reasons,
+    join_review_reasons,
+    provisional_grade,
+)
 
 
 class PredictionService:
@@ -18,87 +26,135 @@ class PredictionService:
         self,
         predictor: Optional[YOLOPredictor] = None,
         damage_classifier: Optional[DamageClassifier] = None,
+        cleanliness_classifier: Optional[CleanlinessClassifier] = None,
     ):
         self.predictor = predictor or YOLOPredictor()
         self.damage_classifier = damage_classifier
-    
+        self.cleanliness_classifier = cleanliness_classifier
+
     def create_prediction(
         self,
         db: Session,
         user_id: int,
         file_name: str,
         file_path: str,
-        file_type: str
+        file_type: str,
     ) -> Prediction:
         prediction = Prediction(
             user_id=user_id,
             file_name=file_name,
             file_type=file_type,
             file_path=file_path,
-            status="processing"
+            tray_id=uuid4().hex,
+            captured_at=datetime.utcnow(),
+            status="processing",
         )
         db.add(prediction)
         db.commit()
         db.refresh(prediction)
         return prediction
-    
+
     def run_prediction(
         self,
         db: Session,
         prediction_id: int,
         confidence: float,
-        save_annotated: bool
+        save_annotated: bool,
     ) -> Prediction:
         start_time = time.time()
-        
+
         prediction = db.query(Prediction).filter(Prediction.id == prediction_id).first()
         if not prediction:
             raise ValueError("Prediction not found")
-        
+
         self.predictor.confidence = confidence
-        
+        img = None
+
         try:
-            if prediction.file_type == "image":
-                img = cv2.imread(prediction.file_path)
-                if img is None:
-                    raise ValueError("Uploaded image could not be decoded")
-                result = self.predictor.predict_image(prediction.file_path)
-                if self.damage_classifier is None:
-                    raise RuntimeError("Damage classifier is not configured")
-                for det in result["detections"]:
-                    crop = crop_detection(
-                        img,
-                        det["bbox"],
-                        settings.DETECTION_CROP_PADDING,
-                        settings.MIN_CROP_SIZE,
-                    )
-                    damage = self.damage_classifier.classify_crop(crop)
-                    det["damage_status"] = damage.status
-                    det["damage_confidence"] = damage.confidence
-                    det["damage_model_version"] = damage.model_version
-                    det["review_reason"] = damage.review_reason
-                    det["grade"] = calculate_grade(
-                        damage.status,
-                        det.get("size_category"),
-                        det["confidence"],
-                        confidence,
-                    )
-            else:
+            if prediction.file_type != "image":
                 raise ValueError("Video prediction is not supported yet")
-            
+
+            img = cv2.imread(prediction.file_path)
+            if img is None:
+                raise ValueError("Uploaded image could not be decoded")
+            result = self.predictor.predict_image(prediction.file_path)
+            if self.damage_classifier is None:
+                raise RuntimeError("Damage classifier is not configured")
+
+            for det in result["detections"]:
+                crop = crop_detection(
+                    img,
+                    det["bbox"],
+                    settings.DETECTION_CROP_PADDING,
+                    settings.MIN_CROP_SIZE,
+                )
+                damage = self.damage_classifier.classify_crop(crop)
+                det["damage_status"] = damage.status
+                det["damage_confidence"] = damage.confidence
+                det["damage_model_version"] = damage.model_version
+                if self.cleanliness_classifier is None:
+                    cleanliness_status = "Unavailable"
+                    cleanliness_confidence = None
+                    cleanliness_model_version = None
+                else:
+                    cleanliness = self.cleanliness_classifier.classify_crop(crop)
+                    cleanliness_status = cleanliness.status
+                    cleanliness_confidence = cleanliness.confidence
+                    cleanliness_model_version = cleanliness.model_version
+
+                det["cleanliness_status"] = cleanliness_status
+                det["cleanliness_confidence"] = cleanliness_confidence
+                det["cleanliness_model_version"] = cleanliness_model_version
+                det["requires_review"] = False
+                det["grade"] = calculate_grade(
+                    damage.status,
+                    det.get("size"),
+                    det["confidence"],
+                    confidence,
+                    cleanliness_status=cleanliness_status,
+                    damage_confidence=damage.confidence,
+                    damage_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+                )
+                det["provisional_grade"] = provisional_grade(
+                    damage.status,
+                    det.get("size"),
+                    damage_confidence=damage.confidence,
+                    damage_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+                    detection_confidence=det["confidence"],
+                    detection_threshold=confidence,
+                )
+                reasons = collect_review_reasons(
+                    detection_confidence=det["confidence"],
+                    detection_threshold=confidence,
+                    damage_status=damage.status,
+                    damage_confidence=damage.confidence,
+                    damage_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+                    cleanliness_status=cleanliness_status,
+                    cleanliness_confidence=cleanliness_confidence,
+                    size=det.get("size"),
+                    geometry_quality=det.get("geometry_quality"),
+                    weight_g=det.get("weight_g"),
+                    damage_review_reason=damage.review_reason,
+                )
+                det["requires_review"] = bool(reasons)
+                det["review_reason"] = join_review_reasons(reasons)
+
             annotated_path = None
             if save_annotated and result["detections"]:
-                if img is not None:
-                    annotated = self.predictor.draw_boxes(img, result["detections"])
-                    base_name = Path(prediction.file_path).stem
-                    ext = Path(prediction.file_path).suffix
-                    annotated_path = str(Path(prediction.file_path).parent / f"annotated_{base_name}{ext}")
-                    if not cv2.imwrite(annotated_path, annotated):
-                        annotated_path = None
-            
+                annotated = self.predictor.draw_boxes(img, result["detections"])
+                base_name = Path(prediction.file_path).stem
+                ext = Path(prediction.file_path).suffix
+                annotated_path = str(
+                    Path(prediction.file_path).parent
+                    / f"annotated_{base_name}{ext}"
+                )
+                if not cv2.imwrite(annotated_path, annotated):
+                    annotated_path = None
+
             for det in result["detections"]:
                 box = DetectionBox(
                     prediction_id=prediction.id,
+                    egg_id=det.get("egg_id"),
                     class_name=det["class"],
                     confidence=det["confidence"],
                     x1=det["bbox"][0],
@@ -106,87 +162,107 @@ class PredictionService:
                     x2=det["bbox"][2],
                     y2=det["bbox"][3],
                     annotated=annotated_path is not None,
-                    size_category=det.get("size_category"),
+                    size=det.get("size"),
+                    length_mm=det.get("length_mm"),
+                    breadth_mm=det.get("breadth_mm"),
+                    geometry_quality=det.get("geometry_quality"),
                     weight_g=det.get("weight_g"),
                     grade=det.get("grade"),
+                    provisional_grade=det.get("provisional_grade"),
+                    requires_review=bool(det.get("requires_review")),
+                    review_reason=det.get("review_reason"),
                     damage_status=det.get("damage_status"),
                     damage_confidence=det.get("damage_confidence"),
                     damage_model_version=det.get("damage_model_version"),
-                    review_reason=det.get("review_reason"),
+                    cleanliness_status=det.get("cleanliness_status"),
+                    cleanliness_confidence=det.get("cleanliness_confidence"),
+                    cleanliness_model_version=det.get(
+                        "cleanliness_model_version"
+                    ),
+                    detection_model_version=det.get(
+                        "detection_model_version"
+                    ),
+                    calibration_version=det.get("calibration_version"),
                 )
                 db.add(box)
-            
+
             prediction.status = "completed"
             prediction.result_json = result
             prediction.annotated_path = annotated_path
             prediction.total_detections = result["total"]
             prediction.damaged_count = sum(
-                det.get("damage_status") == "Damaged" for det in result["detections"]
+                det.get("damage_status") == "Damaged"
+                for det in result["detections"]
             )
             prediction.not_damaged_count = sum(
                 det.get("damage_status") == "Not Damaged"
                 for det in result["detections"]
             )
             prediction.needs_review_count = sum(
-                det.get("damage_status") == "Needs Review"
+                bool(det.get("requires_review"))
                 for det in result["detections"]
             )
             prediction.processing_time_ms = int((time.time() - start_time) * 1000)
             prediction.completed_at = datetime.utcnow()
-            
+
             db.commit()
             db.refresh(prediction)
-            
+
+            try:
+                append_prediction(prediction)
+            except Exception as exc:
+                prediction.error_message = f"CSV export failed: {exc}"
+                db.commit()
+
         except Exception as e:
             prediction.status = "failed"
             prediction.error_message = str(e)
             db.commit()
             raise
-        
+
         return prediction
-    
+
     def get_predictions(
-        self,
-        db: Session,
-        user_id: int,
-        skip: int = 0,
-        limit: int = 20
+        self, db: Session, user_id: int, skip: int = 0, limit: int = 20
     ) -> list[Prediction]:
-        return db.query(Prediction).filter(
-            Prediction.user_id == user_id
-        ).order_by(
-            Prediction.created_at.desc()
-        ).offset(skip).limit(limit).all()
-    
+        return (
+            db.query(Prediction)
+            .filter(Prediction.user_id == user_id)
+            .order_by(Prediction.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
     def get_prediction_detail(
-        self,
-        db: Session,
-        prediction_id: int,
-        user_id: int
+        self, db: Session, prediction_id: int, user_id: int
     ) -> Optional[Prediction]:
-        return db.query(Prediction).filter(
-            Prediction.id == prediction_id,
-            Prediction.user_id == user_id
-        ).first()
-    
+        return (
+            db.query(Prediction)
+            .filter(
+                Prediction.id == prediction_id,
+                Prediction.user_id == user_id,
+            )
+            .first()
+        )
+
     def delete_prediction(
-        self,
-        db: Session,
-        prediction_id: int,
-        user_id: int
+        self, db: Session, prediction_id: int, user_id: int
     ) -> bool:
         prediction = self.get_prediction_detail(db, prediction_id, user_id)
         if not prediction:
             return False
-        
+
         try:
             if os.path.exists(prediction.file_path):
                 os.remove(prediction.file_path)
-            if prediction.annotated_path and os.path.exists(prediction.annotated_path):
+            if prediction.annotated_path and os.path.exists(
+                prediction.annotated_path
+            ):
                 os.remove(prediction.annotated_path)
         except Exception:
             pass
-        
+
         db.delete(prediction)
         db.commit()
         return True

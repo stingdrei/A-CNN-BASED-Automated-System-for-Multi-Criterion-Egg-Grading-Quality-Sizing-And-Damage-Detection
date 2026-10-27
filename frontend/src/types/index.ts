@@ -11,29 +11,64 @@ export interface Token {
   token_type: string;
 }
 
+export type Grade = 'A' | 'B' | 'C' | 'N/A' | 'Reject';
+export type Size = 'Small' | 'Medium' | 'Large' | 'Unknown';
+export type DamageStatus = 'Damaged' | 'Not Damaged' | 'Needs Review';
+export type CleanlinessStatus = 'Clean' | 'Stained' | 'Needs Review' | 'Unavailable' | 'Unknown';
+
+export interface EggConfidence {
+  detection: number;
+  damage?: number | null;
+  cleanliness?: number | null;
+}
+
+export interface EggGeometry {
+  length_mm?: number | null;
+  breadth_mm?: number | null;
+  quality?: string | null;
+}
+
+export interface ModelVersions {
+  detector?: string | null;
+  damage?: string | null;
+  cleanliness?: string | null;
+  calibration?: string | null;
+}
+
 export interface DetectionBox {
   id: number;
+  prediction_id: number;
+  egg_id?: number | null;
   class_name: string;
-  confidence: number;
+  confidence: EggConfidence;
   x1: number;
   y1: number;
   x2: number;
   y2: number;
   annotated: boolean;
-  size_category?: 'small' | 'medium' | 'large';
-  weight_g?: number;
-  grade?: 'AA' | 'A' | 'B' | 'N/A' | 'Reject';
+  grade?: Grade | null;
+  provisional_grade?: Grade | null;
+  size?: Size | null;
+  weight_g?: number | null;
+  damage_status?: DamageStatus | null;
+  cleanliness_status?: CleanlinessStatus | null;
+  requires_review: boolean;
+  review_reason?: string | null;
+  geometry: EggGeometry;
+  model_versions: ModelVersions;
 }
 
 export interface Prediction {
   id: number;
   file_name: string;
   file_type: string;
-  file_path: string;
+  tray_id?: string | null;
+  captured_at?: string | null;
   status: string;
   total_detections: number;
   damaged_count: number;
   not_damaged_count: number;
+  needs_review_count: number;
   processing_time_ms: number | null;
   created_at: string;
   completed_at: string | null;
@@ -59,13 +94,15 @@ export interface DashboardStats {
 export interface HealthStatus {
   status: string;
   model_loaded: boolean;
+  damage_model_loaded: boolean;
+  cleanliness_model_loaded: boolean;
   database_connected: boolean;
 }
 
 export interface GradeDistribution {
-  grade_aa: number;
   grade_a: number;
   grade_b: number;
+  grade_c: number;
   grade_na: number;
   grade_reject: number;
   total: number;

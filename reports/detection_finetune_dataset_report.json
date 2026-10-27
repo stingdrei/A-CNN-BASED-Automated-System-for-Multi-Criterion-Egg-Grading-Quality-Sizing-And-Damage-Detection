@@ -1,0 +1,36 @@
+{
+  "dataset_root": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/data/detection_finetune",
+  "data_yaml": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/data/detection_finetune/data.yaml",
+  "classes": [
+    "egg"
+  ],
+  "splits": {
+    "train": {
+      "images": 169,
+      "boxes": 333,
+      "class_counts": {
+        "egg": 333
+      }
+    },
+    "val": {
+      "images": 23,
+      "boxes": 60,
+      "class_counts": {
+        "egg": 60
+      }
+    },
+    "test": {
+      "images": 19,
+      "boxes": 57,
+      "class_counts": {
+        "egg": 57
+      }
+    }
+  },
+  "annotation_source": "fine-tune one-class labels; orphan val label quarantined; visual verification pending",
+  "duplicate_groups": [],
+  "near_duplicate_candidates": [],
+  "oversized_boxes": [],
+  "errors": [],
+  "valid": true
+}

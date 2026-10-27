@@ -1,6 +1,6 @@
 {
-  "dataset_root": "C:\\Users\\USER_1\\Thesis\\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\\data\\detection",
-  "data_yaml": "C:\\Users\\USER_1\\Thesis\\A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection\\data\\detection\\data.yaml",
+  "dataset_root": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/data/detection",
+  "data_yaml": "/Users/wii/Projects/A-CNN-BASED-Automated-System-for-Multi-Criterion-Egg-Grading-Quality-Sizing-And-Damage-Detection/data/detection/data.yaml",
   "classes": [
     "B-eggs",
     "W-eggs"
