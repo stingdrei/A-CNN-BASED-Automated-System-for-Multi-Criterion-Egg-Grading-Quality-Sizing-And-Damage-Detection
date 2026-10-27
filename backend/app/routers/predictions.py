@@ -26,13 +26,18 @@ async def upload_file(
     if not file_service.is_allowed_file(file.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported file type. Allowed: jpg, jpeg, png, webp, bmp, mp4, avi, mov, mkv"
+            detail="Unsupported image type. Allowed: jpg, jpeg, png, webp, bmp"
         )
 
     try:
         file_path, file_type = file_service.save_file_sync(file)
         prediction = prediction_service.create_prediction(
-            db, current_user.id, file.filename, file_path, file_type
+            db,
+            current_user.id,
+            file.filename,
+            file_path,
+            file_type,
+            operator=current_user.username,
         )
         if (
             not model_registry.detector_loaded

@@ -19,10 +19,15 @@ damage, cleanliness, and geometry measurements.
 - Locked test at confidence 0.75: precision 0.9584, recall 1.0000, mAP50
   0.9860, mAP50-95 0.9135, exact tray-count accuracy 0.8947, 0 missed eggs per
   tray, 0.1579 false positives per tray.
-- 1-5 egg smoke subset: 17 images/41 eggs, exact count 0.9412, 0 missed eggs
-  per tray, 0.0588 false positives per tray, mAP50 0.9881. This is a demo check,
-  not the 0-5 beta gate.
-- 0-egg trays are not present in the current test data.
+- 0-5 subset: 17 images/41 eggs, exact count 0.9412, 0 missed eggs per tray,
+  0.0588 false positives per tray. This is demo evidence, not the beta gate.
+- Count post-processing removes duplicate boxes at IoU 0.85; counts 1-5 are
+  `ok`, 0 is `empty`, and >5 is `over_capacity`. Over-capacity trays keep all
+  detections and require review rather than silently truncating the count.
+- The full test split includes two trays with more than 5 eggs and no 0-egg
+  trays. Physical 0-egg/0-5 acceptance is still required.
+- Checkpoint SHA-256:
+  `c755a7a6cf5ad883486e0396dc0dfda5030ada3007315e6ef479b26a99a931cf`.
 
 ## Requirements
 
@@ -54,8 +59,10 @@ damage, cleanliness, and geometry measurements.
   validation precision/recall tradeoffs.
 - [x] Add a test report with mAP, per-class metrics, missed eggs per tray,
   false positives per tray, and count accuracy.
-- [ ] Add inference tests for 0–5 detections and invalid/empty images.
-- [ ] Export and checksum the release checkpoint.
+- [x] Add inference tests for 0–5 detections and invalid/empty images.
+- [x] Add synthetic duplicate/over-capacity/count-status tests.
+- [x] Record the checkpoint checksum in `models/CHECKSUMS.md`.
+- [ ] Export and checksum the final release checkpoint after retraining.
 
 Visual verification of the one-class labels is still pending. The detector also
 fails the release count/FP thresholds on the full test split, has no 0-egg tray

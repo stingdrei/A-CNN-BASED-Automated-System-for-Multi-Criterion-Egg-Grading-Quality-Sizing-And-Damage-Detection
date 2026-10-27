@@ -152,7 +152,7 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-              <li>Upload an image or video on the <Link to="/upload" className="text-primary-600 hover:underline">Upload</Link> page</li>
+              <li>Upload a tray image on the <Link to="/upload" className="text-primary-600 hover:underline">Upload</Link> page</li>
               <li>YOLO model detects eggs in the image</li>
               <li>View detailed results including detection count and confidence scores</li>
               <li>Download annotated image with bounding boxes</li>

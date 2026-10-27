@@ -90,6 +90,7 @@ def collect_review_reasons(
     geometry_quality: Optional[str],
     weight_g: Optional[float],
     damage_review_reason: Optional[str] = None,
+    tray_over_capacity: bool = False,
 ) -> list[str]:
     reasons: list[str] = []
     if (
@@ -124,6 +125,8 @@ def collect_review_reasons(
         reasons.append("size_uncalibrated")
     if weight_g is None:
         reasons.append("weight_uncalibrated")
+    if tray_over_capacity:
+        reasons.append("tray_over_capacity")
 
     return list(dict.fromkeys(reasons))
 

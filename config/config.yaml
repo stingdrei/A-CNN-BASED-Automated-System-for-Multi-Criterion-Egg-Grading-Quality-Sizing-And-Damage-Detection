@@ -24,11 +24,5 @@ calibration:
   # Example: if a 50mm ruler appears as 100 pixels, mm_per_pixel = 50/100 = 0.5
   camera_distance_cm: 15  # Approximate distance from camera to egg conveyor (optional)
 
-# Detection confidence thresholds
-# Based on YOLO model analysis: Precision=81.53%, Recall=75.63%
-# Default 0.65/0.60 produces ~18% false positives
-# Improved 0.75/0.70 reduces to ~12% false positives (recommended balance)
-# Strict 0.80/0.75 reduces to ~5% false positives (may miss some eggs)
-detection:
-  yolo_confidence: 0.75  # Increased from 0.65 (reduces ~6% more false positives)
-  cnn_confidence: 0.70   # Increased from 0.60 (adds damage classification check)
+# Runtime detection/classification thresholds live in backend/app/config.py
+# and .env. They are intentionally not duplicated here.

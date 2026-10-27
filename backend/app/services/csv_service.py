@@ -10,6 +10,7 @@ from app.config import settings
 CSV_FIELDS = [
     "timestamp",
     "tray_id",
+    "operator",
     "prediction_id",
     "egg_id",
     "file_name",
@@ -32,6 +33,11 @@ CSV_FIELDS = [
     "provisional_grade",
     "requires_review",
     "review_reason",
+    "detection_threshold",
+    "damage_decision_threshold",
+    "cleanliness_decision_threshold",
+    "tray_count_valid",
+    "tray_over_capacity",
     "detector_model_version",
     "damage_model_version",
     "cleanliness_model_version",
@@ -41,12 +47,14 @@ CSV_FIELDS = [
 
 def rows_for_prediction(prediction) -> list[dict]:
     timestamp = prediction.captured_at or prediction.created_at
+    metadata = getattr(prediction, "inference_metadata", None) or {}
     rows = []
     for box in prediction.detection_boxes:
         rows.append(
             {
                 "timestamp": timestamp.isoformat() if timestamp else "",
                 "tray_id": prediction.tray_id or "",
+                "operator": getattr(prediction, "operator", None) or "",
                 "prediction_id": prediction.id,
                 "egg_id": box.egg_id if box.egg_id is not None else "",
                 "file_name": prediction.file_name,
@@ -79,6 +87,21 @@ def rows_for_prediction(prediction) -> list[dict]:
                     "true" if box.requires_review else "false"
                 ),
                 "review_reason": box.review_reason or "",
+                "detection_threshold": metadata.get("detection_threshold", ""),
+                "damage_decision_threshold": metadata.get(
+                    "damage_decision_threshold", ""
+                ),
+                "cleanliness_decision_threshold": metadata.get(
+                    "cleanliness_decision_threshold", ""
+                ),
+                "tray_count_valid": (
+                    "true" if metadata.get("tray_count_valid", True) else "false"
+                ),
+                "tray_over_capacity": (
+                    "true"
+                    if metadata.get("tray_over_capacity", False)
+                    else "false"
+                ),
                 "detector_model_version": box.detection_model_version or "",
                 "damage_model_version": box.damage_model_version or "",
                 "cleanliness_model_version": box.cleanliness_model_version or "",

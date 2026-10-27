@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field, field_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -35,10 +35,23 @@ class TokenData(BaseModel):
     user_id: Optional[int] = None
 
 
+ALLOWED_GRADES = {"A", "B", "C", "N/A", "Reject"}
+ALLOWED_DAMAGE = {"Damaged", "Not Damaged", "Needs Review"}
+ALLOWED_CLEANLINESS = {
+    "Clean",
+    "Stained",
+    "Needs Review",
+    "Unavailable",
+    "Unknown",
+}
+ALLOWED_SIZES = {"Small", "Medium", "Large", "Unknown"}
+ALLOWED_STATUSES = {"processing", "completed", "failed"}
+
+
 class EggConfidence(BaseModel):
-    detection: float
-    damage: Optional[float] = None
-    cleanliness: Optional[float] = None
+    detection: float = Field(ge=0, le=1)
+    damage: Optional[float] = Field(default=None, ge=0, le=1)
+    cleanliness: Optional[float] = Field(default=None, ge=0, le=1)
 
 
 class EggGeometry(BaseModel):
@@ -60,7 +73,7 @@ class DetectionBoxResponse(BaseModel):
     egg_id: Optional[int] = None
     class_name: str
     detection_confidence: float = Field(
-        validation_alias="confidence", exclude=True
+        validation_alias="confidence", exclude=True, ge=0, le=1
     )
     x1: int
     y1: int
@@ -73,11 +86,11 @@ class DetectionBoxResponse(BaseModel):
     weight_g: Optional[float] = None
     damage_status: Optional[str] = None
     damage_confidence: Optional[float] = Field(
-        default=None, exclude=True
+        default=None, exclude=True, ge=0, le=1
     )
     cleanliness_status: Optional[str] = None
     cleanliness_confidence: Optional[float] = Field(
-        default=None, exclude=True
+        default=None, exclude=True, ge=0, le=1
     )
     length_mm: Optional[float] = Field(default=None, exclude=True)
     breadth_mm: Optional[float] = Field(default=None, exclude=True)
@@ -96,6 +109,36 @@ class DetectionBoxResponse(BaseModel):
     )
     requires_review: bool = False
     review_reason: Optional[str] = None
+
+    @field_validator("grade", "provisional_grade")
+    @classmethod
+    def validate_grade(cls, value):
+        if value == "AA":
+            return "A"
+        if value is not None and value not in ALLOWED_GRADES:
+            raise ValueError(f"Unsupported grade: {value!r}")
+        return value
+
+    @field_validator("damage_status")
+    @classmethod
+    def validate_damage_status(cls, value):
+        if value is not None and value not in ALLOWED_DAMAGE:
+            raise ValueError(f"Unsupported damage status: {value!r}")
+        return value
+
+    @field_validator("cleanliness_status")
+    @classmethod
+    def validate_cleanliness_status(cls, value):
+        if value is not None and value not in ALLOWED_CLEANLINESS:
+            raise ValueError(f"Unsupported cleanliness status: {value!r}")
+        return value
+
+    @field_validator("size")
+    @classmethod
+    def validate_size(cls, value):
+        if value is not None and value not in ALLOWED_SIZES:
+            raise ValueError(f"Unsupported size: {value!r}")
+        return value
 
     @computed_field
     @property
@@ -133,8 +176,10 @@ class PredictionResponse(BaseModel):
     id: int
     file_name: str
     file_type: str
-    tray_id: Optional[str] = None
+    tray_id: str
     captured_at: Optional[datetime] = None
+    operator: Optional[str] = None
+    inference_metadata: Optional[dict] = None
     status: str
     total_detections: int
     damaged_count: int
@@ -143,6 +188,13 @@ class PredictionResponse(BaseModel):
     processing_time_ms: Optional[int]
     created_at: datetime
     completed_at: Optional[datetime]
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, value):
+        if value not in ALLOWED_STATUSES:
+            raise ValueError(f"Unsupported prediction status: {value!r}")
+        return value
 
     class Config:
         from_attributes = True
@@ -165,7 +217,6 @@ class PredictionCreate(BaseModel):
 class DashboardStats(BaseModel):
     total_predictions: int
     total_images: int
-    total_videos: int
     total_detections: int
     damaged_percentage: float
     avg_processing_time_ms: float

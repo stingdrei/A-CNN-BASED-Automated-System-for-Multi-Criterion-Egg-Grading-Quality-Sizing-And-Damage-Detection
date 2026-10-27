@@ -62,8 +62,10 @@ export interface Prediction {
   id: number;
   file_name: string;
   file_type: string;
-  tray_id?: string | null;
+  tray_id: string;
   captured_at?: string | null;
+  operator?: string | null;
+  inference_metadata?: Record<string, unknown> | null;
   status: string;
   total_detections: number;
   damaged_count: number;
@@ -83,7 +85,6 @@ export interface PredictionDetail extends Prediction {
 export interface DashboardStats {
   total_predictions: number;
   total_images: number;
-  total_videos: number;
   total_detections: number;
   damaged_percentage: number;
   avg_processing_time_ms: number;

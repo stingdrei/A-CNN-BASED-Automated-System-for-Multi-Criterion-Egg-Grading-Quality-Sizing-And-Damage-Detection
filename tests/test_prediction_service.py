@@ -43,9 +43,26 @@ class FakePredictor:
                 }
             ],
             "total": 1,
+            "max_eggs": 5,
+            "count_valid": True,
+            "over_capacity": False,
+            "count_status": "ok",
+            "duplicate_boxes_removed": 0,
             "damaged": 0,
             "not_damaged": 0,
         }
+
+
+class OverCapacityPredictor(FakePredictor):
+    def predict_image(self, image_path):
+        result = super().predict_image(image_path)
+        result.update(
+            max_eggs=5,
+            count_valid=False,
+            over_capacity=True,
+            count_status="over_capacity",
+        )
+        return result
 
 
 class EmptyPredictor:
@@ -56,12 +73,19 @@ class EmptyPredictor:
         return {
             "detections": [],
             "total": 0,
+            "max_eggs": 5,
+            "count_valid": True,
+            "over_capacity": False,
+            "count_status": "empty",
+            "duplicate_boxes_removed": 0,
             "damaged": 0,
             "not_damaged": 0,
         }
 
 
 class FakeDamage:
+    model_version = "egg_grader.pth"
+
     def classify_crop(self, crop):
         return SimpleNamespace(
             status="Not Damaged",
@@ -157,6 +181,58 @@ class PredictionServiceTests(unittest.TestCase):
         self.assertEqual(box.cleanliness_model_version, "cleanliness_v1.pth")
         self.assertEqual(box.grade, "Reject")
         self.assertEqual(box.provisional_grade, "A")
+
+    def test_prediction_persists_operator_and_inference_metadata(self):
+        service = PredictionService(FakePredictor(), FakeDamage())
+        prediction = service.create_prediction(
+            self.db,
+            self.user.id,
+            "tray.jpg",
+            str(self.image_path),
+            "image",
+            operator="alice",
+        )
+
+        with patch("app.services.prediction_service.append_prediction"):
+            prediction = service.run_prediction(
+                self.db, prediction.id, 0.75, False
+            )
+
+        self.assertEqual(prediction.operator, "alice")
+        self.assertEqual(
+            prediction.inference_metadata["detection_threshold"], 0.75
+        )
+        self.assertEqual(
+            prediction.inference_metadata["detector_model_version"], None
+        )
+        self.assertEqual(
+            prediction.inference_metadata["damage_model_version"],
+            "egg_grader.pth",
+        )
+        self.assertTrue(prediction.inference_metadata["tray_count_valid"])
+        self.assertFalse(prediction.inference_metadata["tray_over_capacity"])
+
+    def test_over_capacity_marks_every_egg_for_review(self):
+        service = PredictionService(OverCapacityPredictor(), FakeDamage())
+        prediction = service.create_prediction(
+            self.db,
+            self.user.id,
+            "six-eggs.jpg",
+            str(self.image_path),
+            "image",
+        )
+
+        with patch("app.services.prediction_service.append_prediction"):
+            prediction = service.run_prediction(
+                self.db, prediction.id, 0.75, False
+            )
+
+        self.assertFalse(prediction.inference_metadata["tray_count_valid"])
+        self.assertTrue(prediction.inference_metadata["tray_over_capacity"])
+        self.assertIn(
+            "tray_over_capacity",
+            prediction.detection_boxes[0].review_reason,
+        )
 
     def test_completed_prediction_persists_provisional_contract(self):
         service = PredictionService(FakePredictor(), FakeDamage())

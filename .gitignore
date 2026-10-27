@@ -21,8 +21,13 @@ dist/
 
 # Backend
 backend/__pycache__/
-backend/.env
 *.log
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+!backend/.env.example
 
 # Uploads (user data)
 uploads/
@@ -61,6 +66,10 @@ uploads/
 
 # Training caches
 *.cache
+
+# Generated evaluation subsets
+data/detection_smoke/
+data/damage_crops/
 
 # Test
 .coverage

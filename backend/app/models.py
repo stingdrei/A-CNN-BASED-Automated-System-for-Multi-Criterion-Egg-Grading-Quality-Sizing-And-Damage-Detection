@@ -1,6 +1,18 @@
 from datetime import datetime
+import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -27,6 +39,12 @@ class User(Base):
 
 class Prediction(Base):
     __tablename__ = "predictions"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('processing', 'completed', 'failed')",
+            name="ck_predictions_status",
+        ),
+    )
 
     id = Column(Integer, primary_key=True)
     user_id = Column(
@@ -35,8 +53,16 @@ class Prediction(Base):
     file_name = Column(String(255), nullable=False)
     file_path = Column(Text, nullable=False)
     file_type = Column(String(20), nullable=False)
-    tray_id = Column(String(64), nullable=True, index=True)
+    tray_id = Column(
+        String(64),
+        nullable=False,
+        unique=True,
+        index=True,
+        default=lambda: uuid.uuid4().hex,
+    )
     captured_at = Column(DateTime, nullable=True)
+    operator = Column(String(100), nullable=True)
+    inference_metadata = Column(JSON, nullable=True)
     status = Column(String(20), nullable=False, default="processing")
     total_detections = Column(Integer, nullable=False, default=0)
     damaged_count = Column(Integer, nullable=False, default=0)
@@ -60,6 +86,35 @@ class Prediction(Base):
 
 class DetectionBox(Base):
     __tablename__ = "detection_boxes"
+    __table_args__ = (
+        CheckConstraint(
+            "grade IS NULL OR grade IN ('AA', 'A', 'B', 'C', 'N/A', 'Reject')",
+            name="ck_detection_boxes_grade",
+        ),
+        CheckConstraint(
+            "provisional_grade IS NULL OR "
+            "provisional_grade IN ('AA', 'A', 'B', 'C', 'N/A', 'Reject')",
+            name="ck_detection_boxes_provisional_grade",
+        ),
+        CheckConstraint(
+            "damage_status IS NULL OR "
+            "damage_status IN ('Damaged', 'Not Damaged', 'Needs Review')",
+            name="ck_detection_boxes_damage_status",
+        ),
+        CheckConstraint(
+            "cleanliness_status IS NULL OR cleanliness_status IN "
+            "('Clean', 'Stained', 'Needs Review', 'Unavailable', 'Unknown')",
+            name="ck_detection_boxes_cleanliness_status",
+        ),
+        CheckConstraint(
+            "size IS NULL OR size IN ('Small', 'Medium', 'Large', 'Unknown')",
+            name="ck_detection_boxes_size",
+        ),
+        CheckConstraint(
+            "confidence >= 0 AND confidence <= 1",
+            name="ck_detection_boxes_confidence",
+        ),
+    )
 
     id = Column(Integer, primary_key=True)
     prediction_id = Column(

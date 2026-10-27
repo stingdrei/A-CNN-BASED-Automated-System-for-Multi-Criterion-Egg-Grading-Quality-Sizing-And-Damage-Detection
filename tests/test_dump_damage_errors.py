@@ -1,70 +1,56 @@
 import sys
-import tempfile
 import unittest
 from pathlib import Path
 
-import cv2
-import numpy as np
-import pandas as pd
-import torch
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT / "src"))
-
-from dump_damage_errors import CSV_COLUMNS, ERROR_TYPES, collect_errors, error_type
-from model import EggGradingCNN
+from dump_damage_errors import classify_probability, error_type, resolve_checkpoint_config
 
 
-class ErrorTypeTests(unittest.TestCase):
-    def test_maps_all_four_cases(self):
-        self.assertEqual(error_type(0, 0), "TP")
-        self.assertEqual(error_type(1, 1), "TN")
-        self.assertEqual(error_type(0, 1), "FN")
-        self.assertEqual(error_type(1, 0), "FP")
+class DumpDamageErrorsTests(unittest.TestCase):
+    def test_resolves_resnet_checkpoint_metadata(self):
+        config = resolve_checkpoint_config(
+            {
+                "arch": "resnet18",
+                "arch_args": {"num_classes": 2, "pretrained": False},
+                "class_names": ["Damaged", "Not Damaged"],
+                "img_size": 224,
+                "damaged_threshold": 0.18,
+            }
+        )
+        self.assertEqual(config["arch"], "resnet18")
+        self.assertEqual(config["num_classes"], 2)
+        self.assertEqual(config["damaged_threshold"], 0.18)
+        self.assertEqual(config["damaged_threshold_source"], "checkpoint")
 
-    def test_error_type_values_are_known(self):
-        for true_label in (0, 1):
-            for pred_label in (0, 1):
-                self.assertIn(error_type(true_label, pred_label), ERROR_TYPES)
+    def test_cli_threshold_and_image_size_override(self):
+        config = resolve_checkpoint_config(
+            {
+                "arch": "custom",
+                "class_names": ["Damaged", "Not Damaged"],
+                "img_size": 224,
+                "damaged_threshold": 0.18,
+            },
+            img_size=256,
+            threshold=0.4,
+        )
+        self.assertEqual(config["img_size"], 256)
+        self.assertEqual(config["damaged_threshold"], 0.4)
+        self.assertEqual(config["damaged_threshold_source"], "cli")
 
-
-class CollectErrorsTests(unittest.TestCase):
-    def _build_fixture(self, root: Path):
-        image_names = ["egg_a.jpg", "egg_b.jpg"]
-        for name in image_names:
-            image = np.random.randint(0, 255, (32, 32, 3), dtype=np.uint8)
-            cv2.imwrite(str(root / name), image)
-
-        manifest = root / "manifest.csv"
-        pd.DataFrame(
-            {"filename": image_names, "label": [0, 1]}
-        ).to_csv(manifest, index=False)
-
-        checkpoint = root / "checkpoint.pth"
-        model = EggGradingCNN(num_classes=2)
-        torch.save({"state_dict": model.state_dict()}, checkpoint)
-        return manifest, checkpoint, image_names
-
-    def test_emits_expected_columns_and_rows(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            manifest, checkpoint, image_names = self._build_fixture(root)
-
-            frame = pd.DataFrame(
-                collect_errors(
-                    [(name, label) for name, label in zip(image_names, [0, 1])],
-                    str(root),
-                    str(checkpoint),
-                    batch_size=2,
-                    device=torch.device("cpu"),
-                )
+    def test_rejects_unknown_class_order(self):
+        with self.assertRaises(ValueError):
+            resolve_checkpoint_config(
+                {"class_names": ["Clean", "Stained"], "arch": "custom"}
             )
 
-            self.assertEqual(list(frame.columns), CSV_COLUMNS)
-            self.assertEqual(len(frame), 2)
-            self.assertEqual(frame["filename"].tolist(), image_names)
-            self.assertTrue(frame["error_type"].isin(ERROR_TYPES).all())
-            self.assertTrue(frame["confidence"].between(0.0, 1.0).all())
+    def test_classifies_at_and_above_threshold_as_damaged(self):
+        self.assertEqual(classify_probability(0.18, 0.18), (0, 0.18))
+        self.assertEqual(classify_probability(0.179, 0.18), (1, 0.821))
+        self.assertEqual(
+            error_type(true_label=1, pred_label=0),
+            "FP",
+        )
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from app.config import settings
 from src.grading import estimate_weight as estimate_egg_weight
 from src.grading import size_category as classify_egg_size
 from src.geometry import bbox_geometry
+from src.tray_count import deduplicate_boxes, tray_count_status
 
 
 class YOLOPredictor:
@@ -17,11 +18,23 @@ class YOLOPredictor:
         confidence: float = 0.75,
         mm_per_pixel: Optional[float] = None,
         weight_k: Optional[float] = None,
+        max_eggs: Optional[int] = None,
+        duplicate_iou: Optional[float] = None,
     ):
         self.model_path = model_path or settings.MODEL_PATH
         self.confidence = confidence
         self.mm_per_pixel = mm_per_pixel or settings.MM_PER_PIXEL
         self.weight_k = settings.WEIGHT_K if weight_k is None else weight_k
+        self.max_eggs = settings.MAX_TRAY_EGGS if max_eggs is None else max_eggs
+        self.duplicate_iou = (
+            settings.DETECTION_DUPLICATE_IOU
+            if duplicate_iou is None
+            else duplicate_iou
+        )
+        if self.max_eggs < 1:
+            raise ValueError("max_eggs must be at least 1")
+        if not 0 < self.duplicate_iou <= 1:
+            raise ValueError("duplicate_iou must be in (0, 1]")
         self.class_names = ["egg"]
         self._model = None
 
@@ -61,16 +74,21 @@ class YOLOPredictor:
         return self._parse_results(results[0])
 
     def predict_frame(self, frame: np.ndarray) -> Dict[str, Any]:
+        if frame is None or frame.size == 0:
+            raise ValueError("Image frame is empty")
         results = self.model(frame, conf=self.confidence)
         return self._parse_results(results[0])
 
     def predict_bytes(self, image_bytes: bytes) -> Dict[str, Any]:
         nparr = np.frombuffer(image_bytes, np.uint8)
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if frame is None:
+            raise ValueError("Could not decode image bytes")
         return self.predict_frame(frame)
 
     def _parse_results(self, result) -> Dict[str, Any]:
         detections = []
+        duplicate_boxes_removed = 0
         boxes = result.boxes
 
         if boxes is not None and len(boxes) > 0:
@@ -78,13 +96,25 @@ class YOLOPredictor:
             confs = boxes.conf.cpu().numpy()
             clss = boxes.cls.cpu().numpy()
 
-            ordered = sorted(
-                range(len(xyxy)),
-                key=lambda index: (float(xyxy[index][1]), float(xyxy[index][0])),
-            )
-            for egg_id, index in enumerate(ordered, start=1):
+            candidates = []
+            for index in range(len(xyxy)):
                 box = xyxy[index]
                 x1, y1, x2, y2 = [int(x) for x in box]
+                if x2 <= x1 or y2 <= y1:
+                    continue
+                candidates.append(
+                    {
+                        "bbox": [x1, y1, x2, y2],
+                        "confidence": float(confs[index]),
+                        "class_id": int(clss[index]),
+                    }
+                )
+            candidates, duplicate_boxes_removed = deduplicate_boxes(
+                candidates, self.duplicate_iou
+            )
+
+            for egg_id, candidate in enumerate(candidates, start=1):
+                x1, y1, x2, y2 = candidate["bbox"]
                 geometry = bbox_geometry(x2 - x1, y2 - y1, self.mm_per_pixel)
                 if geometry is None:
                     size_cat = "Unknown"
@@ -102,11 +132,11 @@ class YOLOPredictor:
                         geometry.breadth_mm,
                         self.weight_k,
                     )
-                class_name = self.get_class_name(int(clss[index]))
+                class_name = self.get_class_name(candidate["class_id"])
                 detections.append({
                     "egg_id": egg_id,
                     "class": class_name,
-                    "confidence": float(confs[index]),
+                    "confidence": candidate["confidence"],
                     "bbox": [x1, y1, x2, y2],
                     "size": size_cat,
                     "length_mm": length_mm,
@@ -119,9 +149,11 @@ class YOLOPredictor:
                     "calibration_version": settings.CALIBRATION_VERSION,
                 })
 
+        count = tray_count_status(len(detections), self.max_eggs)
         return {
             "detections": detections,
-            "total": len(detections),
+            **count,
+            "duplicate_boxes_removed": duplicate_boxes_removed,
             "damaged": 0,
             "not_damaged": 0,
         }

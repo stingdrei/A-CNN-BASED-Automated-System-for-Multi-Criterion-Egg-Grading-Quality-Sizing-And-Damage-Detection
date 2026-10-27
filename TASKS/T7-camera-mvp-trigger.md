@@ -126,7 +126,7 @@ ls reports/cleanliness_test_report.json reports/size_test_report.json \
 ./.venv/bin/python -m unittest discover -s tests -q
 
 # Backend boots and models load
-cd backend && uvicorn app.main:app --reload
+./.venv/bin/uvicorn app.main:app --app-dir backend --reload
 ```
 
 If any report or test is missing, keep this trigger closed.

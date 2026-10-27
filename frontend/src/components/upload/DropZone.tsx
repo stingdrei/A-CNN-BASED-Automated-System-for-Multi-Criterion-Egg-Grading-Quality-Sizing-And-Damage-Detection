@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Upload as UploadIcon, FileImage, Film, X } from 'lucide-react';
+import { Upload as UploadIcon, FileImage, X } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface DropZoneProps {
@@ -8,7 +8,7 @@ interface DropZoneProps {
   maxSizeMB?: number;
 }
 
-export function DropZone({ onFileSelect, accept = 'image/*,video/*', maxSizeMB = 50 }: DropZoneProps) {
+export function DropZone({ onFileSelect, accept = 'image/*', maxSizeMB = 50 }: DropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +18,10 @@ export function DropZone({ onFileSelect, accept = 'image/*,video/*', maxSizeMB =
     const maxBytes = maxSizeMB * 1024 * 1024;
     if (file.size > maxBytes) {
       setError(`File size must be less than ${maxSizeMB}MB`);
+      return false;
+    }
+    if (!file.type.startsWith('image/')) {
+      setError('Only image files are supported');
       return false;
     }
     return true;
@@ -58,7 +62,6 @@ export function DropZone({ onFileSelect, accept = 'image/*,video/*', maxSizeMB =
 
   const getFileIcon = (type: string) => {
     if (type.startsWith('image/')) return FileImage;
-    if (type.startsWith('video/')) return Film;
     return UploadIcon;
   };
 
@@ -104,7 +107,7 @@ export function DropZone({ onFileSelect, accept = 'image/*,video/*', maxSizeMB =
         <p className="text-sm text-gray-600">
           <span className="font-medium text-primary-600">Click to upload</span> or drag and drop
         </p>
-        <p className="text-xs text-gray-500 mt-1">JPG, PNG, WEBP, MP4, AVI (max {maxSizeMB}MB)</p>
+        <p className="text-xs text-gray-500 mt-1">JPG, PNG, WEBP, BMP (max {maxSizeMB}MB)</p>
       </label>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>

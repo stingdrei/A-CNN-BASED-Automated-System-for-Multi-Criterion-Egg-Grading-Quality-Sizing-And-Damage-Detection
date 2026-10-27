@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-10-27T04:10:14.660798+00:00",
+  "checkpoint": "models/egg_grader_crop_resnet18_v1.pth",
+  "labels": "data/damage_crops/test/manifest.csv",
+  "threshold": 0.18,
+  "samples": 132,
+  "counts": {
+    "TP": 84,
+    "TN": 46,
+    "FP": 2
+  },
+  "false_negatives": [],
+  "false_positives": [
+    {
+      "filename": "data/damage_crops/test/not_damaged_130__egg01.jpg",
+      "source_image": "data/damage/Not Damaged/not_damaged_130.jpg",
+      "source_id": "legacy_not_damaged",
+      "true_label": 1,
+      "pred_label": 0,
+      "damaged_probability": 0.480519,
+      "confidence": 0.480519,
+      "error_type": "FP",
+      "bbox_x1": 247,
+      "bbox_y1": 574,
+      "bbox_x2": 989,
+      "bbox_y2": 1148
+    },
+    {
+      "filename": "data/damage_crops/test/not_damaged_141__egg01.jpg",
+      "source_image": "data/damage/Not Damaged/not_damaged_141.jpg",
+      "source_id": "legacy_not_damaged",
+      "true_label": 1,
+      "pred_label": 0,
+      "damaged_probability": 0.214731,
+      "confidence": 0.214731,
+      "error_type": "FP",
+      "bbox_x1": 53,
+      "bbox_y1": 375,
+      "bbox_x2": 855,
+      "bbox_y2": 991
+    }
+  ],
+  "visual_review": {
+    "method": "Manual review of the two crops and source images.",
+    "finding": "No obvious crack or breakage. One crop has a faint smudge/glare patch; both are plausible clean eggs. The errors are over-rejection (false damaged), not missed damage.",
+    "label_action": "No test-set relabeling. Do not train on these test images."
+  },
+  "recommendation": {
+    "threshold": "Keep 0.18. It maximizes damaged recall under the validation-only policy; raising it to remove these two false rejects creates damaged false negatives.",
+    "next_data": "Collect similar smudged/glare/shell-texture hard negatives in a future training split. Re-evaluate on a new locked test set.",
+    "status": "No retrain triggered by this audit."
+  }
+}

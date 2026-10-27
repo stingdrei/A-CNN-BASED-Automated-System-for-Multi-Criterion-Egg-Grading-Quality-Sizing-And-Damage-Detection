@@ -25,32 +25,27 @@ This project is a starter template for an automated egg grading system using Con
 
 ```
 .
-├── README.md
-├── requirements.txt
-├── config/
-│   └── config.yaml
-├── data/
-│   ├── raw/
-│   └── processed/
-├── src/
-│   ├── dataset.py
-│   ├── model.py
-│   ├── train_yolo.py
-│   ├── convert_to_yolo.py
-│   ├── calibrate_camera.py
-│   └── utils.py
-├── models/
-├── notebooks/
-└── runs/
+├── backend/            FastAPI app, SQLAlchemy models, Alembic migrations
+├── frontend/           React + TypeScript + Tailwind dashboard
+├── src/                training, inference, evaluation, calibration scripts
+├── tests/              backend/API/model/rule tests
+├── egg_detection/      YOLO checkpoints and run artifacts
+├── data/               detector/damage datasets and manifests
+├── models/             damage checkpoints, model docs, checksums
+├── reports/            locked test reports, CSV/JSON evidence
+├── config/             training/calibration example config
+├── TASKS/              implementation and release-gate checklists
+└── requirements.txt
 ```
 
 ### Folder Descriptions
-- `data/`: Place egg images here; split as needed (raw/processed).
-- `models/`: Saved models and checkpoints.
-- `notebooks/`: For development and analysis.
-- `src/`: Core source code.
-- `config/`: Configurations (YAML, JSON, etc.).
-- `runs/`: YOLO training outputs and detection runs.
+- `backend/`: authenticated API, persistence, inference orchestration.
+- `frontend/`: upload/camera, result, history, and dashboard UI.
+- `src/`: reusable model/training/evaluation code.
+- `data/`: source data, generated crops, detector datasets, manifests.
+- `models/`: model cards, checkpoints, and checksums.
+- `reports/`: reproducible evaluation evidence.
+- `TASKS/`: task status and release gates.
 
 ## Setup
 1. Clone repository & install dependencies:
@@ -70,9 +65,42 @@ This project is a starter template for an automated egg grading system using Con
     ```
 5. Start the FastAPI backend:
     ```bash
-    cd backend
-    uvicorn app.main:app --reload
+    ./.venv/bin/uvicorn app.main:app --app-dir backend --reload
     ```
+
+Use `./.venv/bin/python -m pip` when installing packages: on this workstation
+`.venv/bin/pip` can point at a different interpreter. OpenCV 4.9 requires
+`numpy<2`.
+
+### Production Configuration and Security
+
+Copy `.env.example` to `.env` and set the deployment values. Never commit
+`.env`.
+
+```bash
+cp .env.example .env
+openssl rand -hex 32   # use this value for SECRET_KEY
+```
+
+Required before `ENVIRONMENT=production` will start:
+
+- unique `SECRET_KEY` of at least 32 characters;
+- `DEBUG=false`;
+- explicit `CORS_ORIGINS`, never `*`;
+- non-local `DATABASE_URL`.
+
+Example:
+
+```bash
+ENVIRONMENT=production
+DEBUG=false
+DATABASE_URL=postgresql://eggs:password@db.example/eggs
+SECRET_KEY=<64-hex-character-value>
+CORS_ORIGINS=https://eggs.example
+```
+
+Run behind HTTPS. The backend rejects video uploads and only accepts static
+images (`jpg`, `jpeg`, `png`, `webp`, `bmp`) with a configurable size limit.
 
 ## Usage
 
@@ -230,6 +258,14 @@ The smoke subset has 17 test images/41 eggs: exact tray-count accuracy 0.9412,
 0 missed eggs per tray, 0.0588 false positives per tray, mAP50 0.9881. This is
 a demo check only; it is not the full 0-5 tray beta gate.
 
+Tray post-processing removes duplicate boxes at IoU 0.85. Counts `1–5` are
+`ok`, `0` is `empty`, and more than `5` is `over_capacity`: all detections are
+kept, `tray_count_valid=false`, and every egg is marked `requires_review` with
+`tray_over_capacity`. The count is never silently capped.
+
+Release evidence still needs physical 0-egg/0–5 trays. The current locked test
+has no 0-egg image and includes two trays with more than 5 eggs.
+
 ### Training on Another Machine
 Transfer the 307MB dataset to any machine with Python:
 
@@ -272,9 +308,11 @@ The `data/detection/data.yaml` uses repository-relative paths and
 ### Static Tray Detection
 ```bash
 # Start the backend, then upload a tray image to POST /api/v1/predictions/upload
-cd backend
-uvicorn app.main:app --reload
+./.venv/bin/uvicorn app.main:app --app-dir backend --reload
 ```
+
+The compatibility routes `POST /api/v1/grade`, `GET /api/v1/records`, and
+`GET /api/v1/stats` map to the same authenticated operations.
 
 ### Browser Camera Capture
 
@@ -358,10 +396,19 @@ print('Avg weight:', df['weight_g'].mean())
 
 ## Configuration
 
-Edit `config/config.yaml` to adjust:
-- `detection.yolo_confidence` — YOLO detection threshold (default: 0.75)
-- `detection.cnn_confidence` — CNN classification threshold (default: 0.70)
-- `calibration.mm_per_pixel` — Camera calibration factor
+Runtime settings come from environment variables / `.env` and are defined in
+`backend/app/config.py`. See `.env.example` for the full list, including:
+
+- `CONFIDENCE_THRESHOLD` — YOLO detections (default: 0.75)
+- `DAMAGE_DECISION_THRESHOLD` — damage classifier (default: 0.18)
+- `MAX_TRAY_EGGS` — static-tray capacity (default: 5)
+- `DETECTION_DUPLICATE_IOU` — duplicate suppression (default: 0.85)
+- `MM_PER_PIXEL`, `WEIGHT_K`, `CALIBRATION_VERSION` — measurement calibration
+
+`config/config.yaml` is retained for training/calibration scripts and is not the
+runtime API configuration.
+
+Checkpoint SHA-256 values are recorded in `models/CHECKSUMS.md`.
 
 ## Extend
 - Add new grading criteria to `src/dataset.py` and `src/model.py`

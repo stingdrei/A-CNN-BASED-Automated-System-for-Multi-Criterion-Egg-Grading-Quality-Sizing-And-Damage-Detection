@@ -43,6 +43,14 @@ def make_prediction(prediction_id: int = 1):
     return SimpleNamespace(
         id=prediction_id,
         tray_id="tray123",
+        operator="alice",
+        inference_metadata={
+            "detection_threshold": 0.75,
+            "damage_decision_threshold": 0.18,
+            "cleanliness_decision_threshold": None,
+            "tray_count_valid": True,
+            "tray_over_capacity": False,
+        },
         file_name="tray.jpg",
         captured_at=datetime(2026, 1, 2, 3, 4, 5),
         created_at=datetime(2026, 1, 2, 3, 4, 5),
@@ -58,6 +66,9 @@ class CsvServiceTests(unittest.TestCase):
         self.assertEqual(rows[0]["provisional_grade"], "A")
         self.assertEqual(rows[0]["requires_review"], "true")
         self.assertEqual(rows[0]["cleanliness_status"], "Unavailable")
+        self.assertEqual(rows[0]["operator"], "alice")
+        self.assertEqual(rows[0]["damage_decision_threshold"], 0.18)
+        self.assertEqual(rows[0]["tray_count_valid"], "true")
 
     def test_append_writes_header_once(self):
         with tempfile.TemporaryDirectory() as tmp:

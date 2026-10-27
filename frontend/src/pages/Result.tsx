@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Film, Download, Trash2, ArrowLeft, Target, AlertTriangle, Camera } from 'lucide-react';
+import { Download, Trash2, ArrowLeft, Target, AlertTriangle, Camera } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { apiClient } from '../api/client';
@@ -193,9 +193,10 @@ export function Result() {
                   </div>
                 )
               ) : (
-                <div className="text-center text-gray-500">
-                  <Film className="w-12 h-12 mx-auto mb-2" />
-                  <p>Video preview</p>
+                <div className="w-full h-full flex flex-col items-center justify-center text-center text-gray-500 px-4">
+                  <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+                  <p className="text-lg font-medium text-gray-700">Unsupported preview</p>
+                  <p className="text-sm text-gray-500 mt-1">This record is not an image upload.</p>
                 </div>
               )}
             </div>

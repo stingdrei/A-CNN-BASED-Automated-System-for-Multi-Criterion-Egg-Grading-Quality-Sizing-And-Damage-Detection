@@ -21,10 +21,6 @@ def get_dashboard_stats(
         Prediction.user_id == current_user.id,
         Prediction.file_type == "image"
     ).count()
-    total_videos = db.query(Prediction).filter(
-        Prediction.user_id == current_user.id,
-        Prediction.file_type == "video"
-    ).count()
     total_detections = db.query(func.sum(Prediction.total_detections)).filter(
         Prediction.user_id == current_user.id
     ).scalar() or 0
@@ -52,7 +48,6 @@ def get_dashboard_stats(
     return DashboardStats(
         total_predictions=total,
         total_images=total_images,
-        total_videos=total_videos,
         total_detections=total_detections,
         damaged_percentage=round(damaged_percentage, 1),
         avg_processing_time_ms=round(avg_time, 1),

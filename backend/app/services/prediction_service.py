@@ -39,6 +39,7 @@ class PredictionService:
         file_name: str,
         file_path: str,
         file_type: str,
+        operator: Optional[str] = None,
     ) -> Prediction:
         prediction = Prediction(
             user_id=user_id,
@@ -47,6 +48,7 @@ class PredictionService:
             file_path=file_path,
             tray_id=uuid4().hex,
             captured_at=datetime.utcnow(),
+            operator=operator,
             status="processing",
         )
         db.add(prediction)
@@ -80,6 +82,11 @@ class PredictionService:
             result = self.predictor.predict_image(prediction.file_path)
             if self.damage_classifier is None:
                 raise RuntimeError("Damage classifier is not configured")
+            damage_review_threshold = getattr(
+                self.damage_classifier,
+                "review_threshold",
+                settings.DAMAGE_REVIEW_THRESHOLD,
+            )
 
             for det in result["detections"]:
                 crop = crop_detection(
@@ -113,13 +120,13 @@ class PredictionService:
                     confidence,
                     cleanliness_status=cleanliness_status,
                     damage_confidence=damage.confidence,
-                    damage_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+                    damage_threshold=damage_review_threshold,
                 )
                 det["provisional_grade"] = provisional_grade(
                     damage.status,
                     det.get("size"),
                     damage_confidence=damage.confidence,
-                    damage_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+                    damage_threshold=damage_review_threshold,
                     detection_confidence=det["confidence"],
                     detection_threshold=confidence,
                 )
@@ -128,13 +135,14 @@ class PredictionService:
                     detection_threshold=confidence,
                     damage_status=damage.status,
                     damage_confidence=damage.confidence,
-                    damage_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+                    damage_threshold=damage_review_threshold,
                     cleanliness_status=cleanliness_status,
                     cleanliness_confidence=cleanliness_confidence,
                     size=det.get("size"),
                     geometry_quality=det.get("geometry_quality"),
                     weight_g=det.get("weight_g"),
                     damage_review_reason=damage.review_reason,
+                    tray_over_capacity=result.get("over_capacity", False),
                 )
                 det["requires_review"] = bool(reasons)
                 det["review_reason"] = join_review_reasons(reasons)
@@ -150,6 +158,10 @@ class PredictionService:
                 )
                 if not cv2.imwrite(annotated_path, annotated):
                     annotated_path = None
+
+            prediction.inference_metadata = self._inference_metadata(
+                confidence, result
+            )
 
             for det in result["detections"]:
                 box = DetectionBox(
@@ -221,6 +233,59 @@ class PredictionService:
             raise
 
         return prediction
+
+    def _inference_metadata(self, confidence: float, result: dict) -> dict:
+        damage_threshold = getattr(
+            self.damage_classifier,
+            "damaged_threshold",
+            settings.DAMAGE_DECISION_THRESHOLD,
+        )
+        damage_review = getattr(
+            self.damage_classifier,
+            "review_threshold",
+            settings.DAMAGE_REVIEW_THRESHOLD,
+        )
+        if self.cleanliness_classifier is None:
+            cleanliness_threshold = None
+            cleanliness_review = None
+            cleanliness_model_version = None
+        else:
+            cleanliness_threshold = getattr(
+                self.cleanliness_classifier,
+                "stained_threshold",
+                settings.CLEANLINESS_DECISION_THRESHOLD,
+            )
+            cleanliness_review = getattr(
+                self.cleanliness_classifier,
+                "review_threshold",
+                settings.CLEANLINESS_REVIEW_THRESHOLD,
+            )
+            cleanliness_model_version = getattr(
+                self.cleanliness_classifier, "model_version", None
+            )
+        return {
+            "detector_model_version": getattr(
+                self.predictor, "model_version", None
+            ),
+            "damage_model_version": getattr(
+                self.damage_classifier, "model_version", None
+            ),
+            "cleanliness_model_version": cleanliness_model_version,
+            "calibration_version": settings.CALIBRATION_VERSION,
+            "detection_threshold": confidence,
+            "damage_decision_threshold": damage_threshold,
+            "damage_review_threshold": damage_review,
+            "cleanliness_decision_threshold": cleanliness_threshold,
+            "cleanliness_review_threshold": cleanliness_review,
+            "crop_padding": settings.DETECTION_CROP_PADDING,
+            "max_tray_eggs": result.get("max_eggs", settings.MAX_TRAY_EGGS),
+            "tray_count_valid": result.get("count_valid", True),
+            "tray_over_capacity": result.get("over_capacity", False),
+            "tray_count_status": result.get("count_status"),
+            "duplicate_boxes_removed": result.get(
+                "duplicate_boxes_removed", 0
+            ),
+        }
 
     def get_predictions(
         self, db: Session, user_id: int, skip: int = 0, limit: int = 20
