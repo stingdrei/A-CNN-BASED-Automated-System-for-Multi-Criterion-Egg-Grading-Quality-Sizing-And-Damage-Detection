@@ -48,6 +48,12 @@ uploads/
 !data/damage/Damaged/*.jpg
 !data/damage/Not\ Damaged/*.jpg
 
+# Cleanliness candidate crop images are required for weak baseline training.
+!data/cleanliness_candidates/
+!data/cleanliness_candidates/crops/
+!data/cleanliness_candidates/crops/**/
+!data/cleanliness_candidates/crops/**/*.jpg
+
 # YOLO detector dataset images are required for training.
 !data/detection/images/
 !data/detection/images/train/
@@ -70,6 +76,10 @@ uploads/
 # Generated evaluation subsets
 data/detection_smoke/
 data/damage_crops/
+
+# External web/stock cleanliness sources; audit artifacts are in reports/
+clean eggs/
+Eggs degrading quality/
 
 # Test
 .coverage

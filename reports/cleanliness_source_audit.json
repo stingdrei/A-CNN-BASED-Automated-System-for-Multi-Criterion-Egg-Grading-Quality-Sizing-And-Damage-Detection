@@ -1,0 +1,805 @@
+{
+  "generated_at": "2026-10-28T03:39:21.062295+00:00",
+  "sources": {
+    "clean eggs": {
+      "root": "clean eggs",
+      "splits": {
+        "train": {
+          "images": 104,
+          "images_with_annotations": 104,
+          "annotations": 268,
+          "categories": [
+            "Brownegg",
+            "Lightbrownegg",
+            "Whiteegg",
+            "color"
+          ],
+          "category_counts": {
+            "Brownegg": 62,
+            "Lightbrownegg": 57,
+            "Whiteegg": 149
+          },
+          "mapped_counts": {
+            "Clean": 268
+          },
+          "missing_images": 0,
+          "invalid_boxes": 0
+        },
+        "valid": {
+          "images": 29,
+          "images_with_annotations": 29,
+          "annotations": 55,
+          "categories": [
+            "Brownegg",
+            "Lightbrownegg",
+            "Whiteegg",
+            "color"
+          ],
+          "category_counts": {
+            "Brownegg": 8,
+            "Lightbrownegg": 10,
+            "Whiteegg": 37
+          },
+          "mapped_counts": {
+            "Clean": 55
+          },
+          "missing_images": 0,
+          "invalid_boxes": 0
+        },
+        "test": {
+          "images": 18,
+          "images_with_annotations": 18,
+          "annotations": 42,
+          "categories": [
+            "Brownegg",
+            "Lightbrownegg",
+            "Whiteegg",
+            "color"
+          ],
+          "category_counts": {
+            "Brownegg": 15,
+            "Lightbrownegg": 6,
+            "Whiteegg": 21
+          },
+          "mapped_counts": {
+            "Clean": 42
+          },
+          "missing_images": 0,
+          "invalid_boxes": 0
+        }
+      },
+      "images": 151,
+      "annotations": 365,
+      "category_counts": {
+        "Brownegg": 85,
+        "Lightbrownegg": 73,
+        "Whiteegg": 207
+      },
+      "mapped_counts": {
+        "Clean": 365
+      },
+      "weak_label_counts": {},
+      "mapped_by_split": {
+        "train": {
+          "Clean": 268
+        },
+        "valid": {
+          "Clean": 55
+        },
+        "test": {
+          "Clean": 42
+        }
+      },
+      "unmapped_categories": {},
+      "invalid_boxes": [],
+      "missing_images": [],
+      "image_errors": [],
+      "stock_keyword_images": [
+        {
+          "image": "clean eggs/train/1000_F_132147432_rNlm3vL5A4276cziDBxUg7aCzYZkpuWX_jpg.rf.2012fe0532c086a68dac2e1231b57855.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "clean eggs/train/single-white-egg-isolated-on-260nw-1567546612-resized_jpg.rf.06ed8a54542d686bdea3e6224c20073c.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/depositphotos_87753080-stock-photo-single-white-chicken-egg-isolated_jpg.rf.429d129ab3f6e681f0397e86470f5cdc.jpg",
+          "keyword": "depositphotos"
+        },
+        {
+          "image": "clean eggs/train/depositphotos_87753080-stock-photo-single-white-chicken-egg-isolated-resized_jpg.rf.50a6e2c40e87b954b4792c2e93fb0a0a.jpg",
+          "keyword": "depositphotos"
+        },
+        {
+          "image": "clean eggs/train/realistic-egg-white-chicken-vector-260nw-1038304543_jpg.rf.514e2fddc7bc6419b1175ccf5149826a.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/single-white-egg-isolated-on-260nw-1567546612_jpg.rf.59d8eadce36aa99cb16ee91f26cbba20.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/1000_F_94263638_DXxjk219D82jbiQFHiIU7eXrN8POlYYo-resized_jpg.rf.8146dd240c73e4b1491c371c1531604f.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "clean eggs/train/depositphotos_4410624-stock-photo-white-egg-resized_jpg.rf.7cac669e77eb38821ae37e9a9522a7ce.jpg",
+          "keyword": "depositphotos"
+        },
+        {
+          "image": "clean eggs/train/white-egg-isolated-on-background-260nw-427646836-resized_jpg.rf.bc3781da4b9ca9b1bdc833ee1e591a63.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/egg-isolated-on-white-background-260nw-112960825-resized_jpg.rf.6d6aab85c41007913d378266aff7ee38.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/realistic-egg-white-chicken-vector-260nw-1038304543-resized_jpg.rf.7d2235916937be165ef6f82fc4340642.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/closeup-single-oval-isolated-white-260nw-519132976-resized_jpg.rf.d70cd7c0a3217319a01f7e00f2593974.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/egg-isolated-on-white-background-260nw-112960825_jpg.rf.f30678618c1ef7a043ba33799577fb23.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/train/1000_F_94263638_DXxjk219D82jbiQFHiIU7eXrN8POlYYo_jpg.rf.e694767b7f86811b348ae0947d60270c.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "clean eggs/valid/closeup-single-oval-isolated-white-260nw-519132976_jpg.rf.2acb48694f07e95ffa88394de0ab81ac.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/valid/1000_F_192169821_3NVfBYqRSmBcnFa3VAmJJBlHGIkAiG9b_jpg.rf.a8826c81c94730653b6a7e5b9d1f58af.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "clean eggs/valid/1000_F_132147432_rNlm3vL5A4276cziDBxUg7aCzYZkpuWX-resized--1-_jpg.rf.796dccba482acc9c2808fc2c88b0f18d.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "clean eggs/valid/depositphotos_4410624-stock-photo-white-egg_jpg.rf.b83215125b2066821ab4f2960deca029.jpg",
+          "keyword": "depositphotos"
+        },
+        {
+          "image": "clean eggs/test/white-egg-isolated-on-background-260nw-427646836_jpg.rf.43a658b278cd23535039021e7b5e7c2a.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "clean eggs/test/1000_F_192169821_3NVfBYqRSmBcnFa3VAmJJBlHGIkAiG9b-resized_jpg.rf.098312aad46b328c6228acb322d452fb.jpg",
+          "keyword": "1000_f_"
+        }
+      ],
+      "image_dimensions": {
+        "width": {
+          "count": 151,
+          "min": 416.0,
+          "median": 416.0,
+          "mean": 416.0,
+          "max": 416.0
+        },
+        "height": {
+          "count": 151,
+          "min": 416.0,
+          "median": 416.0,
+          "mean": 416.0,
+          "max": 416.0
+        }
+      },
+      "crop_dimensions": {
+        "width": {
+          "count": 365,
+          "min": 6.0,
+          "median": 121.0,
+          "mean": 141.814,
+          "max": 376.0
+        },
+        "height": {
+          "count": 365,
+          "min": 13.0,
+          "median": 138.0,
+          "mean": 172.701,
+          "max": 394.0
+        }
+      },
+      "small_crops": 7,
+      "empty_images": 0,
+      "source_categories": {
+        "train": [
+          "Brownegg",
+          "Lightbrownegg",
+          "Whiteegg",
+          "color"
+        ],
+        "valid": [
+          "Brownegg",
+          "Lightbrownegg",
+          "Whiteegg",
+          "color"
+        ],
+        "test": [
+          "Brownegg",
+          "Lightbrownegg",
+          "Whiteegg",
+          "color"
+        ]
+      }
+    },
+    "Eggs degrading quality": {
+      "root": "Eggs degrading quality",
+      "splits": {
+        "train": {
+          "images": 68,
+          "images_with_annotations": 66,
+          "annotations": 346,
+          "categories": [
+            "dirt stained brown egg",
+            "dirt stained white  egg",
+            "eggs",
+            "white egg"
+          ],
+          "category_counts": {
+            "dirt stained brown egg": 224,
+            "dirt stained white  egg": 109,
+            "white egg": 13
+          },
+          "mapped_counts": {
+            "Clean": 13,
+            "Stained": 333
+          },
+          "missing_images": 0,
+          "invalid_boxes": 0
+        },
+        "valid": {
+          "images": 19,
+          "images_with_annotations": 19,
+          "annotations": 110,
+          "categories": [
+            "dirt stained brown egg",
+            "dirt stained white  egg",
+            "eggs",
+            "white egg"
+          ],
+          "category_counts": {
+            "dirt stained brown egg": 35,
+            "dirt stained white  egg": 64,
+            "white egg": 11
+          },
+          "mapped_counts": {
+            "Clean": 11,
+            "Stained": 99
+          },
+          "missing_images": 0,
+          "invalid_boxes": 0
+        },
+        "test": {
+          "images": 10,
+          "images_with_annotations": 9,
+          "annotations": 50,
+          "categories": [
+            "dirt stained brown egg",
+            "dirt stained white  egg",
+            "eggs",
+            "white egg"
+          ],
+          "category_counts": {
+            "dirt stained brown egg": 34,
+            "dirt stained white  egg": 16
+          },
+          "mapped_counts": {
+            "Stained": 49
+          },
+          "missing_images": 0,
+          "invalid_boxes": 1
+        }
+      },
+      "images": 97,
+      "annotations": 506,
+      "category_counts": {
+        "dirt stained brown egg": 293,
+        "dirt stained white  egg": 189,
+        "white egg": 24
+      },
+      "mapped_counts": {
+        "Clean": 24,
+        "Stained": 481
+      },
+      "weak_label_counts": {
+        "Clean": 24
+      },
+      "mapped_by_split": {
+        "train": {
+          "Clean": 13,
+          "Stained": 333
+        },
+        "valid": {
+          "Clean": 11,
+          "Stained": 99
+        },
+        "test": {
+          "Stained": 49
+        }
+      },
+      "unmapped_categories": {},
+      "invalid_boxes": [
+        {
+          "dataset": "Eggs degrading quality",
+          "split": "test",
+          "image": "Eggs degrading quality/test/32_jpeg.rf.2d239bbf60b3b6be5e4f99f1f4132dc7.jpg",
+          "category": "dirt stained white  egg",
+          "bbox": [
+            142,
+            137,
+            0.5,
+            6
+          ]
+        }
+      ],
+      "missing_images": [],
+      "image_errors": [],
+      "stock_keyword_images": [
+        {
+          "image": "Eggs degrading quality/train/240_F_224780706_zbQtQpyjAjUMF252AprXrjahuI1mSqwH_jpg.rf.3fcedc5abe40d8ef733f720a41faccae.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_216537209_d2Y7htbQWymrG5tOQ0aPdt3HgsPmfXK8_jpg.rf.127d93b3d35ed9e705ee8122505ace5c.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/360_F_402137450_nGPPTj7RTc8kHJUbJ8i8LYaR1TjjLRYz_jpg.rf.4bd3ac32bd0abb48c5545f4848277364.jpg",
+          "keyword": "360_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/stock-photo-fresh-and-dirty-chicken-eggs-on-white-background-with-reflection-homemade-healthy-food-1087226006_jpg.rf.61972fcfc2eec8155f677408ef4ef404.jpg",
+          "keyword": "stock-photo"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_216537240_87u59jDUXiUne3DdcpYJVmAfVFfKnQXl_jpg.rf.73b58a68e60b31df3dd04f85eaef1fa2.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_216042862_SGcMgUCuEURLgQjfm9UKsfNXEK66STkl_webp.rf.6072356fbd4a254812be3692fa159083.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_216537770_ssRWwW76A7OfmQlXIQdCiPDkKS9u1C6k_jpg.rf.6a4e36d50b1b0415e481b1d90f15f801.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_204282713_WSaPJrulqSOjn1qfBHIrDhMalik0TFbq_jpg.rf.8d6cea6e2f093159e7ccc9acb130c1bc.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/lotok-eggs-open-tray-dirty-600nw-2273448329_webp.rf.70e555b5ac2e5dcb62e3ebcb9056d12a.jpg",
+          "keyword": "600nw"
+        },
+        {
+          "image": "Eggs degrading quality/train/1000_F_271336577_lPiDAcqdWQ68IDhEHZ2J6p725qH1hscJ_jpg.rf.addb7eb30b3a673410fdd6f026dd740d.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_216537763_q0z2iwOfJdzoCTdK96watFbTDWo2wBsd_jpg.rf.aff2f840a9bd26b1d34633f02cb3512a.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_271336577_lPiDAcqdWQ68IDhEHZ2J6p725qH1hscJ_jpg.rf.c138295fb7dcaefe3cf61c7fe76bff53.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/train/240_F_204282763_lqriUEXuJhIZyXZ4hZ7VU2QqmtskHwxs_jpg.rf.be4253a9c2f598a31d226a81de04f226.jpg",
+          "keyword": "240_f_"
+        },
+        {
+          "image": "Eggs degrading quality/valid/1000_F_266031019_4HfNbbpTBzcryHumR8OC3UbaIDtZFg5A_jpg.rf.4ab0690756d5775d3804dd80393d857d.jpg",
+          "keyword": "1000_f_"
+        },
+        {
+          "image": "Eggs degrading quality/test/dirty-chicken-egg-farm-600nw-1667296792_webp.rf.6e65f07163526f1e69e4f78cc50d11fb.jpg",
+          "keyword": "600nw"
+        },
+        {
+          "image": "Eggs degrading quality/test/stock-photo-studio-lighting-chicken-egg-brown-unpeeled-grown-without-the-use-of-additives-ecoproduct-on-a-1891570015_jpg.rf.b1c73ea25681207651f678ab423a6feb.jpg",
+          "keyword": "stock-photo"
+        },
+        {
+          "image": "Eggs degrading quality/test/ecofriendly-chicken-eggs-stained-manure-260nw-1981140737_webp.rf.2ca9c3a1f37afb4465bbee4e27dcb31a.jpg",
+          "keyword": "260nw"
+        },
+        {
+          "image": "Eggs degrading quality/test/depositphotos_73851491-stock-photo-nest-egg_jpg.rf.46564cc67ff6624f25f0da1cff6d4443.jpg",
+          "keyword": "depositphotos"
+        }
+      ],
+      "image_dimensions": {
+        "width": {
+          "count": 97,
+          "min": 640.0,
+          "median": 640.0,
+          "mean": 640.0,
+          "max": 640.0
+        },
+        "height": {
+          "count": 97,
+          "min": 640.0,
+          "median": 640.0,
+          "mean": 640.0,
+          "max": 640.0
+        }
+      },
+      "crop_dimensions": {
+        "width": {
+          "count": 505,
+          "min": 2.0,
+          "median": 132.0,
+          "mean": 146.677,
+          "max": 572.0
+        },
+        "height": {
+          "count": 505,
+          "min": 4.0,
+          "median": 165.0,
+          "mean": 176.459,
+          "max": 640.0
+        }
+      },
+      "small_crops": 5,
+      "empty_images": 3,
+      "source_categories": {
+        "train": [
+          "dirt stained brown egg",
+          "dirt stained white  egg",
+          "eggs",
+          "white egg"
+        ],
+        "valid": [
+          "dirt stained brown egg",
+          "dirt stained white  egg",
+          "eggs",
+          "white egg"
+        ],
+        "test": [
+          "dirt stained brown egg",
+          "dirt stained white  egg",
+          "eggs",
+          "white egg"
+        ]
+      }
+    }
+  },
+  "totals": {
+    "mapped_crops": {
+      "Clean": 389,
+      "Stained": 481
+    },
+    "images": 248,
+    "annotations": 871,
+    "exact_duplicate_groups": 1,
+    "near_duplicate_pairs": 43
+  },
+  "mapping": {
+    "brownegg": {
+      "label": 0,
+      "label_name": "Clean",
+      "weak_label": false
+    },
+    "lightbrownegg": {
+      "label": 0,
+      "label_name": "Clean",
+      "weak_label": false
+    },
+    "whiteegg": {
+      "label": 0,
+      "label_name": "Clean",
+      "weak_label": false
+    },
+    "white egg": {
+      "label": 0,
+      "label_name": "Clean",
+      "weak_label": true
+    },
+    "dirt stained brown egg": {
+      "label": 1,
+      "label_name": "Stained",
+      "weak_label": false
+    },
+    "dirt stained white egg": {
+      "label": 1,
+      "label_name": "Stained",
+      "weak_label": false
+    }
+  },
+  "unmapped_categories": [
+    "color",
+    "eggs"
+  ],
+  "exact_duplicate_groups": [
+    {
+      "sha256": "05c8bda3dea0f5119cc657338c1d868f0c6bdeb14d43bd365561029388fe9d6d",
+      "files": [
+        {
+          "dataset": "clean eggs",
+          "split": "train",
+          "image": "clean eggs/train/brown-eggs-500x500_jpg.rf.4d959b6aa5db237cd82892338c523f79.jpg"
+        },
+        {
+          "dataset": "clean eggs",
+          "split": "test",
+          "image": "clean eggs/test/brown-eggs-500x500_jpg.rf.d7ec5794090f4ef89a2813f7a3374f88.jpg"
+        }
+      ]
+    }
+  ],
+  "near_duplicate_pairs": [
+    {
+      "distance": 0,
+      "left": "clean eggs:train/one-white-egg-isolated-white-background_219958-800_jpg.rf.2873e3eca175a382550fea5f6eb422b4.jpg",
+      "right": "clean eggs:test/one-white-egg-isolated-white-background_219958-800-resized_jpg.rf.828dec59397d3a39e1589824bca4b0d1.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/image8_jpeg.rf.3802f05d9a788ed0fb8d952a746e2805.jpg",
+      "right": "clean eggs:valid/images101-resized_jpg.rf.baa3843ef097cb233a58e684d0bdba1d.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/jfif1_jpg.rf.3e409ebcc2793177e6bd6387c0e78095.jpg",
+      "right": "clean eggs:valid/jfif19_11zon_jpg.rf.29d467fef058dc789084dfd3f59c49db.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/images101_jpg.rf.427e6c8c1115652c97c5a77691e55d5a.jpg",
+      "right": "clean eggs:valid/images101-resized_jpg.rf.baa3843ef097cb233a58e684d0bdba1d.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/images13-resized_jpg.rf.4406e6240b539d19dd2017f0077caba5.jpg",
+      "right": "clean eggs:valid/images171_jpg.rf.0bd8bdfebd84ae5b51c086931ca5b45b.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/images13-resized_jpg.rf.4406e6240b539d19dd2017f0077caba5.jpg",
+      "right": "clean eggs:test/images57_jpg.rf.abf6f06703fbca71489d1b3f4a5a3122.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/depositphotos_87753080-stock-photo-single-white-chicken-egg-isolated-resized_jpg.rf.50a6e2c40e87b954b4792c2e93fb0a0a.jpg",
+      "right": "clean eggs:valid/images101-resized_jpg.rf.baa3843ef097cb233a58e684d0bdba1d.jpg"
+    },
+    {
+      "distance": 3,
+      "left": "clean eggs:train/images145-resized_jpg.rf.5511c3d9514602c136588829013f81fb.jpg",
+      "right": "clean eggs:valid/images145_jpg.rf.5098cbf7278de4c4e64d347141024bd3.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/realistic-egg-white-chicken-vector-260nw-1038304543_jpg.rf.514e2fddc7bc6419b1175ccf5149826a.jpg",
+      "right": "clean eggs:valid/images145_jpg.rf.5098cbf7278de4c4e64d347141024bd3.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/istic-egg-chicken-egg-isolated-with-soft-shadows-white-background_250169-183_jpg.rf.61db6b5c729f43da339eab9eb32af19e.jpg",
+      "right": "clean eggs:valid/istic-egg-chicken-egg-isolated-with-soft-shadows-white-background_250169-183-resized_jpg.rf.8196f200908a700519914b65ce0de257.jpg"
+    },
+    {
+      "distance": 2,
+      "left": "clean eggs:train/images41-resized_jpg.rf.5ed76d51573158cf71ce641926c29895.jpg",
+      "right": "clean eggs:valid/images41_jpg.rf.0013c878c8eedbd0ac41b643dab72477.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/image10_jpeg.rf.74c1aeeb2b053a1b1e5d73132fe92dfc.jpg",
+      "right": "clean eggs:valid/jfif19_11zon_jpg.rf.29d467fef058dc789084dfd3f59c49db.jpg"
+    },
+    {
+      "distance": 3,
+      "left": "clean eggs:train/images67-resized_jpg.rf.99f95117e9f768af2fb2a3418e939172.jpg",
+      "right": "clean eggs:test/images67_jpg.rf.8a4962e90ddf0f3a800a668c4d9a887e.jpg"
+    },
+    {
+      "distance": 3,
+      "left": "clean eggs:train/white-egg-isolated-on-background-260nw-427646836-resized_jpg.rf.bc3781da4b9ca9b1bdc833ee1e591a63.jpg",
+      "right": "clean eggs:valid/image6_jpeg.rf.cd4815de185ef275f098bf9b1da02b1c.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/white-egg-isolated-on-background-260nw-427646836-resized_jpg.rf.bc3781da4b9ca9b1bdc833ee1e591a63.jpg",
+      "right": "clean eggs:test/white-egg-isolated-on-background-260nw-427646836_jpg.rf.43a658b278cd23535039021e7b5e7c2a.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/realistic-white-single-chicken-egg-isolated-vector-13301876-resized_jpg.rf.ba452f4c611f827fd1650fb0291465d3.jpg",
+      "right": "clean eggs:valid/66072159_jpg.rf.77057c89c2475a50be55f945a04931ce.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/image16_jpeg.rf.80ade590a849d82630f443d16f387ebf.jpg",
+      "right": "clean eggs:valid/jfif5_11zon_jpg.rf.568c5408ebe5ae56b7e358893281e011.jpg"
+    },
+    {
+      "distance": 3,
+      "left": "clean eggs:train/realistic-egg-white-chicken-vector-260nw-1038304543-resized_jpg.rf.7d2235916937be165ef6f82fc4340642.jpg",
+      "right": "clean eggs:valid/images145_jpg.rf.5098cbf7278de4c4e64d347141024bd3.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/images171-resized_jpg.rf.bd83195328e393d4e30d956dc80572d2.jpg",
+      "right": "clean eggs:valid/images57-resized_jpg.rf.0543c0d044f4a99d3ca621578fff61fd.jpg"
+    },
+    {
+      "distance": 1,
+      "left": "clean eggs:train/images171-resized_jpg.rf.bd83195328e393d4e30d956dc80572d2.jpg",
+      "right": "clean eggs:valid/images171_jpg.rf.0bd8bdfebd84ae5b51c086931ca5b45b.jpg"
+    },
+    {
+      "distance": 1,
+      "left": "clean eggs:train/images171-resized_jpg.rf.bd83195328e393d4e30d956dc80572d2.jpg",
+      "right": "clean eggs:test/images57_jpg.rf.abf6f06703fbca71489d1b3f4a5a3122.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/image23_jpeg.rf.da91dfdd63f2df278f3946da4e08b0e9.jpg",
+      "right": "clean eggs:valid/jfif5_11zon_jpg.rf.568c5408ebe5ae56b7e358893281e011.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/image23_jpeg.rf.da91dfdd63f2df278f3946da4e08b0e9.jpg",
+      "right": "clean eggs:valid/images171_jpg.rf.0bd8bdfebd84ae5b51c086931ca5b45b.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/image23_jpeg.rf.da91dfdd63f2df278f3946da4e08b0e9.jpg",
+      "right": "clean eggs:test/images57_jpg.rf.abf6f06703fbca71489d1b3f4a5a3122.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:train/jfif1_11zon_jpg.rf.cd0035e3fd09c9b4a0b682c01d30b224.jpg",
+      "right": "clean eggs:valid/jfif19_11zon_jpg.rf.29d467fef058dc789084dfd3f59c49db.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/images108_jpg.rf.ec68defa7a67967206c71340cb6358df.jpg",
+      "right": "clean eggs:valid/images108-resized_jpg.rf.d455b4b50aab548e7f733618022f0afb.jpg"
+    },
+    {
+      "distance": 2,
+      "left": "clean eggs:train/closeup-single-oval-isolated-white-260nw-519132976-resized_jpg.rf.d70cd7c0a3217319a01f7e00f2593974.jpg",
+      "right": "clean eggs:valid/closeup-single-oval-isolated-white-260nw-519132976_jpg.rf.2acb48694f07e95ffa88394de0ab81ac.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/closeup-single-oval-isolated-white-260nw-519132976-resized_jpg.rf.d70cd7c0a3217319a01f7e00f2593974.jpg",
+      "right": "clean eggs:valid/1000_F_132147432_rNlm3vL5A4276cziDBxUg7aCzYZkpuWX-resized--1-_jpg.rf.796dccba482acc9c2808fc2c88b0f18d.jpg"
+    },
+    {
+      "distance": 2,
+      "left": "clean eggs:train/closeup-single-oval-isolated-white-260nw-519132976-resized_jpg.rf.d70cd7c0a3217319a01f7e00f2593974.jpg",
+      "right": "clean eggs:test/image7_jpeg.rf.277938b9b7bf27368de5a484d6281900.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/66072159-resized_jpg.rf.cb7489ffaf8653413585de107a4e36aa.jpg",
+      "right": "clean eggs:valid/66072159_jpg.rf.77057c89c2475a50be55f945a04931ce.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:train/images98_jpg.rf.deb903e414861c55b3af65084504d4dd.jpg",
+      "right": "clean eggs:valid/images145_jpg.rf.5098cbf7278de4c4e64d347141024bd3.jpg"
+    },
+    {
+      "distance": 2,
+      "left": "clean eggs:train/images224-resized_jpg.rf.fae6401fa3423b6b3eec13bf2c475baf.jpg",
+      "right": "clean eggs:valid/images224_jpg.rf.01f446caa2ba1f4dce31c25ea9a7d249.jpg"
+    },
+    {
+      "distance": 1,
+      "left": "clean eggs:valid/images57-resized_jpg.rf.0543c0d044f4a99d3ca621578fff61fd.jpg",
+      "right": "clean eggs:test/images57_jpg.rf.abf6f06703fbca71489d1b3f4a5a3122.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:valid/closeup-single-oval-isolated-white-260nw-519132976_jpg.rf.2acb48694f07e95ffa88394de0ab81ac.jpg",
+      "right": "clean eggs:test/image7_jpeg.rf.277938b9b7bf27368de5a484d6281900.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:valid/600px-White_chicken_egg_square-resized_jpg.rf.0f5c1b3b712f1f1a2e5aa5fe34736555.jpg",
+      "right": "clean eggs:test/600px-White_chicken_egg_square_jpg.rf.41a484b4a92bf45fead40d3cfb1dfbc9.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:valid/images171_jpg.rf.0bd8bdfebd84ae5b51c086931ca5b45b.jpg",
+      "right": "clean eggs:test/images57_jpg.rf.abf6f06703fbca71489d1b3f4a5a3122.jpg"
+    },
+    {
+      "distance": 4,
+      "left": "clean eggs:valid/1000_F_132147432_rNlm3vL5A4276cziDBxUg7aCzYZkpuWX-resized--1-_jpg.rf.796dccba482acc9c2808fc2c88b0f18d.jpg",
+      "right": "clean eggs:test/image7_jpeg.rf.277938b9b7bf27368de5a484d6281900.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "clean eggs:valid/images91-resized_jpg.rf.ed16f3f5e573348d66245af12d51e0b7.jpg",
+      "right": "clean eggs:test/images91_jpg.rf.67cba1ad07deb81581fbfe9f8de97af0.jpg"
+    },
+    {
+      "distance": 1,
+      "left": "clean eggs:valid/image6_jpeg.rf.cd4815de185ef275f098bf9b1da02b1c.jpg",
+      "right": "clean eggs:test/white-egg-isolated-on-background-260nw-427646836_jpg.rf.43a658b278cd23535039021e7b5e7c2a.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "Eggs degrading quality:train/download-8-_jpg.rf.19c8cd9c275d61136b196c1b0f17b754.jpg",
+      "right": "Eggs degrading quality:test/32_jpeg.rf.2d239bbf60b3b6be5e4f99f1f4132dc7.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "Eggs degrading quality:train/3_jpeg.rf.c77f846f1cafbd1f8f0b34ac71dd20de.jpg",
+      "right": "Eggs degrading quality:valid/images-4-_jpg.rf.2a4e4d17c5fe4be5dfcd528158d4eed4.jpg"
+    },
+    {
+      "distance": 0,
+      "left": "Eggs degrading quality:train/12_jpeg.rf.922a6d555cf749d141861f06fc0ac8c1.jpg",
+      "right": "Eggs degrading quality:valid/images-18-_jpg.rf.e78ff96ce55006ec274097086949011a.jpg"
+    },
+    {
+      "distance": 1,
+      "left": "Eggs degrading quality:train/44_jpg.rf.f3012ed3be69e6f3492f9d6ec39a5ea8.jpg",
+      "right": "Eggs degrading quality:valid/37_jpeg.rf.a99f0ba067b461b2067ffd9b70c102e7.jpg"
+    }
+  ],
+  "near_duplicate_pairs_truncated": false,
+  "crop_previews": {
+    "Clean": [
+      "reports/cleanliness_source_previews/crops/clean_00.jpg",
+      "reports/cleanliness_source_previews/crops/clean_01.jpg"
+    ],
+    "Stained": [
+      "reports/cleanliness_source_previews/crops/stained_00.jpg",
+      "reports/cleanliness_source_previews/crops/stained_01.jpg"
+    ]
+  },
+  "annotated_previews": {
+    "clean eggs": [
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_00.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_01.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_02.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_03.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_04.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_05.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_06.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_07.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_train_08.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_valid_00.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_valid_01.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_valid_02.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_test_00.jpg",
+      "reports/cleanliness_source_previews/clean_eggs/clean_eggs_test_01.jpg"
+    ],
+    "Eggs degrading quality": [
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_train_00.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_train_01.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_train_02.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_train_03.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_train_04.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_train_05.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_valid_00.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_valid_01.jpg",
+      "reports/cleanliness_source_previews/Eggs_degrading_quality/Eggs_degrading_quality_test_00.jpg"
+    ]
+  },
+  "candidate_manifest": "reports/cleanliness_candidate_crops.csv",
+  "limitations": [
+    "Crops are from ground-truth COCO boxes, not runtime detector boxes.",
+    "The clean-eggs and degrading-quality datasets are web/stock imagery.",
+    "`white egg` in the degrading dataset is treated as a weak Clean label.",
+    "Stock/watermark detection is filename-based; manual previews show visible watermarks and text overlays that are not counted.",
+    "No source/session metadata is present, so leakage cannot be fully ruled out.",
+    "This audit does not train a model and does not write crop image files."
+  ]
+}
