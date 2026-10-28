@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-10-28T14:56:23.619454+00:00",
+  "git": {
+    "commit": "722460a5df7d3a0107dd159c41aad7828bca79c2",
+    "dirty": true
+  },
+  "combined_sha256": "7fe89d35485c84b5ddd21e11dc1fe1cc0ba733da31972d31de4ee2bbd949039e",
+  "manifests": {
+    "train": {
+      "path": "data/cleanliness_candidates/manifests/train.csv",
+      "sha256": "4659be18408b034b10e196cb2e2da6c25fe98a7587838c8f745622a0e67e93b2",
+      "rows": 425,
+      "labels": {
+        "Clean": 195,
+        "Stained": 230
+      },
+      "unique_filenames": 425,
+      "unique_source_groups": 68,
+      "unique_source_images": 68,
+      "missing_files": [],
+      "missing_file_count": 0
+    },
+    "valid": {
+      "path": "data/cleanliness_candidates/manifests/valid.csv",
+      "sha256": "f9989be74d656a42a7e63c27d9ce1f067069df41db06da2247b78b8f7e60e273",
+      "rows": 92,
+      "labels": {
+        "Clean": 42,
+        "Stained": 50
+      },
+      "unique_filenames": 92,
+      "unique_source_groups": 40,
+      "unique_source_images": 40,
+      "missing_files": [],
+      "missing_file_count": 0
+    },
+    "test": {
+      "path": "data/cleanliness_candidates/manifests/test.csv",
+      "sha256": "5006c7eae2b3ebd3012671a974a0d82fd6856d2db5d8b564f62d8ab8f5527a98",
+      "rows": 91,
+      "labels": {
+        "Clean": 42,
+        "Stained": 49
+      },
+      "unique_filenames": 91,
+      "unique_source_groups": 40,
+      "unique_source_images": 40,
+      "missing_files": [],
+      "missing_file_count": 0
+    }
+  },
+  "overlaps": {
+    "filenames": [],
+    "source_groups": [],
+    "source_images": [],
+    "sha256": []
+  },
+  "overlap_count": 0,
+  "missing_file_count": 0,
+  "release_ready": true,
+  "limitations": [
+    "Manifest hashes freeze the split definitions, not model behavior.",
+    "Cross-split checks only run for columns present in every manifest.",
+    "This does not prove physical-source independence without session metadata."
+  ]
+}
