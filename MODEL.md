@@ -23,7 +23,7 @@ augmentation, threshold selection, or calibration fitting.
 |---|---|---|---|
 | Egg detector | `models/egg_detection_finetuned/weights/best.pt` | Locate eggs in a tray image | Baseline exists; needs controlled retraining and test evaluation |
 | Damage classifier | `models/egg_grader.pth` | Damaged / Not Damaged | Artifact exists; metrics and backend integration are missing |
-| Cleanliness classifier | None | Clean / Stained | Must be created |
+| Cleanliness classifier | `models/egg_grader_cleanliness_v1.pth` | Clean / Stained | Weak web/stock candidate exists; physical validation required |
 | Size estimator | None | Small / Medium / Large from calibrated geometry | Must be implemented and validated against PNS/BAFS labels |
 | Weight estimator | None | Reported grams from calibrated geometry | Must be calibrated against actual weights |
 | Grading engine | Rule logic in backend | Combine all criteria into grade | Must be finalized after classifier and policy validation |

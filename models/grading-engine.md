@@ -18,8 +18,10 @@ else:
 ```
 
 Unknown, invalid, or below-threshold inputs must not receive A, B, or C.
-Cleanliness is currently `Unavailable`, so final grades are `N/A` and the API
-exposes `provisional_grade` from damage + size only.
+If the cleanliness checkpoint cannot be loaded, status is `Unavailable`, final
+grades are `N/A`, and the API exposes `provisional_grade` from damage + size
+only. If it loads, final grades use its Clean/Stained prediction. The current
+cleanliness checkpoint is a weak web/stock candidate and is not release-approved.
 
 Damage status is decided from `P(Damaged)` using a validation-selected
 threshold stored in the checkpoint (`0.18` for the current ResNet18 crop
@@ -45,7 +47,7 @@ when a not-damaged prediction is below the confidence threshold.
 - [x] Finalize the per-egg JSON schema and use it in API, DB, CSV, frontend.
 - [x] Add exhaustive grading-rule unit tests.
 - [ ] Add end-to-end tests for damaged, stained, clean-small,
-  clean-medium, and clean-large eggs (stained/clean blocked by missing model).
+  clean-medium, and clean-large eggs using the candidate cleanliness checkpoint.
 - [x] Add low-confidence and invalid-input behavior.
 - [x] Remove stale `AA` and incompatible grade terminology from frontend types.
 - [ ] Evaluate complete-tray grading accuracy on the frozen test set.

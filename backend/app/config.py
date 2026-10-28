@@ -42,7 +42,9 @@ class Settings(BaseSettings):
     CLEANLINESS_MODEL_PATH: str = str(
         PROJECT_ROOT / "models" / "egg_grader_cleanliness_v1.pth"
     )
-    CLEANLINESS_DECISION_THRESHOLD: float = 0.5
+    # Validation-selected for the current cleanliness checkpoint at a 0.98
+    # stained-recall floor. Re-select when replacing the checkpoint.
+    CLEANLINESS_DECISION_THRESHOLD: float = 0.04
     CLEANLINESS_REVIEW_THRESHOLD: float = 0.75
     DETECTION_CROP_PADDING: float = 0.1
     MIN_CROP_SIZE: int = 8

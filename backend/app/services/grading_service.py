@@ -1,8 +1,9 @@
 """Deterministic per-egg grading and review policy.
 
-The final grade requires damage, cleanliness, and size. Cleanliness is not
-implemented yet, so final grades are ``N/A``. ``provisional_grade`` exposes the
-damage+size decision without pretending cleanliness was evaluated.
+The final grade requires damage, cleanliness, and size. If cleanliness is
+``Unavailable``, the final grade is ``N/A``. ``provisional_grade`` exposes the
+damage+size decision without pretending cleanliness was evaluated. The current
+cleanliness checkpoint is a web/stock candidate and is not release-approved.
 """
 
 from typing import Iterable, Optional

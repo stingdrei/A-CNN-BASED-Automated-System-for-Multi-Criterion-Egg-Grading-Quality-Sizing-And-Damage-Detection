@@ -6,9 +6,11 @@
 
 This project is a starter template for an automated egg grading system using Convolutional Neural Networks (CNNs), YOLO object detection, and OpenCV. It targets multi-criterion grading: quality, sizing, and damage detection.
 
-> **Current beta status:** cleanliness is not implemented, so final grades are
-> `N/A`. The API exposes `provisional_grade` from damage and size only. Physical
-> size/weight calibration and the 0-egg/0-5 tray camera gate are not validated.
+> **Current beta status:** a Clean/Stained checkpoint exists, but it was trained
+> on weak web/stock crops and is **not release-approved**. Final grades now use
+> its prediction when the checkpoint loads; treat them as beta until physical
+> cleanliness validation is complete. Physical size/weight calibration and the
+> 0-egg/0-5 tray camera gate remain unvalidated.
 
 ## Features
 - Modular data loading and image preprocessing (OpenCV)
@@ -17,7 +19,7 @@ This project is a starter template for an automated egg grading system using Con
 - Static tray image grading through the FastAPI backend
 - Camera calibration hooks for size/weight measurements (not yet validated)
 - Per-egg CSV export with canonical grading fields
-- Provisional grading while cleanliness is unavailable
+- Provisional grading from damage and size; final grade requires cleanliness
 - Clearly separated training and inference scripts
 - Easy expansion for new grading criteria
 
@@ -372,12 +374,12 @@ The report includes `k`, a 95% interval, R², MAE, RMSE, signed error, and the
 
 Every per-egg result now carries:
 
-- `grade`: final grade; `N/A` while cleanliness is unavailable.
+- `grade`: final grade; `N/A` unless damage, cleanliness, and size all pass.
 - `provisional_grade`: damage+size decision (`A/B/C/Reject/N/A`); not final.
 - `size`: canonical `Small/Medium/Large/Unknown`.
 - `damage_status`, `cleanliness_status`.
 - `confidence`: nested `detection`, `damage`, `cleanliness`.
-  `cleanliness_status=Unavailable` until a cleanliness checkpoint is present.
+  `cleanliness_status=Unavailable` only when the checkpoint cannot be loaded.
 - `geometry`: nested `length_mm`, `breadth_mm`, `quality`.
 - `requires_review`, `review_reason`.
 - `model_versions`: nested detector/damage/cleanliness/calibration versions.
@@ -428,6 +430,30 @@ python src/apply_cleanliness_review.py --dry-run
 python src/apply_cleanliness_review.py
 ```
 
+### Evaluate Cleanliness and Select Threshold
+
+Select the stain threshold on validation only, then evaluate the untouched test
+split at that fixed threshold:
+
+```bash
+python src/evaluate_cleanliness.py \
+    --valid-labels data/cleanliness_candidates/manifests/valid.csv \
+    --test-labels data/cleanliness_candidates/manifests/test.csv \
+    --checkpoint models/egg_grader_cleanliness_v1.pth \
+    --image-root . \
+    --target-stained-recall 0.98 \
+    --output reports/cleanliness_crop_resnet18_v1_eval.json \
+    --errors-output reports/cleanliness_crop_resnet18_v1_eval_errors.csv
+```
+
+The report includes the validation threshold sweep, selected threshold,
+confusion matrix, stained/clean recall, macro F1, specificity, and expected
+calibration error. Current committed checkpoint at the validation-selected
+`0.04` threshold: validation balanced accuracy `0.9781`, stained recall `0.9800`;
+test balanced accuracy `0.9779`, stained recall `0.9796`, one false positive and
+one false negative. The two test errors look like label-noise/hard cases; inspect
+them before changing labels.
+
 ### Analyze Results
 ```bash
 python3 -c "
@@ -457,6 +483,9 @@ Runtime settings come from environment variables / `.env` and are defined in
 
 - `CONFIDENCE_THRESHOLD` — YOLO detections (default: 0.75)
 - `DAMAGE_DECISION_THRESHOLD` — damage classifier (default: 0.18)
+- `CLEANLINESS_DECISION_THRESHOLD` — stain threshold (default: 0.04,
+  validation-selected for the current checkpoint at a 0.98 recall floor)
+- `CLEANLINESS_REVIEW_THRESHOLD` — clean-confidence review threshold (default: 0.75)
 - `MAX_TRAY_EGGS` — static-tray capacity (default: 5)
 - `DETECTION_DUPLICATE_IOU` — duplicate suppression (default: 0.85)
 - `MM_PER_PIXEL`, `WEIGHT_K`, `CALIBRATION_VERSION` — measurement calibration
