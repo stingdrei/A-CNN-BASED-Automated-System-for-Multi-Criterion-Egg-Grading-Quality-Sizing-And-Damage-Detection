@@ -10,11 +10,6 @@ from src.build_cleanliness_dataset import (
     filter_rows,
     split_clusters,
 )
-from src.build_cleanliness_dataset import (
-    cluster_images,
-    filter_rows,
-    split_clusters,
-)
 
 
 def row(source="a.jpg", stock="", weak="0", width="100", height="100"):

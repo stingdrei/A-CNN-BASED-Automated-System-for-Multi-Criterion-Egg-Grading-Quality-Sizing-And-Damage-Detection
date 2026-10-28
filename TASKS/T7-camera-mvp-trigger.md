@@ -51,6 +51,21 @@ Reports committed under `reports/`, evaluated once on a frozen egg-level set:
       false-accept rate <= 1%.
 - [ ] 0-egg and 5-egg trays explicitly tested.
 
+### Physical tray evidence command
+
+```bash
+python src/validate_physical_trays.py \
+  --images data/physical_trays \
+  --expectations data/physical_tray_expectations.csv \
+  --output reports/physical_tray_validation.json \
+  --csv reports/physical_tray_validation.csv \
+  --fail-on-gate
+```
+
+Expectations CSV: `filename,expected_count,notes`. The tool requires at least
+one 0-egg and one 5-egg tray, exact count accuracy `>=0.95`, false positives
+`<=0.10/tray`, and missed eggs `<=0.02/tray`.
+
 ### 4. "90%+ done" is defined by the gates, not a vibe
 Treat "model is 90%+ done" as: **sections 1–3 all checked**, plus:
 - [ ] Every model has a frozen test report and reproducible checkpoint.

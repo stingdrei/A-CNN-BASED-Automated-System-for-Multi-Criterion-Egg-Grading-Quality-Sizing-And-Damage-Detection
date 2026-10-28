@@ -325,6 +325,33 @@ or `localhost`.
 The browser-camera MVP is implemented but not release-approved: the physical
 0-egg/0-5 tray checks and the cleanliness/size/weight gates remain open.
 
+### Physical Tray Release Check
+
+Capture physical 0-egg and 5-egg trays under production lighting. Record the
+expected count per image:
+
+```csv
+filename,expected_count,notes
+0_egg_tray.jpg,0,empty tray
+5_egg_tray.jpg,5,full tray
+```
+
+Run the production detector without training:
+
+```bash
+python src/validate_physical_trays.py \
+    --images data/physical_trays \
+    --expectations data/physical_tray_expectations.csv \
+    --output reports/physical_tray_validation.json \
+    --csv reports/physical_tray_validation.csv \
+    --fail-on-gate
+```
+
+The report requires at least one 0-egg and one 5-egg tray, exact count accuracy
+`>= 0.95`, false positives `<= 0.10/tray`, and missed eggs `<= 0.02/tray`.
+This checks detector counts only; damage, cleanliness, size, and weight still
+need their own evidence.
+
 ### Weight Calibration
 
 Fit `W = k × L × B²` from weighed eggs after collecting a CSV with
@@ -338,7 +365,8 @@ python src/calibrate_weight.py \
 
 The report includes `k`, a 95% interval, R², MAE, RMSE, signed error, and the
 ±3 g rate. The backend keeps `WEIGHT_K=0.0` until a fit is accepted; set
-`WEIGHT_K` and `CALIBRATION_VERSION` to activate it.
+`WEIGHT_K` and `CALIBRATION_VERSION` to activate it. The CSV template is
+`data/weight_calibration.example.csv`; use at least 30 eggs for release.
 
 ### Provisional Grading Contract
 
@@ -371,6 +399,34 @@ Set `EGG_CSV_PATH` to override it. The schema is defined in
 The camera window shows YOLO detections and the current egg count. Press `q` or
 `Esc` to stop. Use `--camera 1` if the default camera is unavailable. This is a
 detector-only demonstration; it does not save predictions or run the API.
+
+### Freeze Manifests
+
+Freeze split definitions and check cross-split leakage before evaluation:
+
+```bash
+python src/freeze_manifests.py \
+    --manifest data/cleanliness_candidates/manifests/train.csv \
+    --manifest data/cleanliness_candidates/manifests/valid.csv \
+    --manifest data/cleanliness_candidates/manifests/test.csv \
+    --output reports/cleanliness_manifest_freeze.json
+```
+
+### Cleanliness Crop Review
+
+Generate contact sheets and an editable review CSV:
+
+```bash
+python src/make_cleanliness_review.py
+```
+
+Change `decision` to `exclude` for watermarked, ambiguous, or mislabeled crops,
+then apply:
+
+```bash
+python src/apply_cleanliness_review.py --dry-run
+python src/apply_cleanliness_review.py
+```
 
 ### Analyze Results
 ```bash

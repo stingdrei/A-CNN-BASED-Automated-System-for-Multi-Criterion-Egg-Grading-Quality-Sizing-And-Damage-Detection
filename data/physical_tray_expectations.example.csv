@@ -1,0 +1,4 @@
+filename,expected_count,notes
+0_egg_tray.jpg,0,empty tray
+1_egg_tray.jpg,1,one egg
+5_egg_tray.jpg,5,full tray
