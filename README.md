@@ -41,8 +41,8 @@ This project is a starter template for an automated egg grading system using Con
 ```
 
 ### Folder Descriptions
-- `backend/`: authenticated API, persistence, inference orchestration.
-- `frontend/`: upload/camera, result, history, and dashboard UI.
+- `backend/`: auth-free MVP API, persistence, inference orchestration.
+- `frontend/`: single-page live camera inspection dashboard.
 - `src/`: reusable model/training/evaluation code.
 - `data/`: source data, generated crops, detector datasets, manifests.
 - `models/`: model cards, checkpoints, and checksums.
@@ -81,12 +81,10 @@ Copy `.env.example` to `.env` and set the deployment values. Never commit
 
 ```bash
 cp .env.example .env
-openssl rand -hex 32   # use this value for SECRET_KEY
 ```
 
 Required before `ENVIRONMENT=production` will start:
 
-- unique `SECRET_KEY` of at least 32 characters;
 - `DEBUG=false`;
 - explicit `CORS_ORIGINS`, never `*`;
 - non-local `DATABASE_URL`.
@@ -97,12 +95,13 @@ Example:
 ENVIRONMENT=production
 DEBUG=false
 DATABASE_URL=postgresql://eggs:password@db.example/eggs
-SECRET_KEY=<64-hex-character-value>
 CORS_ORIGINS=https://eggs.example
 ```
 
-Run behind HTTPS. The backend rejects video uploads and only accepts static
-images (`jpg`, `jpeg`, `png`, `webp`, `bmp`) with a configurable size limit.
+The MVP has no authentication; deploy it only on a trusted network or behind
+an external access gateway. Run behind HTTPS. The backend rejects video uploads
+and only accepts static images (`jpg`, `jpeg`, `png`, `webp`, `bmp`) with a
+configurable size limit.
 
 ## Usage
 
@@ -314,15 +313,15 @@ The `data/detection/data.yaml` uses repository-relative paths and
 ```
 
 The compatibility routes `POST /api/v1/grade`, `GET /api/v1/records`, and
-`GET /api/v1/stats` map to the same authenticated operations.
+`GET /api/v1/stats` map to the same auth-free operations.
 
 ### Browser Camera Capture
 
-The upload page supports a one-shot camera mode at
-`/upload?mode=camera`. It requests the rear camera, shows a live preview, and
-posts one JPEG frame when **Capture & Analyze** is pressed. The result page has
-a **Next Tray** button that returns to the camera. Camera access requires HTTPS
-or `localhost`.
+The dashboard is a single-page live inspection station. It requests the rear
+camera, shows a live viewfinder, and posts one JPEG frame when **Capture Frame**
+is pressed (or `Spacebar`). Results render as per-egg cards with grade, size,
+damage, cleanliness, and review flags. An **Upload Image** fallback is available
+when no camera is present. Camera access requires HTTPS or `localhost`.
 
 The browser-camera MVP is implemented but not release-approved: the physical
 0-egg/0-5 tray checks and the cleanliness/size/weight gates remain open.

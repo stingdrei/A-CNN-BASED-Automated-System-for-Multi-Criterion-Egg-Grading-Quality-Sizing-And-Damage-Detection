@@ -4,8 +4,8 @@ from sqlalchemy import func, select, text
 
 from app.database import get_db
 from app.models import User, Prediction, DetectionBox
+from app.operator import get_operator
 from app.schemas import DashboardStats, HealthResponse, GradeDistribution
-from app.security import get_current_user
 from app.ml.model_registry import model_registry
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -14,33 +14,33 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 @router.get("/stats", response_model=DashboardStats)
 def get_dashboard_stats(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
-    total = db.query(Prediction).filter(Prediction.user_id == current_user.id).count()
+    total = db.query(Prediction).filter(Prediction.user_id == operator.id).count()
     total_images = db.query(Prediction).filter(
-        Prediction.user_id == current_user.id,
+        Prediction.user_id == operator.id,
         Prediction.file_type == "image"
     ).count()
     total_detections = db.query(func.sum(Prediction.total_detections)).filter(
-        Prediction.user_id == current_user.id
+        Prediction.user_id == operator.id
     ).scalar() or 0
     
     damaged = db.query(func.sum(Prediction.damaged_count)).filter(
-        Prediction.user_id == current_user.id
+        Prediction.user_id == operator.id
     ).scalar() or 0
     not_damaged = db.query(func.sum(Prediction.not_damaged_count)).filter(
-        Prediction.user_id == current_user.id
+        Prediction.user_id == operator.id
     ).scalar() or 0
     
     damaged_percentage = (damaged / total_detections * 100) if total_detections > 0 else 0
     
     avg_time = db.query(func.avg(Prediction.processing_time_ms)).filter(
-        Prediction.user_id == current_user.id,
+        Prediction.user_id == operator.id,
         Prediction.status == "completed"
     ).scalar() or 0
     
     recent = db.query(Prediction).filter(
-        Prediction.user_id == current_user.id
+        Prediction.user_id == operator.id
     ).order_by(
         Prediction.created_at.desc()
     ).limit(5).all()
@@ -84,10 +84,10 @@ def health_check():
 @router.get("/grades", response_model=GradeDistribution)
 def get_grade_distribution(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
     prediction_ids = select(Prediction.id).where(
-        Prediction.user_id == current_user.id
+        Prediction.user_id == operator.id
     )
     
     grade_counts = db.query(

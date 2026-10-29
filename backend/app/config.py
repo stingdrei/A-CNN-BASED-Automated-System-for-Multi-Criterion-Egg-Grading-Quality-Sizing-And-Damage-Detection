@@ -8,9 +8,6 @@ from pydantic_settings import BaseSettings
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
-DEFAULT_DEV_SECRET = "your-secret-key-change-in-production-min-32-chars-long"
-
-
 class Settings(BaseSettings):
     APP_NAME: str = "Egg-CV API"
     ENVIRONMENT: str = "development"
@@ -19,9 +16,6 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql://wii@localhost/eggcvdatabase"
 
-    SECRET_KEY: str = DEFAULT_DEV_SECRET
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     CORS_ORIGINS: str = (
         "http://localhost:5173,http://localhost:3000,http://localhost:5174"
     )
@@ -67,11 +61,6 @@ class Settings(BaseSettings):
     def validate_production_security(self):
         if self.ENVIRONMENT != "production":
             return self
-        if self.SECRET_KEY == DEFAULT_DEV_SECRET or len(self.SECRET_KEY) < 32:
-            raise ValueError(
-                "SECRET_KEY must be set to a unique value of at least 32 "
-                "characters in production"
-            )
         if self.DEBUG:
             raise ValueError("DEBUG must be false in production")
         if "*" in self.cors_origins:

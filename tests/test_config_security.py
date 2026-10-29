@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
-from app.config import DEFAULT_DEV_SECRET, Settings
+from app.config import Settings
 
 
 def production_settings(**overrides):
@@ -14,7 +14,6 @@ def production_settings(**overrides):
         "_env_file": None,
         "ENVIRONMENT": "production",
         "DEBUG": False,
-        "SECRET_KEY": "a" * 32,
         "DATABASE_URL": "postgresql://eggs:secret@db.example/eggs",
         "CORS_ORIGINS": "https://eggs.example",
     }
@@ -26,14 +25,6 @@ class ConfigSecurityTests(unittest.TestCase):
     def test_production_accepts_hardened_settings(self):
         settings = production_settings()
         self.assertEqual(settings.cors_origins, ["https://eggs.example"])
-
-    def test_production_rejects_default_secret(self):
-        with self.assertRaises(ValidationError):
-            production_settings(SECRET_KEY=DEFAULT_DEV_SECRET)
-
-    def test_production_rejects_short_secret(self):
-        with self.assertRaises(ValidationError):
-            production_settings(SECRET_KEY="short")
 
     def test_production_rejects_debug(self):
         with self.assertRaises(ValidationError):

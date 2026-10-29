@@ -1,20 +1,12 @@
-export interface User {
-  id: number;
-  email: string;
-  username: string;
-  created_at: string;
-  is_active: boolean;
-}
-
-export interface Token {
-  access_token: string;
-  token_type: string;
-}
-
 export type Grade = 'A' | 'B' | 'C' | 'N/A' | 'Reject';
 export type Size = 'Small' | 'Medium' | 'Large' | 'Unknown';
 export type DamageStatus = 'Damaged' | 'Not Damaged' | 'Needs Review';
-export type CleanlinessStatus = 'Clean' | 'Stained' | 'Needs Review' | 'Unavailable' | 'Unknown';
+export type CleanlinessStatus =
+  | 'Clean'
+  | 'Stained'
+  | 'Needs Review'
+  | 'Unavailable'
+  | 'Unknown';
 
 export interface EggConfidence {
   detection: number;
@@ -89,7 +81,6 @@ export interface DashboardStats {
   damaged_percentage: number;
   avg_processing_time_ms: number;
   recent_predictions: Prediction[];
-  grade_distribution?: GradeDistribution;
 }
 
 export interface HealthStatus {
@@ -111,4 +102,11 @@ export interface GradeDistribution {
 
 export interface UserSettings {
   mm_per_pixel: number;
+}
+
+export interface CapturedFrame {
+  file: File;
+  dataUrl: string;
+  width: number;
+  height: number;
 }

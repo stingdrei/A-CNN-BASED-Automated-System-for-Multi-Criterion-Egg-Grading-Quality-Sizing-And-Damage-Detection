@@ -5,8 +5,8 @@ from typing import List
 
 from app.database import get_db
 from app.models import User, Prediction
+from app.operator import get_operator
 from app.schemas import PredictionResponse, PredictionDetail
-from app.security import get_current_user
 from app.services.file_service import file_service
 from app.services.prediction_service import prediction_service
 from app.ml.model_registry import model_registry
@@ -21,7 +21,7 @@ async def upload_file(
     confidence_threshold: float = Query(0.75, ge=0.1, le=0.99),
     save_annotated: bool = Query(True),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
     if not file_service.is_allowed_file(file.filename):
         raise HTTPException(
@@ -33,11 +33,11 @@ async def upload_file(
         file_path, file_type = file_service.save_file_sync(file)
         prediction = prediction_service.create_prediction(
             db,
-            current_user.id,
+            operator.id,
             file.filename,
             file_path,
             file_type,
-            operator=current_user.username,
+            operator=operator.username,
         )
         if (
             not model_registry.detector_loaded
@@ -47,7 +47,7 @@ async def upload_file(
         ):
             raise RuntimeError("Required prediction models are not available")
         model_registry.detector.confidence = confidence_threshold
-        model_registry.detector.mm_per_pixel = current_user.mm_per_pixel
+        model_registry.detector.mm_per_pixel = operator.mm_per_pixel
         cleanliness_classifier = (
             model_registry.cleanliness
             if model_registry.cleanliness_loaded
@@ -88,19 +88,19 @@ def get_predictions(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
-    return prediction_service.get_predictions(db, current_user.id, skip, limit)
+    return prediction_service.get_predictions(db, operator.id, skip, limit)
 
 
 @router.get("/{prediction_id}", response_model=PredictionDetail)
 def get_prediction(
     prediction_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
     prediction = prediction_service.get_prediction_detail(
-        db, prediction_id, current_user.id
+        db, prediction_id, operator.id
     )
     if not prediction:
         raise HTTPException(
@@ -114,10 +114,10 @@ def get_prediction(
 def delete_prediction(
     prediction_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
     success = prediction_service.delete_prediction(
-        db, prediction_id, current_user.id
+        db, prediction_id, operator.id
     )
     if not success:
         raise HTTPException(
@@ -131,10 +131,10 @@ def delete_prediction(
 def download_annotated(
     prediction_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    operator: User = Depends(get_operator)
 ):
     prediction = prediction_service.get_prediction_detail(
-        db, prediction_id, current_user.id
+        db, prediction_id, operator.id
     )
     if not prediction:
         raise HTTPException(

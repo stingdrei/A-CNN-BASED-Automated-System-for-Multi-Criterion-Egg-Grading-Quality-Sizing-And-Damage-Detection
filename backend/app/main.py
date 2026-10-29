@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-from app.config import DEFAULT_DEV_SECRET, settings
+from app.config import settings
 from app.database import engine, Base
-from app.routers import auth, compat, predictions, dashboard, user_settings
+from app.routers import compat, predictions, dashboard, user_settings
 from app.ml.model_registry import model_registry
 
 model_loaded = False
@@ -27,8 +27,6 @@ async def lifespan(app: FastAPI):
 
     if settings.ENVIRONMENT != "production":
         Base.metadata.create_all(bind=engine)
-        if settings.SECRET_KEY == DEFAULT_DEV_SECRET:
-            print("WARNING: using the development SECRET_KEY")
     yield
 
 
@@ -49,7 +47,6 @@ app.add_middleware(
 # Serve uploaded files statically
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-app.include_router(auth.router, prefix="/api/v1/auth")
 app.include_router(predictions.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(user_settings.router, prefix="/api/v1")

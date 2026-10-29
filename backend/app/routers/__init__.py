@@ -1,1 +1,1 @@
-from app.routers import auth, predictions, dashboard
+from app.routers import compat, dashboard, predictions, user_settings

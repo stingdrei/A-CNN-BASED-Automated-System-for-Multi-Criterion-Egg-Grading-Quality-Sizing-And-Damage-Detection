@@ -1,38 +1,6 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from typing import Optional, List
 from datetime import datetime
-
-
-class UserBase(BaseModel):
-    email: EmailStr
-    username: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class UserResponse(UserBase):
-    id: int
-    created_at: datetime
-    is_active: bool
-
-    class Config:
-        from_attributes = True
-
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
-class TokenData(BaseModel):
-    user_id: Optional[int] = None
 
 
 ALLOWED_GRADES = {"A", "B", "C", "N/A", "Reject"}

@@ -70,7 +70,7 @@ class DashboardContractTests(unittest.TestCase):
             self._box(prediction.id, grade)
         self.db.commit()
 
-        result = get_grade_distribution(db=self.db, current_user=self.user)
+        result = get_grade_distribution(db=self.db, operator=self.user)
 
         self.assertEqual(result.grade_a, 3)
         self.assertEqual(result.grade_b, 1)
@@ -95,7 +95,7 @@ class DashboardContractTests(unittest.TestCase):
         self._box(foreign.id, "Reject")
         self.db.commit()
 
-        result = get_grade_distribution(db=self.db, current_user=self.user)
+        result = get_grade_distribution(db=self.db, operator=self.user)
 
         self.assertEqual(result.grade_a, 1)
         self.assertEqual(result.grade_reject, 0)
