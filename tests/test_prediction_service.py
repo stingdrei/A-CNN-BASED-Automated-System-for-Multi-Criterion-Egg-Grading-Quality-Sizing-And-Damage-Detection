@@ -22,8 +22,12 @@ from app.services.prediction_service import PredictionService
 class FakePredictor:
     def __init__(self):
         self.confidence = 0.75
+        self.calls = []
 
-    def predict_image(self, image_path):
+    def predict_image(self, image_path, confidence=None, mm_per_pixel=None):
+        self.calls.append(
+            {"confidence": confidence, "mm_per_pixel": mm_per_pixel}
+        )
         return {
             "detections": [
                 {
@@ -54,8 +58,8 @@ class FakePredictor:
 
 
 class OverCapacityPredictor(FakePredictor):
-    def predict_image(self, image_path):
-        result = super().predict_image(image_path)
+    def predict_image(self, image_path, confidence=None, mm_per_pixel=None):
+        result = super().predict_image(image_path, confidence, mm_per_pixel)
         result.update(
             max_eggs=5,
             count_valid=False,
@@ -68,8 +72,12 @@ class OverCapacityPredictor(FakePredictor):
 class EmptyPredictor:
     def __init__(self):
         self.confidence = 0.75
+        self.calls = []
 
-    def predict_image(self, image_path):
+    def predict_image(self, image_path, confidence=None, mm_per_pixel=None):
+        self.calls.append(
+            {"confidence": confidence, "mm_per_pixel": mm_per_pixel}
+        )
         return {
             "detections": [],
             "total": 0,
@@ -233,6 +241,33 @@ class PredictionServiceTests(unittest.TestCase):
             "tray_over_capacity",
             prediction.detection_boxes[0].review_reason,
         )
+
+    def test_run_prediction_forwards_request_scoped_calibration(self):
+        predictor = FakePredictor()
+        service = PredictionService(predictor, FakeDamage())
+        prediction = service.create_prediction(
+            self.db,
+            self.user.id,
+            "tray.jpg",
+            str(self.image_path),
+            "image",
+        )
+
+        with patch("app.services.prediction_service.append_prediction"):
+            service.run_prediction(
+                self.db,
+                prediction.id,
+                0.91,
+                False,
+                mm_per_pixel=0.2,
+            )
+
+        self.assertEqual(
+            predictor.calls,
+            [{"confidence": 0.91, "mm_per_pixel": 0.2}],
+        )
+        # Per-request settings must never leak into the shared predictor.
+        self.assertEqual(predictor.confidence, 0.75)
 
     def test_completed_prediction_persists_provisional_contract(self):
         service = PredictionService(FakePredictor(), FakeDamage())

@@ -1,4 +1,5 @@
 import os
+import threading
 import numpy as np
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -37,6 +38,10 @@ class YOLOPredictor:
             raise ValueError("duplicate_iou must be in (0, 1]")
         self.class_names = ["egg"]
         self._model = None
+        # Ultralytics predictors keep internal state; serialize model calls so
+        # concurrent inspections cannot corrupt each other. Per-request
+        # thresholds and calibration are passed as arguments, never stored.
+        self._inference_lock = threading.Lock()
 
     @property
     def model_version(self) -> str:
@@ -69,24 +74,54 @@ class YOLOPredictor:
             print(f"Error loading model: {e}")
             return False
 
-    def predict_image(self, image_path: str) -> Dict[str, Any]:
-        results = self.model(image_path, conf=self.confidence)
-        return self._parse_results(results[0])
+    def predict_image(
+        self,
+        image_path: str,
+        confidence: Optional[float] = None,
+        mm_per_pixel: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        effective_confidence = (
+            self.confidence if confidence is None else confidence
+        )
+        with self._inference_lock:
+            results = self.model(image_path, conf=effective_confidence)
+        return self._parse_results(results[0], mm_per_pixel=mm_per_pixel)
 
-    def predict_frame(self, frame: np.ndarray) -> Dict[str, Any]:
+    def predict_frame(
+        self,
+        frame: np.ndarray,
+        confidence: Optional[float] = None,
+        mm_per_pixel: Optional[float] = None,
+    ) -> Dict[str, Any]:
         if frame is None or frame.size == 0:
             raise ValueError("Image frame is empty")
-        results = self.model(frame, conf=self.confidence)
-        return self._parse_results(results[0])
+        effective_confidence = (
+            self.confidence if confidence is None else confidence
+        )
+        with self._inference_lock:
+            results = self.model(frame, conf=effective_confidence)
+        return self._parse_results(results[0], mm_per_pixel=mm_per_pixel)
 
-    def predict_bytes(self, image_bytes: bytes) -> Dict[str, Any]:
+    def predict_bytes(
+        self,
+        image_bytes: bytes,
+        confidence: Optional[float] = None,
+        mm_per_pixel: Optional[float] = None,
+    ) -> Dict[str, Any]:
         nparr = np.frombuffer(image_bytes, np.uint8)
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if frame is None:
             raise ValueError("Could not decode image bytes")
-        return self.predict_frame(frame)
+        return self.predict_frame(
+            frame, confidence=confidence, mm_per_pixel=mm_per_pixel
+        )
 
-    def _parse_results(self, result) -> Dict[str, Any]:
+    def _parse_results(
+        self, result, mm_per_pixel: Optional[float] = None
+    ) -> Dict[str, Any]:
+        effective_mm_per_pixel = (
+            self.mm_per_pixel if mm_per_pixel is None else mm_per_pixel
+        )
         detections = []
         duplicate_boxes_removed = 0
         boxes = result.boxes
@@ -115,7 +150,9 @@ class YOLOPredictor:
 
             for egg_id, candidate in enumerate(candidates, start=1):
                 x1, y1, x2, y2 = candidate["bbox"]
-                geometry = bbox_geometry(x2 - x1, y2 - y1, self.mm_per_pixel)
+                geometry = bbox_geometry(
+                    x2 - x1, y2 - y1, effective_mm_per_pixel
+                )
                 if geometry is None:
                     size_cat = "Unknown"
                     length_mm = None

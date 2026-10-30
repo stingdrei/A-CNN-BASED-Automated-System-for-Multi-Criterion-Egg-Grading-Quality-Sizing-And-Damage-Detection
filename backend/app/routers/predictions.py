@@ -16,7 +16,7 @@ router = APIRouter(prefix="/predictions", tags=["predictions"])
 
 
 @router.post("/upload", response_model=PredictionDetail)
-async def upload_file(
+def upload_file(
     file: UploadFile = File(...),
     confidence_threshold: float = Query(0.75, ge=0.1, le=0.99),
     save_annotated: bool = Query(True),
@@ -46,8 +46,6 @@ async def upload_file(
             or model_registry.damage is None
         ):
             raise RuntimeError("Required prediction models are not available")
-        model_registry.detector.confidence = confidence_threshold
-        model_registry.detector.mm_per_pixel = operator.mm_per_pixel
         cleanliness_classifier = (
             model_registry.cleanliness
             if model_registry.cleanliness_loaded
@@ -59,7 +57,11 @@ async def upload_file(
             cleanliness_classifier,
         )
         prediction = pred_service.run_prediction(
-            db, prediction.id, confidence_threshold, save_annotated
+            db,
+            prediction.id,
+            confidence_threshold,
+            save_annotated,
+            mm_per_pixel=operator.mm_per_pixel,
         )
     except ValueError as e:
         if "file_path" in locals():

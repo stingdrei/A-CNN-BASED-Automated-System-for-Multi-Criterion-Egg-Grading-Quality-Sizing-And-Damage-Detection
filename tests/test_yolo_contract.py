@@ -106,6 +106,19 @@ class YoloContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             YOLOPredictor(model_path="dummy.pt", duplicate_iou=1.5)
 
+    def test_parse_results_accepts_request_scoped_mm_per_pixel(self):
+        predictor = YOLOPredictor(
+            model_path="dummy.pt", mm_per_pixel=0.09, weight_k=0.0
+        )
+        result = predictor._parse_results(
+            SimpleNamespace(boxes=FakeBoxes()), mm_per_pixel=0.5
+        )
+        first = result["detections"][0]
+        self.assertAlmostEqual(first["length_mm"], 50.0)
+        self.assertAlmostEqual(first["breadth_mm"], 25.0)
+        # Override is per call and must not mutate the shared default.
+        self.assertEqual(predictor.mm_per_pixel, 0.09)
+
     def test_duplicate_boxes_are_removed_before_counting(self):
         predictor = YOLOPredictor(model_path="dummy.pt", duplicate_iou=0.85)
         result = predictor._parse_results(

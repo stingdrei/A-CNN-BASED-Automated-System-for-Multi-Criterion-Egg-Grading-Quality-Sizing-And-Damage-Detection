@@ -62,6 +62,7 @@ class PredictionService:
         prediction_id: int,
         confidence: float,
         save_annotated: bool,
+        mm_per_pixel: Optional[float] = None,
     ) -> Prediction:
         start_time = time.time()
 
@@ -69,7 +70,6 @@ class PredictionService:
         if not prediction:
             raise ValueError("Prediction not found")
 
-        self.predictor.confidence = confidence
         img = None
 
         try:
@@ -79,7 +79,11 @@ class PredictionService:
             img = cv2.imread(prediction.file_path)
             if img is None:
                 raise ValueError("Uploaded image could not be decoded")
-            result = self.predictor.predict_image(prediction.file_path)
+            result = self.predictor.predict_image(
+                prediction.file_path,
+                confidence=confidence,
+                mm_per_pixel=mm_per_pixel,
+            )
             if self.damage_classifier is None:
                 raise RuntimeError("Damage classifier is not configured")
             damage_review_threshold = getattr(

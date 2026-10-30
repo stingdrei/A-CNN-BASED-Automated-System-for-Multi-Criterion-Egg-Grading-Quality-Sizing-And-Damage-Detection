@@ -1,4 +1,5 @@
 import sys
+import inspect
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -84,6 +85,11 @@ class ApiContractTests(unittest.TestCase):
         self.assertIn(("/api/v1/grade", "POST"), routes)
         self.assertIn(("/api/v1/records", "GET"), routes)
         self.assertIn(("/api/v1/stats", "GET"), routes)
+
+    def test_upload_runs_in_threadpool_not_on_event_loop(self):
+        from app.routers.predictions import upload_file
+
+        self.assertFalse(inspect.iscoroutinefunction(upload_file))
 
     def test_legacy_aa_grade_normalizes_to_a(self):
         box = SimpleNamespace(

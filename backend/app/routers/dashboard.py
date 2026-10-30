@@ -56,10 +56,9 @@ def get_dashboard_stats(
 
 
 @router.get("/health", response_model=HealthResponse)
-def health_check():
+def health_check(db: Session = Depends(get_db)):
     database_connected = False
     try:
-        db = next(get_db())
         db.execute(text("SELECT 1"))
         database_connected = True
     except Exception:
