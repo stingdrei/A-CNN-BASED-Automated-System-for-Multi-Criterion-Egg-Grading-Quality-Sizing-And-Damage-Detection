@@ -7,7 +7,12 @@ from types import SimpleNamespace
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from app.main import app
-from app.schemas import DetectionBoxResponse, GradeDistribution, HealthResponse
+from app.schemas import (
+    DetectionBoxResponse,
+    GradeDistribution,
+    HealthResponse,
+    UserSettingsUpdate,
+)
 
 
 class ApiContractTests(unittest.TestCase):
@@ -90,6 +95,16 @@ class ApiContractTests(unittest.TestCase):
         from app.routers.predictions import upload_file
 
         self.assertFalse(inspect.iscoroutinefunction(upload_file))
+
+    def test_settings_reject_non_positive_mm_per_pixel(self):
+        from pydantic import ValidationError
+
+        for invalid in (0, -0.09):
+            with self.assertRaises(ValidationError):
+                UserSettingsUpdate(mm_per_pixel=invalid)
+        self.assertEqual(
+            UserSettingsUpdate(mm_per_pixel=0.09).mm_per_pixel, 0.09
+        )
 
     def test_legacy_aa_grade_normalizes_to_a(self):
         box = SimpleNamespace(

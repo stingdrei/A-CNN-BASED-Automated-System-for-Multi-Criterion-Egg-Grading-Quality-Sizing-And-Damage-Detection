@@ -17,6 +17,16 @@ export function ResultsPanel({ result, crops }: ResultsPanelProps) {
   const processingTime = result?.processing_time_ms
     ? `${(result.processing_time_ms / 1000).toFixed(2)}s`
     : '—';
+  const metadata = (result?.inference_metadata ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const cleanlinessApproved =
+    metadata.cleanliness_release_approved === true;
+  const calibrationReady =
+    metadata.calibration_version !== 'uncalibrated' &&
+    metadata.size_calibrated === true &&
+    metadata.weight_calibrated === true;
   const cardCount = Math.max(boxes.length, 5);
 
   return (
@@ -41,6 +51,22 @@ export function ResultsPanel({ result, crops }: ResultsPanelProps) {
           {result && result.needs_review_count > 0 && (
             <span className="rounded-full bg-amber-50 border border-amber-300 px-3 py-1 font-code-metric text-label-sm text-amber-800 font-bold">
               {result.needs_review_count} REVIEW
+            </span>
+          )}
+          {result && !cleanlinessApproved && (
+            <span
+              className="rounded-full bg-amber-50 border border-amber-300 px-3 py-1 font-code-metric text-label-sm text-amber-800 font-bold"
+              title="Cleanliness model has not passed physical release validation"
+            >
+              BETA · CLEANLINESS UNVALIDATED
+            </span>
+          )}
+          {result && !calibrationReady && (
+            <span
+              className="rounded-full bg-slate-100 border border-slate-300 px-3 py-1 font-code-metric text-label-sm text-slate-700 font-bold"
+              title="Size and weight require camera calibration"
+            >
+              SIZE/WEIGHT UNCALIBRATED
             </span>
           )}
         </div>

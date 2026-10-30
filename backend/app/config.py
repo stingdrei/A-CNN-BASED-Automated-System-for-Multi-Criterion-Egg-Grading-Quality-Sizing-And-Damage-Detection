@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # stained-recall floor. Re-select when replacing the checkpoint.
     CLEANLINESS_DECISION_THRESHOLD: float = 0.04
     CLEANLINESS_REVIEW_THRESHOLD: float = 0.75
+    # Set true only after physical validation and release sign-off. Until then
+    # the UI must surface cleanliness results as beta, never as final grades.
+    CLEANLINESS_RELEASE_APPROVED: bool = False
     DETECTION_CROP_PADDING: float = 0.1
     MIN_CROP_SIZE: int = 8
     MAX_TRAY_EGGS: int = 5

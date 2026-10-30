@@ -217,6 +217,11 @@ class PredictionServiceTests(unittest.TestCase):
             prediction.inference_metadata["damage_model_version"],
             "egg_grader.pth",
         )
+        self.assertFalse(prediction.inference_metadata["weight_calibrated"])
+        self.assertFalse(prediction.inference_metadata["size_calibrated"])
+        self.assertFalse(
+            prediction.inference_metadata["cleanliness_release_approved"]
+        )
         self.assertTrue(prediction.inference_metadata["tray_count_valid"])
         self.assertFalse(prediction.inference_metadata["tray_over_capacity"])
 
@@ -300,7 +305,8 @@ class PredictionServiceTests(unittest.TestCase):
         self.assertEqual(box.cleanliness_status, "Unavailable")
         self.assertTrue(box.requires_review)
         self.assertIn("cleanliness_unavailable", box.review_reason)
-        self.assertIn("size_uncalibrated", box.review_reason)
+        self.assertNotIn("weight_uncalibrated", box.review_reason)
+        self.assertNotIn("size_uncalibrated", box.review_reason)
 
         box_payload = DetectionBoxResponse.model_validate(box).model_dump()
         self.assertEqual(box_payload["confidence"]["detection"], 0.93)

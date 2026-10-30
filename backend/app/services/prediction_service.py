@@ -143,8 +143,8 @@ class PredictionService:
                     cleanliness_status=cleanliness_status,
                     cleanliness_confidence=cleanliness_confidence,
                     size=det.get("size"),
-                    geometry_quality=det.get("geometry_quality"),
                     weight_g=det.get("weight_g"),
+                    weight_calibrated=settings.WEIGHT_K > 0,
                     damage_review_reason=damage.review_reason,
                     tray_over_capacity=result.get("over_capacity", False),
                 )
@@ -276,6 +276,11 @@ class PredictionService:
             ),
             "cleanliness_model_version": cleanliness_model_version,
             "calibration_version": settings.CALIBRATION_VERSION,
+            "size_calibrated": settings.CALIBRATION_VERSION != "uncalibrated",
+            "weight_calibrated": settings.WEIGHT_K > 0,
+            "cleanliness_release_approved": (
+                settings.CLEANLINESS_RELEASE_APPROVED
+            ),
             "detection_threshold": confidence,
             "damage_decision_threshold": damage_threshold,
             "damage_review_threshold": damage_review,

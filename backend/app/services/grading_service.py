@@ -88,8 +88,8 @@ def collect_review_reasons(
     cleanliness_confidence: Optional[float] = None,
     cleanliness_threshold: float = 0.75,
     size: Optional[str],
-    geometry_quality: Optional[str],
     weight_g: Optional[float],
+    weight_calibrated: bool = False,
     damage_review_reason: Optional[str] = None,
     tray_over_capacity: bool = False,
 ) -> list[str]:
@@ -122,10 +122,10 @@ def collect_review_reasons(
 
     if normalize_size(size) == "Unknown":
         reasons.append("size_unknown")
-    elif geometry_quality == "bbox_fallback":
-        reasons.append("size_uncalibrated")
-    if weight_g is None:
-        reasons.append("weight_uncalibrated")
+    # Camera calibration is a tray-level configuration state surfaced in
+    # inference metadata and the UI, not a per-egg defect.
+    if weight_calibrated and weight_g is None:
+        reasons.append("weight_unavailable")
     if tray_over_capacity:
         reasons.append("tray_over_capacity")
 

@@ -101,21 +101,48 @@ class GradingServiceTests(unittest.TestCase):
             damage_threshold=0.75,
             cleanliness_status="Unavailable",
             size="Large",
-            geometry_quality="bbox_fallback",
             weight_g=None,
         )
         self.assertEqual(
             reasons,
             [
                 "cleanliness_unavailable",
-                "size_uncalibrated",
-                "weight_uncalibrated",
             ],
         )
         self.assertEqual(
             join_review_reasons(reasons),
-            "cleanliness_unavailable;size_uncalibrated;weight_uncalibrated",
+            "cleanliness_unavailable",
         )
+
+    def test_uncalibrated_weight_is_not_a_per_egg_review_reason(self):
+        reasons = collect_review_reasons(
+            detection_confidence=0.95,
+            detection_threshold=0.75,
+            damage_status="Not Damaged",
+            damage_confidence=0.90,
+            damage_threshold=0.75,
+            cleanliness_status="Clean",
+            cleanliness_confidence=0.95,
+            size="Large",
+            weight_g=None,
+            weight_calibrated=False,
+        )
+        self.assertEqual(reasons, [])
+
+    def test_missing_weight_after_calibration_requires_review(self):
+        reasons = collect_review_reasons(
+            detection_confidence=0.95,
+            detection_threshold=0.75,
+            damage_status="Not Damaged",
+            damage_confidence=0.90,
+            damage_threshold=0.75,
+            cleanliness_status="Clean",
+            cleanliness_confidence=0.95,
+            size="Large",
+            weight_g=None,
+            weight_calibrated=True,
+        )
+        self.assertEqual(reasons, ["weight_unavailable"])
 
     def test_low_damage_confidence_requires_review(self):
         reasons = collect_review_reasons(
@@ -127,7 +154,6 @@ class GradingServiceTests(unittest.TestCase):
             cleanliness_status="Clean",
             cleanliness_confidence=0.95,
             size="Large",
-            geometry_quality="ellipse_fit",
             weight_g=60.0,
         )
         self.assertEqual(reasons, ["low_damage_confidence"])

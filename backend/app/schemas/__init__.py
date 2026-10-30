@@ -202,14 +202,14 @@ class HealthResponse(BaseModel):
 
 
 class UserSettings(BaseModel):
-    mm_per_pixel: float = 0.5
+    mm_per_pixel: float = Field(gt=0, le=10)
 
     class Config:
         from_attributes = True
 
 
 class UserSettingsUpdate(BaseModel):
-    mm_per_pixel: float
+    mm_per_pixel: float = Field(gt=0, le=10)
 
 
 class GradeDistribution(BaseModel):
