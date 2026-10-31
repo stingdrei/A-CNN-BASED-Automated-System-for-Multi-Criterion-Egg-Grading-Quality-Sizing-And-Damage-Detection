@@ -1,0 +1,5 @@
+split,filename,true_label,predicted_label,stained_probability,outcome
+valid,data/cleanliness_candidates/crops/valid/Clean/jfif6_11zon_jpg.rf.9803e8e147978fe6865b4cd1157c1aaa__egg00182.jpg,Clean,Stained,0.06593741,false_positive
+valid,data/cleanliness_candidates/crops/valid/Stained/40_jpeg.rf.707d9a45b61f8f9c80ec584ce1b281fe__egg00139.jpg,Stained,Clean,0.00006071,false_negative
+test,data/cleanliness_candidates/crops/test/Clean/jfif17_11zon_jpg.rf.d26223009f98cddc4494d3039bab915e__egg00040.jpg,Clean,Stained,0.98561805,false_positive
+test,data/cleanliness_candidates/crops/test/Stained/48_jpeg.rf.7d0e160e2f00a9252067cb24a8d0530e__egg00164.jpg,Stained,Clean,0.00308075,false_negative
