@@ -179,6 +179,17 @@ class CleanlinessClassifier:
             return CleanlinessResult(
                 "Needs Review", 0.0, self.model_version, "invalid_crop"
             )
+        # If the crop is too small relative to the model's expected input size
+        # (224×224), resizing it will heavily upsample and produce unreliable
+        # predictions. Fall back to Needs Review rather than classify an undersized
+        # crop. The minimum crop area of ~2,500 px² (~5% of model input area) ensures
+        # the crop retains meaningful visual detail after resizing.
+        MIN_CROP_AREA = 2500
+        crop_area = crop.shape[0] * crop.shape[1]
+        if crop_area < MIN_CROP_AREA:
+            return CleanlinessResult(
+                "Needs Review", 0.0, self.model_version, "small_crop"
+            )
 
         self._ensure_model()
         if crop.ndim == 2:

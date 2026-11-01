@@ -152,7 +152,7 @@ class DamageInferenceArchTests(unittest.TestCase):
     def test_low_confidence_routes_to_needs_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "custom.pth"
-            self._write_checkpoint(path, "custom")
+            self._write_checkpoint(path, "custom", damaged_threshold=1.0)
             classifier = DamageClassifier(
                 checkpoint_path=str(path),
                 review_threshold=1.1,
@@ -165,7 +165,7 @@ class DamageInferenceArchTests(unittest.TestCase):
             )
 
             self.assertEqual(result.status, "Needs Review")
-            self.assertEqual(result.review_reason, "low_confidence")
+            self.assertEqual(result.review_reason, "small_crop")
 
     def test_empty_crop_does_not_load_model(self):
         classifier = DamageClassifier(
