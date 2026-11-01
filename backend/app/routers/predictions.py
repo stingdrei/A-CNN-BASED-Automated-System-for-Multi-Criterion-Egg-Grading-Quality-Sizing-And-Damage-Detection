@@ -64,7 +64,8 @@ def upload_file(
             mm_per_pixel=operator.mm_per_pixel,
         )
     except ValueError as e:
-        if "file_path" in locals():
+        # Only remove the upload when no prediction row references it.
+        if "file_path" in locals() and "prediction" not in locals():
             file_service.delete_file(file_path)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

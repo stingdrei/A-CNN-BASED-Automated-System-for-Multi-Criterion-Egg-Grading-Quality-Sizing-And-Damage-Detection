@@ -115,7 +115,7 @@ def collect_errors(
     device: torch.device = None,
 ):
     device = device or choose_device()
-    checkpoint_obj = torch.load(checkpoint, map_location=device, weights_only=False)
+    checkpoint_obj = torch.load(checkpoint, map_location=device, weights_only=True)
     config = resolve_checkpoint_config(checkpoint_obj, img_size, threshold)
     state_dict = checkpoint_obj.get("state_dict", checkpoint_obj)
 

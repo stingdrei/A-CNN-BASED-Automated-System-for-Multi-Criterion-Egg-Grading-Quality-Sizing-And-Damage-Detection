@@ -66,6 +66,10 @@ class PredictionService:
     ) -> Prediction:
         start_time = time.time()
 
+        # Only an explicit calibration version counts as calibrated; a manual
+        # mm_per_pixel override still needs the operator to bump the version.
+        size_calibrated = settings.CALIBRATION_VERSION != "uncalibrated"
+
         prediction = db.query(Prediction).filter(Prediction.id == prediction_id).first()
         if not prediction:
             raise ValueError("Prediction not found")
@@ -116,6 +120,13 @@ class PredictionService:
                 det["cleanliness_status"] = cleanliness_status
                 det["cleanliness_confidence"] = cleanliness_confidence
                 det["cleanliness_model_version"] = cleanliness_model_version
+                if not size_calibrated:
+                    # Geometry in millimetres is meaningless until the camera
+                    # is calibrated; drop it rather than publishing numbers.
+                    det["size"] = "Unknown"
+                    det["length_mm"] = None
+                    det["breadth_mm"] = None
+                    det["weight_g"] = None
                 det["requires_review"] = False
                 det["grade"] = calculate_grade(
                     damage.status,
@@ -125,6 +136,7 @@ class PredictionService:
                     cleanliness_status=cleanliness_status,
                     damage_confidence=damage.confidence,
                     damage_threshold=damage_review_threshold,
+                    size_calibrated=size_calibrated,
                 )
                 det["provisional_grade"] = provisional_grade(
                     damage.status,
@@ -133,6 +145,7 @@ class PredictionService:
                     damage_threshold=damage_review_threshold,
                     detection_confidence=det["confidence"],
                     detection_threshold=confidence,
+                    size_calibrated=size_calibrated,
                 )
                 reasons = collect_review_reasons(
                     detection_confidence=det["confidence"],
@@ -145,6 +158,7 @@ class PredictionService:
                     size=det.get("size"),
                     weight_g=det.get("weight_g"),
                     weight_calibrated=settings.WEIGHT_K > 0,
+                    size_calibrated=size_calibrated,
                     damage_review_reason=damage.review_reason,
                     tray_over_capacity=result.get("over_capacity", False),
                 )

@@ -12,11 +12,33 @@ from app.config import settings
 
 ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 
+# Magic-byte prefixes per extension family. Extension alone is not proof that
+# the bytes are an image we can decode.
+IMAGE_SIGNATURES = {
+    ".jpg": (b"\xff\xd8\xff",),
+    ".jpeg": (b"\xff\xd8\xff",),
+    ".png": (b"\x89PNG\r\n\x1a\n",),
+    ".webp": (b"RIFF",),
+    ".bmp": (b"BM",),
+}
+HEADER_BYTES = 16
+
+
+def validate_image_signature(header: bytes, extension: str) -> None:
+    expected = IMAGE_SIGNATURES.get(extension)
+    if expected is None:
+        raise ValueError(f"Unsupported file type: {extension}")
+    if not header.startswith(expected):
+        raise ValueError(
+            f"File content does not match the {extension} extension"
+        )
+
+
 
 class FileService:
     def __init__(self):
         self.upload_dir = Path(settings.UPLOAD_DIR)
-        self.upload_dir.mkdir(exist_ok=True)
+        self.upload_dir.mkdir(parents=True, exist_ok=True)
         
     def get_file_type(self, filename: str) -> str:
         ext = Path(filename).suffix.lower()
@@ -40,6 +62,7 @@ class FileService:
             raise ValueError(
                 f"File exceeds the {settings.MAX_FILE_SIZE_MB} MB limit"
             )
+        validate_image_signature(content[:HEADER_BYTES], ext)
         async with aiofiles.open(file_path, "wb") as f:
             await f.write(content)
         
@@ -54,9 +77,13 @@ class FileService:
         
         max_bytes = settings.MAX_FILE_SIZE_MB * 1024 * 1024
         total_bytes = 0
+        header = b""
         try:
             with open(file_path, "wb") as f:
                 while chunk := file.file.read(1024 * 1024):
+                    if not header:
+                        header = chunk[:HEADER_BYTES]
+                        validate_image_signature(header, ext)
                     total_bytes += len(chunk)
                     if total_bytes > max_bytes:
                         raise ValueError(

@@ -173,6 +173,14 @@ class PredictionDetail(PredictionResponse):
     annotated_path: Optional[str]
     detection_boxes: List[DetectionBoxResponse] = Field(default_factory=list)
 
+    @computed_field
+    @property
+    def annotated_url(self) -> Optional[str]:
+        """Browser-fetchable path for the annotated image, if one exists."""
+        if not self.annotated_path:
+            return None
+        return f"/api/v1/predictions/{self.id}/download"
+
     class Config:
         from_attributes = True
 

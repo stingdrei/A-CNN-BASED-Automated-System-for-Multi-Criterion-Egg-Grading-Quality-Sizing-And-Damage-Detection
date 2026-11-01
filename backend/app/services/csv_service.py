@@ -2,9 +2,12 @@
 
 import csv
 from pathlib import Path
+import threading
 from typing import Optional
 
 from app.config import settings
+
+_csv_lock = threading.Lock()
 
 
 CSV_FIELDS = [
@@ -114,13 +117,15 @@ def rows_for_prediction(prediction) -> list[dict]:
 def append_prediction(prediction, path: Optional[str] = None) -> Path:
     destination = Path(path or settings.EGG_CSV_PATH)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    needs_header = not destination.is_file() or destination.stat().st_size == 0
     rows = rows_for_prediction(prediction)
     if not rows:
         return destination
-    with destination.open("a", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
-        if needs_header:
-            writer.writeheader()
-        writer.writerows(rows)
+    # Header detection and append must be atomic: handlers run in a threadpool.
+    with _csv_lock:
+        needs_header = not destination.is_file() or destination.stat().st_size == 0
+        with destination.open("a", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+            if needs_header:
+                writer.writeheader()
+            writer.writerows(rows)
     return destination

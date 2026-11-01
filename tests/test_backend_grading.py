@@ -144,7 +144,9 @@ class GradingServiceTests(unittest.TestCase):
         )
         self.assertEqual(reasons, ["weight_unavailable"])
 
-    def test_low_damage_confidence_requires_review(self):
+    def test_damaged_never_requires_review_for_confidence(self):
+        # Damaged already maps to Reject; re-flagging it would only inflate the
+        # review queue. Only not-damaged uncertainty is a review signal.
         reasons = collect_review_reasons(
             detection_confidence=0.95,
             detection_threshold=0.75,
@@ -156,7 +158,93 @@ class GradingServiceTests(unittest.TestCase):
             size="Large",
             weight_g=60.0,
         )
+        self.assertEqual(reasons, [])
+
+    def test_low_not_damaged_confidence_requires_review(self):
+        reasons = collect_review_reasons(
+            detection_confidence=0.95,
+            detection_threshold=0.75,
+            damage_status="Not Damaged",
+            damage_confidence=0.60,
+            damage_threshold=0.75,
+            cleanliness_status="Clean",
+            cleanliness_confidence=0.95,
+            size="Large",
+            weight_g=60.0,
+        )
         self.assertEqual(reasons, ["low_damage_confidence"])
+
+    def test_uncalibrated_size_suppresses_size_grades(self):
+        self.assertEqual(
+            calculate_grade(
+                "Not Damaged",
+                "Large",
+                0.95,
+                0.75,
+                cleanliness_status="Clean",
+                size_calibrated=False,
+            ),
+            "N/A",
+        )
+        self.assertEqual(
+            provisional_grade(
+                "Not Damaged",
+                "Large",
+                detection_confidence=0.95,
+                detection_threshold=0.75,
+                size_calibrated=False,
+            ),
+            "N/A",
+        )
+
+    def test_uncalibrated_size_still_rejects(self):
+        for damage, cleanliness in (
+            ("Damaged", "Clean"),
+            ("Not Damaged", "Stained"),
+        ):
+            with self.subTest(damage=damage, cleanliness=cleanliness):
+                self.assertEqual(
+                    map_to_grade(
+                        damage, cleanliness, "Large", size_calibrated=False
+                    ),
+                    "Reject",
+                )
+
+    def test_calibrated_size_restores_letter_grade(self):
+        self.assertEqual(
+            map_to_grade("Not Damaged", "Clean", "Large"),
+            "A",
+        )
+
+    def test_uncalibrated_size_is_not_a_review_reason(self):
+        reasons = collect_review_reasons(
+            detection_confidence=0.95,
+            detection_threshold=0.75,
+            damage_status="Not Damaged",
+            damage_confidence=0.90,
+            damage_threshold=0.75,
+            cleanliness_status="Clean",
+            cleanliness_confidence=0.95,
+            size="Unknown",
+            weight_g=None,
+            size_calibrated=False,
+        )
+        self.assertNotIn("size_unknown", reasons)
+
+    def test_calibrated_size_unknown_is_a_review_reason(self):
+        reasons = collect_review_reasons(
+            detection_confidence=0.95,
+            detection_threshold=0.75,
+            damage_status="Not Damaged",
+            damage_confidence=0.90,
+            damage_threshold=0.75,
+            cleanliness_status="Clean",
+            cleanliness_confidence=0.95,
+            size="Unknown",
+            weight_g=None,
+            size_calibrated=True,
+        )
+        self.assertEqual(reasons, ["size_unknown"])
 
 
 if __name__ == "__main__":

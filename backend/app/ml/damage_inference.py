@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import threading
 from typing import Any, Optional
 
 import cv2
@@ -63,6 +64,7 @@ class DamageClassifier:
         self._model = None
         self._torch = None
         self._transform = None
+        self._init_lock = threading.Lock()
         self.class_names = self.EXPECTED_CLASSES
         self.arch = "unknown"
         self.img_size = 224
@@ -84,7 +86,12 @@ class DamageClassifier:
     def _ensure_model(self) -> None:
         if self._model is not None:
             return
+        with self._init_lock:
+            if self._model is not None:
+                return
+            self._load_model_locked()
 
+    def _load_model_locked(self) -> None:
         import torch
         from torchvision import transforms
 
@@ -93,7 +100,7 @@ class DamageClassifier:
         checkpoint = torch.load(
             self.checkpoint_path,
             map_location=self._select_device(torch),
-            weights_only=False,
+            weights_only=True,
         )
         class_names = tuple(checkpoint.get("class_names", ()))
         if class_names != self.EXPECTED_CLASSES:
@@ -131,11 +138,7 @@ class DamageClassifier:
         model.load_state_dict(checkpoint["state_dict"])
         model.to(self._select_device(torch))
         model.eval()
-        self._torch = torch
-        self._model = model
-        self.arch = arch
-        self.img_size = img_size
-        self._transform = transforms.Compose(
+        transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
                 transforms.Resize((img_size,) * 2),
@@ -146,6 +149,13 @@ class DamageClassifier:
                 ),
             ]
         )
+        # Publish state only once every dependency is ready so concurrent
+        # callers never observe a model without its transform.
+        self._torch = torch
+        self.arch = arch
+        self.img_size = img_size
+        self._transform = transform
+        self._model = model
 
     def _select_device(self, torch_module: Any):
         if self.device_name:

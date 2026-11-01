@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PredictionDetail } from '../../types';
 import { EggResultCard, EggResultPlaceholder } from './EggResultCard';
 
@@ -8,6 +9,39 @@ interface ResultsPanelProps {
 
 const GRID_CLASS =
   'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-space-md';
+
+function AnnotatedPreview({ url, trayId }: { url: string; trayId: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-space-md rounded-2xl border border-slate-200 bg-slate-50/60 p-space-sm">
+      <img
+        src={url}
+        alt={`Annotated capture for ${trayId}`}
+        className="h-32 w-auto max-w-full rounded-xl border border-slate-200 bg-white object-contain"
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+      <div className="flex flex-col gap-space-xs">
+        <span className="font-code-metric text-label-sm text-[#424656] font-bold">
+          ANNOTATED FRAME
+        </span>
+        <span className="font-body-md text-body-md text-[#727687]">
+          Detector boxes overlaid on the captured tray.
+        </span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="font-code-metric text-label-sm text-[#0050cb] underline"
+        >
+          Open full size
+        </a>
+      </div>
+    </div>
+  );
+}
 
 export function ResultsPanel({ result, crops }: ResultsPanelProps) {
   const boxes = result?.detection_boxes ?? [];
@@ -27,7 +61,8 @@ export function ResultsPanel({ result, crops }: ResultsPanelProps) {
     metadata.calibration_version !== 'uncalibrated' &&
     metadata.size_calibrated === true &&
     metadata.weight_calibrated === true;
-  const cardCount = Math.max(boxes.length, 5);
+  const maxTrayEggs = Number(metadata.max_tray_eggs) || 5;
+  const cardCount = Math.max(boxes.length, maxTrayEggs);
 
   return (
     <section className="flex flex-col bg-white/70 backdrop-blur-2xl border border-white/80 rounded-3xl p-space-md shadow-[0_12px_36px_0_rgba(0,80,203,0.06)] gap-space-md">
@@ -43,7 +78,7 @@ export function ResultsPanel({ result, crops }: ResultsPanelProps) {
 
         <div className="flex flex-wrap items-center gap-space-xs">
           <span className="rounded-full bg-white/80 border border-blue-200/70 px-3 py-1 font-code-metric text-label-sm text-[#0050cb] font-bold">
-            {boxes.length} / 5 DETECTED
+            {boxes.length} / {maxTrayEggs} DETECTED
           </span>
           <span className="rounded-full bg-white/80 border border-emerald-200/70 px-3 py-1 font-code-metric text-label-sm text-emerald-700 font-bold">
             {processingTime} INFERENCE
@@ -71,6 +106,10 @@ export function ResultsPanel({ result, crops }: ResultsPanelProps) {
           )}
         </div>
       </div>
+
+      {result?.annotated_url && (
+        <AnnotatedPreview url={result.annotated_url} trayId={trayLabel} />
+      )}
 
       {result && boxes.length === 0 && (
         <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/70 px-4 py-3">

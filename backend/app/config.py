@@ -50,6 +50,8 @@ class Settings(BaseSettings):
     MM_PER_PIXEL: float = 0.09
     # Fitted coefficient for W = k * L * B^2; 0.0 means not yet calibrated.
     WEIGHT_K: float = 0.0
+    # Only a non-"uncalibrated" value enables size-derived grades and mm
+    # metrics. Changing MM_PER_PIXEL alone does not count as calibration.
     CALIBRATION_VERSION: str = "uncalibrated"
 
     @property

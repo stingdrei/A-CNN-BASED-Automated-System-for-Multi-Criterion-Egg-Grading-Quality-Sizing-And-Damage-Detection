@@ -41,13 +41,22 @@ class HealthContractTests(unittest.TestCase):
         self.assertTrue(response.database_connected)
         self.assertTrue(response.cleanliness_model_loaded)
 
-    def test_health_degrades_without_cleanliness_model(self):
+    def test_health_stays_healthy_without_optional_cleanliness_model(self):
+        # Cleanliness is beta/optional; its absence degrades results, not the
+        # API's readiness to grade with damage + detector.
         with patch.object(dashboard.model_registry, "detector_loaded", True), \
                 patch.object(dashboard.model_registry, "damage_loaded", True), \
                 patch.object(dashboard.model_registry, "cleanliness_loaded", False):
             response = dashboard.health_check(db=self.db)
-        self.assertEqual(response.status, "degraded")
+        self.assertEqual(response.status, "healthy")
         self.assertFalse(response.cleanliness_model_loaded)
+
+    def test_health_degrades_without_required_models(self):
+        with patch.object(dashboard.model_registry, "detector_loaded", False), \
+                patch.object(dashboard.model_registry, "damage_loaded", True), \
+                patch.object(dashboard.model_registry, "cleanliness_loaded", True):
+            response = dashboard.health_check(db=self.db)
+        self.assertEqual(response.status, "degraded")
 
 
 if __name__ == "__main__":

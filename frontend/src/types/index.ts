@@ -71,6 +71,7 @@ export interface Prediction {
 export interface PredictionDetail extends Prediction {
   result_json: Record<string, unknown> | null;
   annotated_path: string | null;
+  annotated_url: string | null;
   detection_boxes: DetectionBox[];
 }
 

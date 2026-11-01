@@ -188,7 +188,11 @@ class PredictionServiceTests(unittest.TestCase):
         self.assertEqual(box.cleanliness_confidence, 0.88)
         self.assertEqual(box.cleanliness_model_version, "cleanliness_v1.pth")
         self.assertEqual(box.grade, "Reject")
-        self.assertEqual(box.provisional_grade, "A")
+        # Uncalibrated size cannot produce a letter grade, even provisionally.
+        self.assertEqual(box.provisional_grade, "N/A")
+        self.assertEqual(box.size, "Unknown")
+        self.assertIsNone(box.length_mm)
+        self.assertIsNone(box.breadth_mm)
 
     def test_prediction_persists_operator_and_inference_metadata(self):
         service = PredictionService(FakePredictor(), FakeDamage())
@@ -300,8 +304,10 @@ class PredictionServiceTests(unittest.TestCase):
 
         box = prediction.detection_boxes[0]
         self.assertEqual(box.grade, "N/A")
-        self.assertEqual(box.provisional_grade, "A")
-        self.assertEqual(box.size, "Large")
+        self.assertEqual(box.provisional_grade, "N/A")
+        self.assertEqual(box.size, "Unknown")
+        self.assertIsNone(box.length_mm)
+        self.assertIsNone(box.breadth_mm)
         self.assertEqual(box.cleanliness_status, "Unavailable")
         self.assertTrue(box.requires_review)
         self.assertIn("cleanliness_unavailable", box.review_reason)
@@ -311,12 +317,39 @@ class PredictionServiceTests(unittest.TestCase):
         box_payload = DetectionBoxResponse.model_validate(box).model_dump()
         self.assertEqual(box_payload["confidence"]["detection"], 0.93)
         self.assertEqual(box_payload["confidence"]["damage"], 0.9)
-        self.assertEqual(box_payload["provisional_grade"], "A")
+        self.assertEqual(box_payload["provisional_grade"], "N/A")
+        self.assertIsNone(box_payload["geometry"]["length_mm"])
 
         detail = PredictionDetail.model_validate(prediction).model_dump()
         self.assertEqual(detail["tray_id"], prediction.tray_id)
         self.assertEqual(len(detail["detection_boxes"]), 1)
         self.assertEqual(detail["detection_boxes"][0]["grade"], "N/A")
+        self.assertIsNone(detail["annotated_url"])
+
+    def test_calibrated_settings_restore_letter_grades(self):
+        service = PredictionService(FakePredictor(), FakeDamage())
+        prediction = service.create_prediction(
+            self.db,
+            self.user.id,
+            "tray.jpg",
+            str(self.image_path),
+            "image",
+        )
+
+        with patch("app.services.prediction_service.append_prediction"), patch(
+            "app.services.prediction_service.settings.CALIBRATION_VERSION",
+            "cam-v1",
+        ):
+            prediction = service.run_prediction(
+                self.db, prediction.id, 0.75, False
+            )
+
+        box = prediction.detection_boxes[0]
+        self.assertTrue(prediction.inference_metadata["size_calibrated"])
+        self.assertEqual(box.size, "Large")
+        self.assertEqual(box.provisional_grade, "A")
+        self.assertEqual(box.length_mm, 62.5)
+        self.assertEqual(box.breadth_mm, 45.0)
 
 
 if __name__ == "__main__":

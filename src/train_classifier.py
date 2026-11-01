@@ -265,7 +265,7 @@ def train(args: argparse.Namespace) -> None:
     )
     if args.init_checkpoint:
         init = torch.load(
-            args.init_checkpoint, map_location="cpu", weights_only=False
+            args.init_checkpoint, map_location="cpu", weights_only=True
         )
         init_arch = init.get("arch") or ARCH_CUSTOM
         if init_arch != args.arch:
