@@ -329,7 +329,7 @@ def main() -> None:
     )
 
     report = {
-        "checkpoint": str(args.checkpoint),
+        "checkpoint": args.checkpoint.as_posix(),
         "device": str(device),
         "img_size": img_size,
         "class_names": metadata["class_names"],

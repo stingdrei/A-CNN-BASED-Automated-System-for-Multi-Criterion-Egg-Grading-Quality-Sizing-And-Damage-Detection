@@ -447,7 +447,11 @@ python src/evaluate_cleanliness.py \
 
 The report includes the validation threshold sweep, selected threshold,
 confusion matrix, stained/clean recall, macro F1, specificity, and expected
-calibration error. Current committed checkpoint at the validation-selected
+calibration error. It also records the device used and the checkpoint SHA-256;
+path fields are normalized to POSIX so the artifacts stay portable across
+machines. Commit the canonical report from the primary dev machine rather than
+overwriting it with a run from another OS.
+ Current committed checkpoint at the validation-selected
 `0.04` threshold: validation balanced accuracy `0.9781`, stained recall `0.9800`;
 test balanced accuracy `0.9779`, stained recall `0.9796`, one false positive and
 one false negative. The two test errors look like label-noise/hard cases; inspect
