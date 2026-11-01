@@ -11,6 +11,7 @@ from app.services.file_service import file_service
 from app.services.prediction_service import prediction_service
 from app.ml.model_registry import model_registry
 from app.services.prediction_service import PredictionService
+from app.utils.errors import public_error_message
 
 router = APIRouter(prefix="/predictions", tags=["predictions"])
 
@@ -69,7 +70,7 @@ def upload_file(
             file_service.delete_file(file_path)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail=public_error_message(e) or "Invalid request",
         ) from e
     except Exception as e:
         if "file_path" in locals() and "prediction" not in locals():

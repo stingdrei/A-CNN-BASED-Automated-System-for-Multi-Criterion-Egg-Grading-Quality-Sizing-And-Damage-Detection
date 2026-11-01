@@ -70,6 +70,10 @@ class PredictionService:
         # mm_per_pixel override still needs the operator to bump the version.
         size_calibrated = settings.CALIBRATION_VERSION != "uncalibrated"
 
+        # Release the pooled DB connection before CPU inference so concurrent
+        # uploads never pin pool slots for the whole prediction.
+        db.close()
+
         prediction = db.query(Prediction).filter(Prediction.id == prediction_id).first()
         if not prediction:
             raise ValueError("Prediction not found")
