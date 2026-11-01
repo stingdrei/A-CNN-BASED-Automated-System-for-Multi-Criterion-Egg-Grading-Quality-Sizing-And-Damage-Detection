@@ -26,9 +26,13 @@ def map_to_grade(
     damage_status: str,
     cleanliness_status: str,
     size: str,
+    *,
+    size_calibrated: bool = True,
 ) -> str:
     if damage_status == "Damaged" or cleanliness_status == "Stained":
         return "Reject"
     if damage_status != "Not Damaged" or cleanliness_status != "Clean":
+        return "N/A"
+    if not size_calibrated:
         return "N/A"
     return {"Large": "A", "Medium": "B", "Small": "C"}.get(size, "N/A")

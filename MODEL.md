@@ -21,12 +21,12 @@ augmentation, threshold selection, or calibration fitting.
 
 | Component | Current artifact | Current role | Readiness |
 |---|---|---|---|
-| Egg detector | `models/egg_detection_finetuned/weights/best.pt` | Locate eggs in a tray image | Baseline exists; needs controlled retraining and test evaluation |
-| Damage classifier | `models/egg_grader.pth` | Damaged / Not Damaged | Artifact exists; metrics and backend integration are missing |
-| Cleanliness classifier | `models/egg_grader_cleanliness_v1.pth` | Clean / Stained | Weak web/stock candidate exists; physical validation required |
-| Size estimator | None | Small / Medium / Large from calibrated geometry | Must be implemented and validated against PNS/BAFS labels |
-| Weight estimator | None | Reported grams from calibrated geometry | Must be calibrated against actual weights |
-| Grading engine | Rule logic in backend | Combine all criteria into grade | Must be finalized after classifier and policy validation |
+| Egg detector | `egg_detection/finetune_egg_v1/weights/best.pt` | Locate eggs in a tray image | Baseline fine-tune; needs controlled retraining and locked test evaluation |
+| Damage classifier | `models/egg_grader_crop_resnet18_v1.pth` | Damaged / Not Damaged on per-egg crops | Trained and integrated in the backend; metrics in `reports/damage_crop_resnet18_v1_test_report.json` |
+| Cleanliness classifier | `models/egg_grader_cleanliness_v1.pth` | Clean / Stained | Beta web/stock candidate; not release-approved (`CLEANLINESS_RELEASE_APPROVED=false`) |
+| Size estimator | Geometry in `src/grading.py` + `backend/app/ml/yolo_inference.py` | Small / Medium / Large from calibrated pixels | Implemented; gated off until `CALIBRATION_VERSION` is set |
+| Weight estimator | `estimate_weight` in `src/grading.py` | Reported grams from calibrated geometry | Implemented; returns nothing until `WEIGHT_K` is fitted |
+| Grading engine | `backend/app/services/grading_service.py` | Combine all criteria into grade | Implemented; size-derived letters suppressed while uncalibrated |
 
 ## Target architecture
 

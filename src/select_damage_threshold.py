@@ -118,7 +118,7 @@ def main() -> None:
     if not 0 < args.step < 1:
         raise ValueError("--step must be between 0 and 1")
     checkpoint = torch.load(
-        args.checkpoint, map_location="cpu", weights_only=False
+        args.checkpoint, map_location="cpu", weights_only=True
     )
     prob_values, labels, device = collect_probabilities(args, checkpoint)
     rows = sweep(prob_values, labels, args.step)

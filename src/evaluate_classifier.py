@@ -38,7 +38,7 @@ def choose_device() -> torch.device:
 def evaluate(args: argparse.Namespace) -> dict:
     labels = read_labels(args.labels)
     device = choose_device()
-    checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
+    checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=True)
     state_dict = checkpoint.get("state_dict", checkpoint)
     class_names = checkpoint.get("class_names", ["Damaged", "Not Damaged"])
     if list(class_names) != ["Damaged", "Not Damaged"]:

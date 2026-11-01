@@ -61,7 +61,7 @@ def checkpoint_sha256(path: Path) -> str:
 
 def load_cleanliness_model(checkpoint_path: Path, device: torch.device):
     checkpoint = torch.load(
-        checkpoint_path, map_location=device, weights_only=False
+        checkpoint_path, map_location=device, weights_only=True
     )
     state_dict = checkpoint.get("state_dict", checkpoint)
     class_names = validate_checkpoint_classes(

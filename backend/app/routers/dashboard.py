@@ -65,10 +65,11 @@ def health_check(db: Session = Depends(get_db)):
         pass
     
     cleanliness_loaded = model_registry.cleanliness_loaded
+    # Cleanliness is an optional beta model: missing it degrades results, not
+    # API readiness. Detector, damage classifier, and DB are required.
     ready = (
         model_registry.detector_loaded
         and model_registry.damage_loaded
-        and cleanliness_loaded
         and database_connected
     )
     return HealthResponse(

@@ -11,6 +11,14 @@ This project is a starter template for an automated egg grading system using Con
 > its prediction when the checkpoint loads; treat them as beta until physical
 > cleanliness validation is complete. Physical size/weight calibration and the
 > 0-egg/0-5 tray camera gate remain unvalidated.
+>
+> **MVP operating mode:** the web → capture → results flow is ready for one
+> supervised inspection station. While `CALIBRATION_VERSION=uncalibrated`, the
+> API nulls `length_mm`/`breadth_mm`/`weight_g`, reports `size=Unknown`, and
+> returns `N/A` instead of size-derived letter grades (`Damaged`/`Stained` still
+> `Reject`). Letter grades require bumping `CALIBRATION_VERSION`; weights also
+> require fitting `WEIGHT_K`.
+
 
 ## Features
 - Modular data loading and image preprocessing (OpenCV)
