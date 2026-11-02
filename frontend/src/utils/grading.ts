@@ -27,7 +27,7 @@ export const GRADE_META: Record<Grade, GradeMeta> = {
     thumbClass: 'border-orange-300 text-orange-800',
   },
   Reject: {
-    label: 'Reject (Damaged)',
+    label: 'Reject',
     badgeClass: 'bg-red-50 border-red-200 text-red-700',
     cardClass: 'border-red-200 hover:border-red-400',
     thumbClass: 'border-red-300 text-red-700',
@@ -47,9 +47,25 @@ export function resolveGrade(box: DetectionBox): {
 } {
   const finalGrade = box.grade && box.grade !== 'N/A' ? box.grade : null;
   const grade = finalGrade ?? box.provisional_grade ?? box.grade ?? 'N/A';
+  let meta = GRADE_META[grade] ?? GRADE_META['N/A'];
+
+  if (grade === 'Reject') {
+    const isDamaged = box.damage_status === 'Damaged';
+    const isStained = box.cleanliness_status === 'Stained';
+    if (isDamaged && isStained) {
+      meta = { ...meta, label: 'Reject (Damaged & Stained)' };
+    } else if (isDamaged) {
+      meta = { ...meta, label: 'Reject (Damaged)' };
+    } else if (isStained) {
+      meta = { ...meta, label: 'Reject (Stained)' };
+    } else {
+      meta = { ...meta, label: 'Reject' };
+    }
+  }
+
   return {
     grade,
-    meta: GRADE_META[grade],
+    meta,
     isProvisional: finalGrade === null,
   };
 }

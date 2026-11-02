@@ -1,5 +1,6 @@
 from typing import Optional
 
+from app.config import settings
 from app.ml.cleanliness_inference import CleanlinessClassifier
 from app.ml.damage_inference import DamageClassifier
 from app.ml.yolo_inference import YOLOPredictor
@@ -17,9 +18,15 @@ class ModelRegistry:
     def load(self) -> tuple[bool, bool]:
         self.detector = YOLOPredictor()
         detector_loaded = self.detector.load_model()
-        self.damage = DamageClassifier()
+        self.damage = DamageClassifier(
+            damaged_threshold=settings.DAMAGE_DECISION_THRESHOLD,
+            review_threshold=settings.DAMAGE_REVIEW_THRESHOLD,
+        )
         damage_loaded = self.damage.load_model()
-        self.cleanliness = CleanlinessClassifier()
+        self.cleanliness = CleanlinessClassifier(
+            stained_threshold=settings.CLEANLINESS_DECISION_THRESHOLD,
+            review_threshold=settings.CLEANLINESS_REVIEW_THRESHOLD,
+        )
         cleanliness_loaded = self.cleanliness.load_model()
         self.detector_loaded = detector_loaded
         self.damage_loaded = damage_loaded

@@ -22,6 +22,9 @@ dist/
 # Backend
 backend/__pycache__/
 *.log
+*.db
+*.sqlite
+*.sqlite3
 
 # Environment secrets
 .env
