@@ -1,0 +1,50 @@
+{
+  "created_utc": "2026-11-24T05:51:04.294663+00:00",
+  "review_csv_sha256": "b2441f44b95651f0165da7440edd576cb261e7eac6662056bdd9d0d11f1d1ffe",
+  "snapshot_sha256": "b47ecc367384930be5636d8885a0842c80e69b4ea5cf86f778a53ee3199a667c",
+  "seed": 20261124,
+  "validation_fraction_requested": 0.2,
+  "accepted_rows": 3061,
+  "training_eligible_rows": 2605,
+  "quality_holdout_rows": 456,
+  "accepted_rows_with_invalid_label": 0,
+  "label_counts": {
+    "Clean": 1522,
+    "Stained": 1539
+  },
+  "split_label_counts": {
+    "train": {
+      "Clean": 877,
+      "Stained": 1194
+    },
+    "quality_holdout": {
+      "Stained": 79,
+      "Clean": 377
+    },
+    "validation": {
+      "Clean": 268,
+      "Stained": 266
+    }
+  },
+  "quality_holdout_label_counts": {
+    "Stained": 79,
+    "Clean": 377
+  },
+  "source_group_counts_by_split": {
+    "train": 28,
+    "quality_holdout": 17,
+    "validation": 9
+  },
+  "unique_source_groups": 37,
+  "groups_crossing_splits": [],
+  "missing_crops": [],
+  "unreadable_crops": [],
+  "dimension_mismatch_crops": [],
+  "exact_duplicate_sha256_groups": {},
+  "quality_flag_counts": {
+    "small_for_model": 310,
+    "edge_touch": 165
+  },
+  "note": "Crops with small_for_model or edge_touch are quality_holdout pending explicit adjudication. Real-camera independent test set is not included.",
+  "snapshot_line_endings_normalized": true
+}
