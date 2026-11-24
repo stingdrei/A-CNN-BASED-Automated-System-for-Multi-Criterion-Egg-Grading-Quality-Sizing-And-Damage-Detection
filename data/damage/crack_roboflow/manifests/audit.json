@@ -1,0 +1,40 @@
+{
+  "task": "binary crack damage classification",
+  "definition": "Damaged=crack label; Not Damaged=clean or dirty without crack",
+  "source": "/Users/wii/Projects/THESIS/training",
+  "source_labels_sha256": "7d17515dcf08f6e63f1bc3be3c02154fef51a161c21d57e90d23a963ff1a5e05",
+  "seed": 20261124,
+  "split_method": "StratifiedGroupKFold, 10 folds; fold 0=test, fold 1=validation, folds 2-9=train",
+  "total_images": 3481,
+  "total_source_groups": 1609,
+  "split_counts": {
+    "train": {
+      "images": 2784,
+      "source_groups": 1288,
+      "labels": {
+        "Damaged": 925,
+        "Not Damaged": 1859
+      }
+    },
+    "validation": {
+      "images": 348,
+      "source_groups": 160,
+      "labels": {
+        "Not Damaged": 232,
+        "Damaged": 116
+      }
+    },
+    "test": {
+      "images": 349,
+      "source_groups": 161,
+      "labels": {
+        "Not Damaged": 233,
+        "Damaged": 116
+      }
+    }
+  },
+  "source_group_overlap": 0,
+  "exact_duplicate_sha256_groups": [],
+  "unlisted_image_count": 0,
+  "note": "Roboflow export provided no validation/test directories. Splits created here; source-group proxy strips .rf.<hash> suffix. Test remains same-source-dataset evaluation, not independent camera test."
+}
