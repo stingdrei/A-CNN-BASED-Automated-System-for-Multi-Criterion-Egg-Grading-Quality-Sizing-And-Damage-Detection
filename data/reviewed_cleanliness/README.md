@@ -62,3 +62,20 @@ PYTHONPATH=src python3 src/train_classifier.py \
 
 This evaluates only on the grouped validation split. Do not use the independent
 real-camera set until model selection is complete.
+
+## Archive for thesis/reproducibility
+
+After copying crops to this machine, create a deterministic archive containing
+only the exact train/validation images plus manifests, frozen decisions, and
+audit. Every crop SHA-256 is checked before archiving. Write archive to external
+storage; do not commit large image archives to Git.
+
+```bash
+python3 scripts/archive_reviewed_cleanliness.py \
+  --output /path/to/external-drive/cleanliness-reviewed-train-valid.tar.gz
+```
+
+Keep the generated `.sha256` and `.crops.sha256` sidecars with the archive. This
+archive excludes quality-holdout crops and the not-yet-collected independent
+real-camera test set. Record model command, software versions, hardware, and
+training metrics separately in the thesis log.
