@@ -1,0 +1,52 @@
+{
+  "checkpoint": "models/damage_finetuned_v2.pth",
+  "arch": "custom",
+  "img_size": 224,
+  "damaged_threshold": 0.5,
+  "damaged_threshold_source": "checkpoint",
+  "samples": 174,
+  "device": "cuda",
+  "accuracy": 0.8275862068965517,
+  "balanced_accuracy": 0.8393518518518519,
+  "macro_precision": 0.8020604395604396,
+  "macro_recall": 0.8393518518518519,
+  "macro_f1": 0.8120679723502304,
+  "damaged_recall": 0.8083333333333333,
+  "confusion_matrix": [
+    [
+      97,
+      23
+    ],
+    [
+      7,
+      47
+    ]
+  ],
+  "classification_report": {
+    "Damaged": {
+      "precision": 0.9326923076923077,
+      "recall": 0.8083333333333333,
+      "f1-score": 0.8660714285714286,
+      "support": 120.0
+    },
+    "Not Damaged": {
+      "precision": 0.6714285714285714,
+      "recall": 0.8703703703703703,
+      "f1-score": 0.7580645161290323,
+      "support": 54.0
+    },
+    "accuracy": 0.8275862068965517,
+    "macro avg": {
+      "precision": 0.8020604395604396,
+      "recall": 0.8393518518518519,
+      "f1-score": 0.8120679723502304,
+      "support": 174.0
+    },
+    "weighted avg": {
+      "precision": 0.8516104585070102,
+      "recall": 0.8275862068965517,
+      "f1-score": 0.8325520419513747,
+      "support": 174.0
+    }
+  }
+}
