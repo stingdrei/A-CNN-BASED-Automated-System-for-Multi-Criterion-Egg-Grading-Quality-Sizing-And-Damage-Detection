@@ -1,0 +1,52 @@
+{
+  "checkpoint": "models\\egg_grader_crop_v1.pth",
+  "arch": "custom",
+  "img_size": 224,
+  "damaged_threshold": 0.5,
+  "damaged_threshold_source": "checkpoint",
+  "samples": 174,
+  "device": "cuda",
+  "accuracy": 0.7701149425287356,
+  "balanced_accuracy": 0.7416666666666667,
+  "macro_precision": 0.7327586206896552,
+  "macro_recall": 0.7416666666666667,
+  "macro_f1": 0.736682808716707,
+  "damaged_recall": 0.8166666666666667,
+  "confusion_matrix": [
+    [
+      98,
+      22
+    ],
+    [
+      18,
+      36
+    ]
+  ],
+  "classification_report": {
+    "Damaged": {
+      "precision": 0.8448275862068966,
+      "recall": 0.8166666666666667,
+      "f1-score": 0.8305084745762712,
+      "support": 120.0
+    },
+    "Not Damaged": {
+      "precision": 0.6206896551724138,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.6428571428571429,
+      "support": 54.0
+    },
+    "accuracy": 0.7701149425287356,
+    "macro avg": {
+      "precision": 0.7327586206896552,
+      "recall": 0.7416666666666667,
+      "f1-score": 0.736682808716707,
+      "support": 174.0
+    },
+    "weighted avg": {
+      "precision": 0.7752675386444708,
+      "recall": 0.7701149425287356,
+      "f1-score": 0.7722718543875762,
+      "support": 174.0
+    }
+  }
+}
