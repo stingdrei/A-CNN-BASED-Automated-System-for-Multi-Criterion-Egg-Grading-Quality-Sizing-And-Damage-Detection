@@ -27,13 +27,12 @@ class Settings(BaseSettings):
         PROJECT_ROOT / "egg_detection" / "finetune_egg_v1" / "weights" / "best.pt"
     )
     DAMAGE_MODEL_PATH: str = str(
-        PROJECT_ROOT / "models" / "egg_grader_crop_resnet18_v1.pth"
+        PROJECT_ROOT / "models" / "damage_resnet18_v2.pth"
     )
     EGG_CSV_PATH: str = str(PROJECT_ROOT / "reports" / "egg_statistics_v2.csv")
     CONFIDENCE_THRESHOLD: float = 0.75
-    # Conservative MVP defaults; the lower validation thresholds favor recall
-    # but produce too many artifact-driven false positives in web images.
-    DAMAGE_DECISION_THRESHOLD: float = 0.65
+    # Match the threshold used in the ResNet-18 test evaluation.
+    DAMAGE_DECISION_THRESHOLD: float = 0.5
     DAMAGE_REVIEW_THRESHOLD: float = 0.75
     CLEANLINESS_MODEL_PATH: str = str(
         PROJECT_ROOT / "models" / "egg_grader_cleanliness_v1.pth"
